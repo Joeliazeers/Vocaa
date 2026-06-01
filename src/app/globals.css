@@ -1,0 +1,269 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&display=swap');
+
+:root {
+  --font-sans: 'Nunito', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Noto Sans JP", "Noto Sans SC", sans-serif;
+}
+
+html, body {
+  font-family: var(--font-sans);
+  @apply bg-ink-50 text-ink-900 antialiased transition-colors duration-200;
+  /* Prevent iOS auto-zoom on input focus and tap-highlight flash */
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+html.dark, html.dark body {
+  @apply bg-ink-950 text-ink-100;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection color */
+::selection {
+  @apply bg-brand-200 text-brand-900;
+}
+
+/* Visible keyboard-focus ring for accessibility (mouse clicks stay clean) */
+*:focus-visible {
+  @apply outline-none ring-2 ring-brand-400 ring-offset-2 ring-offset-white dark:ring-offset-ink-950;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Larger, comfier tap targets on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  button, a[role="button"], .btn, .nav-pill, label[role="radio"] {
+    min-height: 44px;
+  }
+}
+
+/* Prevent iOS Safari from auto-zooming when focusing inputs (font must be ≥16px) */
+@media (max-width: 640px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+@layer components {
+  /* ─── Cards ────────────────────────────── */
+  .card {
+    @apply rounded-2xl border-2 border-ink-200 bg-white p-5 shadow-sm
+           transition-all duration-200
+           hover:shadow-md
+           dark:border-ink-700 dark:bg-ink-900 dark:shadow-none dark:hover:border-ink-600;
+  }
+  .card-fun {
+    @apply rounded-2xl border-2 border-b-4 bg-white p-5 
+           transition-all duration-200
+           active:border-b-2 active:translate-y-[2px]
+           dark:bg-ink-900;
+  }
+
+  /* ─── Buttons ──────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5
+           text-sm font-bold tracking-wide
+           transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-brand-300 focus:ring-offset-2
+           disabled:cursor-not-allowed disabled:opacity-50
+           active:scale-95;
+  }
+  .btn-primary {
+    @apply btn border-2 border-b-4 border-brand-700
+           bg-brand-500 text-white
+           hover:bg-brand-600
+           active:border-b-2 active:translate-y-[2px];
+  }
+  .btn-secondary {
+    @apply btn border-2 border-b-4 border-ink-300
+           bg-white text-ink-800
+           hover:bg-ink-50
+           active:border-b-2 active:translate-y-[2px]
+           dark:border-ink-600 dark:bg-ink-800 dark:text-ink-100 dark:hover:bg-ink-700;
+  }
+  .btn-ghost {
+    @apply btn text-ink-600 hover:bg-ink-100 dark:text-ink-300 dark:hover:bg-ink-800;
+  }
+  .btn-danger {
+    @apply btn border-2 border-b-4 border-heart-600
+           bg-heart-400 text-white
+           hover:bg-heart-500
+           active:border-b-2 active:translate-y-[2px];
+  }
+  .btn-sun {
+    @apply btn border-2 border-b-4 border-sun-600
+           bg-sun-500 text-white
+           hover:bg-sun-400
+           active:border-b-2 active:translate-y-[2px];
+  }
+  .btn-sky {
+    @apply btn border-2 border-b-4 border-sky-700
+           bg-sky-500 text-white
+           hover:bg-sky-400
+           active:border-b-2 active:translate-y-[2px];
+  }
+
+  /* ─── Inputs ───────────────────────────── */
+  .input {
+    @apply w-full rounded-xl border-2 border-ink-200 bg-white px-4 py-3 text-sm font-semibold
+           outline-none transition-all duration-200
+           focus:border-brand-400 focus:ring-4 focus:ring-brand-100
+           dark:border-ink-600 dark:bg-ink-800 dark:text-ink-100 dark:focus:ring-brand-900;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-bold text-ink-700 dark:text-ink-300;
+  }
+
+  /* ─── Chips & badges ───────────────────── */
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold;
+  }
+  .badge-xp {
+    @apply chip bg-sun-100 text-sun-700
+           dark:bg-ink-800 dark:text-sun-400;
+  }
+  .badge-streak {
+    @apply chip bg-heart-100 text-heart-500
+           dark:bg-ink-800 dark:text-heart-400;
+  }
+  .badge-level {
+    @apply chip bg-amethyst-100 text-amethyst-600
+           dark:bg-ink-800 dark:text-amethyst-400;
+  }
+
+  /* ─── Surface ──────────────────────────── */
+  .surface {
+    @apply bg-white dark:bg-ink-900;
+  }
+
+  /* ─── Gradient text ────────────────────── */
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-500 via-sky-500 to-amethyst-500
+           bg-clip-text text-transparent;
+  }
+
+  /* ─── Fun progress bar ─────────────────── */
+  .progress-track {
+    @apply h-4 w-full rounded-full bg-ink-200 dark:bg-ink-700 overflow-hidden;
+  }
+  .progress-fill {
+    @apply h-full rounded-full bg-gradient-to-r from-brand-400 to-brand-500
+           transition-all duration-500 ease-out;
+  }
+
+  /* ─── Mascot bounce ────────────────────── */
+  .mascot {
+    @apply transition-transform duration-200 hover:scale-110;
+  }
+  .mascot-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* ─── Stat card with icon ──────────────── */
+  .stat-card {
+    @apply card-fun flex items-center gap-4 border-ink-200 dark:border-ink-700;
+  }
+  .stat-icon {
+    @apply flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl;
+  }
+
+  /* ─── Skill node (Duolingo-style circle) ─ */
+  .skill-node {
+    @apply relative flex flex-col items-center;
+  }
+  .skill-circle {
+    @apply flex h-20 w-20 items-center justify-center rounded-full
+           border-4 border-b-[6px]
+           text-3xl font-extrabold
+           transition-all duration-200
+           cursor-pointer
+           hover:scale-110;
+  }
+  .skill-circle-active {
+    @apply skill-circle border-brand-600 bg-brand-500 text-white
+           shadow-lg shadow-brand-500/30
+           animate-pulse-glow;
+  }
+  .skill-circle-done {
+    @apply skill-circle border-sun-600 bg-sun-500 text-white;
+  }
+  .skill-circle-locked {
+    @apply skill-circle border-ink-300 bg-ink-200 text-ink-400 cursor-not-allowed
+           dark:border-ink-600 dark:bg-ink-700 dark:text-ink-500;
+  }
+
+  /* ─── Nav link pill ────────────────────── */
+  .nav-pill {
+    @apply flex flex-row items-center justify-center gap-1.5 rounded-xl px-2 py-2 text-xs font-bold
+           transition-all duration-150;
+  }
+  .nav-pill-active {
+    @apply nav-pill bg-brand-100 text-brand-700
+           dark:bg-ink-800 dark:text-brand-400;
+  }
+  .nav-pill-idle {
+    @apply nav-pill text-ink-400 hover:bg-ink-100 hover:text-ink-600
+           dark:text-ink-500 dark:hover:bg-ink-800 dark:hover:text-ink-300;
+  }
+
+  /* ─── Mission item ─────────────────────── */
+  .mission-item {
+    @apply flex items-center gap-3 rounded-xl border-2 border-ink-200 bg-white p-3
+           transition-all duration-200
+           dark:border-ink-700 dark:bg-ink-900;
+  }
+  .mission-done {
+    @apply mission-item border-brand-200 bg-brand-50
+           dark:border-ink-700 dark:bg-ink-800;
+  }
+
+  /* ─── Tool button (canvas tools etc.) ──── */
+  .tool-btn {
+    @apply flex h-12 w-12 items-center justify-center rounded-xl border-2 text-xl
+           transition-all border-ink-200 bg-white hover:bg-ink-50
+           disabled:opacity-30
+           dark:border-ink-700 dark:bg-ink-900 dark:hover:bg-ink-800;
+  }
+  .tool-btn-active {
+    @apply border-brand-500 bg-brand-100 text-brand-700 shadow-sm
+           dark:bg-brand-900 dark:text-brand-300;
+  }
+}
+
+/* ─── Accessibility: visually-hidden but screen-reader readable ─── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── Stroke-trace demo: pen tracing the character outline ─── */
+@keyframes trace-reveal {
+  0%   { clip-path: inset(0 100% 0 0); opacity: 0.9; }
+  90%  { clip-path: inset(0 0 0 0); opacity: 0.9; }
+  100% { clip-path: inset(0 0 0 0); opacity: 0.25; }
+}
+.animate-trace {
+  animation: trace-reveal 2.4s ease-in-out;
+}

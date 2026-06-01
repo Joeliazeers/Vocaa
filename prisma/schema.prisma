@@ -1,0 +1,326 @@
+// Vocaa — Prisma schema (SQLite for the MVP).
+// Mirrors §13 of the PRD, simplified for a single-app vertical slice.
+// JSON-shaped fields are stored as String (SQLite has no native JSON);
+// helpers in src/lib serialize/deserialize them.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  profile       Profile?
+  paths         LearningPath[]
+  moduleProgress ModuleProgress[]
+  skillProgress  SkillProgress[]
+  flashcardStates FlashcardState[]
+  quizAttempts   QuizAttempt[]
+  xpTransactions XPTransaction[]
+  dailyMissions  DailyMission[]
+  achievements   UserAchievement[]
+  conversations  ConversationSession[]
+  errorLogs      ErrorLog[]
+  errorJournals  ErrorJournal[]
+  remedialPlans  RemedialPlan[]
+  passwordResetTokens PasswordResetToken[]
+  writingAttempts WritingAttempt[]
+}
+
+model Profile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username          String
+  country           String?
+  avatarSeed        String   @default("vocaa")
+  currentLanguageId String?
+  goal              String?  // travel | education | career | hobby
+  level             String?  // beginner | intermediate | advanced (self-reported at onboarding)
+  dailyTargetMin    Int      @default(20)
+  totalXp           Int      @default(0)
+  userLevel         Int      @default(1)
+  streakCount       Int      @default(0)
+  longestStreak     Int      @default(0)
+  lastActiveDate    String?  // YYYY-MM-DD (local-day key)
+  onboarded         Boolean  @default(false)
+  preferences       String   @default("{}") // JSON
+  createdAt         DateTime @default(now())
+}
+
+model LearningPath {
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  languageId         String
+  goal               String
+  level              String
+  dailyTargetMinutes Int
+  masteryPoints      Int      @default(0)
+  createdAt          DateTime @default(now())
+
+  @@unique([userId, languageId])
+}
+
+model Language {
+  id              String  @id @default(cuid())
+  code            String  @unique // id | en | ja | zh
+  name            String
+  hasWritingSystem Boolean @default(false)
+
+  skills      Skill[]
+  vocabulary  Vocabulary[]
+}
+
+model Skill {
+  id          String  @id @default(cuid())
+  languageId  String
+  language    Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  levelLabel  String   // e.g. "N5", "Beginner"
+  title       String
+  description String   @default("")
+  orderIndex  Int      @default(0)
+  // CSV of prerequisite Skill ids (kept simple for the MVP)
+  prerequisiteIds String @default("")
+  // CSV of user levels that get this skill auto-completed at onboarding
+  // e.g. "intermediate,advanced" means intermediate + advanced users skip it
+  autoCompleteLevel String @default("")
+
+  modules     Module[]
+  skillProgress SkillProgress[]
+}
+
+model Module {
+  id          String  @id @default(cuid())
+  skillId     String
+  skill       Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  title       String
+  orderIndex  Int      @default(0)
+  objectives  String   @default("[]") // JSON array of strings
+  grammar     String   @default("")   // markdown-ish text
+  reading     String   @default("")
+  dialogue    String   @default("[]") // JSON array of {speaker, text, translation}
+  xpReward    Int      @default(50)
+
+  vocabulary  Vocabulary[]
+  quiz        Quiz?
+  progress    ModuleProgress[]
+}
+
+model Vocabulary {
+  id              String  @id @default(cuid())
+  languageId      String
+  language        Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  moduleId        String?
+  module          Module?  @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  term            String
+  reading         String   @default("")
+  meaning         String
+  exampleSentence String   @default("")
+  audioUrl        String   @default("")
+
+  flashcardStates FlashcardState[]
+}
+
+model FlashcardState {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vocabularyId  String
+  vocabulary    Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
+  easeFactor    Float    @default(2.5)
+  intervalDays  Int      @default(0)
+  repetitions   Int      @default(0)
+  dueDate       DateTime @default(now())
+  lastReviewed  DateTime?
+
+  @@unique([userId, vocabularyId])
+}
+
+model Quiz {
+  id            String  @id @default(cuid())
+  moduleId      String  @unique
+  module        Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  passThreshold Int     @default(60)
+  questions     QuizQuestion[]
+  attempts      QuizAttempt[]
+}
+
+model QuizQuestion {
+  id         String @id @default(cuid())
+  quizId     String
+  quiz       Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  type       String @default("multiple_choice") // multiple_choice | fill_blank | matching | reorder
+  prompt     String
+  options    String // JSON array of strings (or pairs for matching)
+  answer     Int    @default(0) // used for multiple_choice index
+  answerData String @default("") // JSON for complex answers (e.g., correct order indices, or accepted text)
+  skillTag   String @default("general")
+  orderIndex Int    @default(0)
+}
+
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  score     Int
+  passed    Boolean
+  answers   String   // JSON array of selected indices
+  createdAt DateTime @default(now())
+}
+
+model ModuleProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moduleId    String
+  module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  status      String   @default("not_started") // not_started | in_progress | completed
+  completedAt DateTime?
+
+  @@unique([userId, moduleId])
+}
+
+model SkillProgress {
+  id              String  @id @default(cuid())
+  userId          String
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId         String
+  skill           Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  percentComplete Int     @default(0)
+  unlocked        Boolean @default(false)
+
+  @@unique([userId, skillId])
+}
+
+model XPTransaction {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source     String   // module | quiz | mission | flashcard | login | conversation | writing
+  amount     Int
+  languageId String?
+  createdAt  DateTime @default(now())
+}
+
+model DailyMission {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      String  // YYYY-MM-DD
+  type      String  // complete_module | review_flashcards | earn_xp
+  target    Int
+  progress  Int     @default(0)
+  completed Boolean @default(false)
+  xpReward  Int     @default(20)
+
+  @@unique([userId, date, type])
+}
+
+model Achievement {
+  id          String @id @default(cuid())
+  code        String @unique
+  title       String
+  description String
+  icon        String @default("trophy")
+  criteria    String // JSON {type, value}
+
+  unlocks     UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  unlockedAt    DateTime @default(now())
+
+  @@unique([userId, achievementId])
+}
+
+model ConversationSession {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scenario   String
+  languageId String
+  status     String   @default("active") // active | ended
+  summary    String   @default("")       // JSON
+  createdAt  DateTime @default(now())
+
+  messages   ConversationMessage[]
+}
+
+model ConversationMessage {
+  id         String   @id @default(cuid())
+  sessionId  String
+  session    ConversationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role       String   // user | ai
+  content    String
+  evaluation String   @default("") // JSON {grammar, vocabulary, correction, natural_alternative, score}
+  createdAt  DateTime @default(now())
+}
+
+model ErrorLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   String   // grammar | vocabulary | writing | conversation
+  detail     String   // JSON
+  sourceRef  String   @default("")
+  languageId String?
+  createdAt  DateTime @default(now())
+}
+
+model ErrorJournal {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStart String
+  weekEnd   String
+  summary   String   // JSON {topErrors, focusAreas, trend}
+  createdAt DateTime @default(now())
+}
+
+model RemedialPlan {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source    String   // journal | quiz
+  items     String   // JSON
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model WritingAttempt {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  character  String
+  languageId String
+  score      Int      // 0-100
+  createdAt  DateTime @default(now())
+}

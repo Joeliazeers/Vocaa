@@ -1,0 +1,21 @@
+node_modules
+.next
+out
+build
+*.log
+
+# Local DB
+prisma/dev.db
+prisma/dev.db-journal
+
+# Env
+.env
+.env.local
+.env.production
+
+next-env.d.ts
+.DS_Store
+
+# Documentation
+DOCUMENTATION.pdf
+PRD.md
