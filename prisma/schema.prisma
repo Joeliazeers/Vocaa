@@ -106,11 +106,15 @@ model Module {
   skill       Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
   title       String
   orderIndex  Int      @default(0)
-  objectives  String   @default("[]") // JSON array of strings
-  grammar     String   @default("")   // markdown-ish text
-  reading     String   @default("")
-  dialogue    String   @default("[]") // JSON array of {speaker, text, translation}
-  xpReward    Int      @default(50)
+  objectives      String   @default("[]") // JSON array of strings
+  warmUp          String   @default("")   // reflection question shown before content
+  canDo           String   @default("[]") // JSON string[] — "After this lesson you can…"
+  grammar         String   @default("")   // markdown-ish text
+  reading         String   @default("")
+  dialogue        String   @default("[]") // JSON array of {speaker, text, translation}
+  patternExamples String   @default("[]") // JSON [{pattern, examples[]}]
+  cultureNote     String   @default("")   // short cultural context paragraph
+  xpReward        Int      @default(50)
 
   vocabulary  Vocabulary[]
   quiz        Quiz?

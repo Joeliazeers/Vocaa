@@ -8,6 +8,7 @@ import { ModulePlayer } from "./ModulePlayer";
 export const dynamic = "force-dynamic";
 
 type DialogueLine = { speaker: string; text: string; translation: string };
+type PatternEx = { pattern: string; examples: string[] };
 
 export default async function ModulePage({ params }: { params: { id: string } }) {
   const user = await getCurrentUser();
@@ -16,7 +17,7 @@ export default async function ModulePage({ params }: { params: { id: string } })
   const prefs = (() => {
     try { return JSON.parse(user.profile?.preferences ?? "{}"); } catch { return {}; }
   })();
-  const showFurigana = prefs.showFurigana !== false; // default true
+  const showFurigana = prefs.showFurigana !== false;
 
   const module = await prisma.module.findUnique({
     where: { id: params.id },
@@ -29,8 +30,10 @@ export default async function ModulePage({ params }: { params: { id: string } })
   if (!module) notFound();
 
   const langCode = module.skill.language.code;
-  const objectives = parseJson<string[]>(module.objectives, []);
-  const dialogue = parseJson<DialogueLine[]>(module.dialogue, []);
+  const objectives       = parseJson<string[]>(module.objectives, []);
+  const canDo            = parseJson<string[]>(module.canDo, []);
+  const dialogue         = parseJson<DialogueLine[]>(module.dialogue, []);
+  const patternExamples  = parseJson<PatternEx[]>(module.patternExamples, []);
   const questions = (module.quiz?.questions ?? []).map((q) => ({
     id: q.id,
     type: q.type,
@@ -50,6 +53,8 @@ export default async function ModulePage({ params }: { params: { id: string } })
       <ModulePlayer
         moduleId={module.id}
         objectives={objectives}
+        warmUp={module.warmUp}
+        canDo={canDo}
         vocabulary={module.vocabulary.map((v) => ({
           term: v.term,
           reading: v.reading,
@@ -59,6 +64,8 @@ export default async function ModulePage({ params }: { params: { id: string } })
         grammar={module.grammar}
         reading={module.reading}
         dialogue={dialogue}
+        patternExamples={patternExamples}
+        cultureNote={module.cultureNote}
         questions={questions}
         xpReward={module.xpReward}
         langCode={langCode}

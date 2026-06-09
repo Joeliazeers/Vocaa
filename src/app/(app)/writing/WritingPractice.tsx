@@ -302,63 +302,126 @@ export function WritingPractice({ langCode, languageId }: WritingPracticeProps) 
   }
 
   /**
+   * Separable box blur on a Float32Array (width × height).
+   * Approximates Gaussian — three passes would be ideal but one is fast enough here.
+   */
+  function boxBlur(src: Float32Array, w: number, h: number, r: number): Float32Array {
+    const tmp = new Float32Array(w * h);
+    const dst = new Float32Array(w * h);
+
+    // Horizontal pass: src → tmp
+    for (let y = 0; y < h; y++) {
+      let sum = 0;
+      for (let x = 0; x < Math.min(r, w); x++) sum += src[y * w + x];
+      for (let x = 0; x < w; x++) {
+        if (x + r < w) sum += src[y * w + x + r];
+        if (x - r - 1 >= 0) sum -= src[y * w + x - r - 1];
+        const cnt = Math.min(x + r + 1, w) - Math.max(x - r, 0);
+        tmp[y * w + x] = sum / cnt;
+      }
+    }
+
+    // Vertical pass: tmp → dst
+    for (let x = 0; x < w; x++) {
+      let sum = 0;
+      for (let y = 0; y < Math.min(r, h); y++) sum += tmp[y * w + x];
+      for (let y = 0; y < h; y++) {
+        if (y + r < h) sum += tmp[(y + r) * w + x];
+        if (y - r - 1 >= 0) sum -= tmp[(y - r - 1) * w + x];
+        const cnt = Math.min(y + r + 1, h) - Math.max(y - r, 0);
+        dst[y * w + x] = sum / cnt;
+      }
+    }
+
+    return dst;
+  }
+
+  /**
    * Compare drawn canvas vs a reference rendering of the expected character.
-   * Both are downsampled to 64×64 for speed. Uses soft IoU on grayscale darkness.
-   * Returns 0-100. Drawing the wrong character yields a low score (~15-25).
+   *
+   * Old approach (IoU at 64×64) punished users because hand-drawn strokes (6 px)
+   * become ~1 px when downsampled — far thinner than the font reference, so IoU
+   * was always tiny even for correct drawings.
+   *
+   * New approach:
+   *  1. Work at 128×128 for better fidelity.
+   *  2. Box-blur the drawn image (radius 8) to "dilate" thin strokes.
+   *  3. Lightly blur the reference (radius 2) to smooth font jaggies.
+   *  4. Compute a β=2 F-score: weights recall (coverage) 4× over precision,
+   *     so extra strokes are forgiven but missing the shape is penalised.
    */
   function pixelCompare(expectedChar: string): { score: number; feedback: string } {
-    const SZ = 64;
+    const SZ = 128;
+    const DRAWN_BLUR = 8;  // dilate drawn strokes to match font thickness
+    const REF_BLUR   = 2;  // smooth reference font
 
-    // Render reference character at SZ×SZ
+    // Render reference on a TRANSPARENT background so we can use the alpha
+    // channel as the ink mask — identical approach to the drawn canvas below.
     const refCanvas = document.createElement("canvas");
-    refCanvas.width = SZ;
-    refCanvas.height = SZ;
+    refCanvas.width = SZ; refCanvas.height = SZ;
     const rCtx = refCanvas.getContext("2d")!;
-    rCtx.fillStyle = "#ffffff";
-    rCtx.fillRect(0, 0, SZ, SZ);
+    rCtx.clearRect(0, 0, SZ, SZ);           // transparent (no white fill)
     rCtx.fillStyle = "#000000";
-    rCtx.font = `bold ${Math.floor(SZ * 0.70)}px serif`;
+    rCtx.font = `bold ${Math.floor(SZ * 0.72)}px serif`;
     rCtx.textAlign = "center";
     rCtx.textBaseline = "middle";
     rCtx.fillText(expectedChar, SZ / 2, SZ / 2 + 2);
-    const refData = rCtx.getImageData(0, 0, SZ, SZ).data;
+    const refRaw = rCtx.getImageData(0, 0, SZ, SZ).data;
 
-    // Downsample drawn canvas to SZ×SZ over white background
+    // Downsample drawn canvas onto a TRANSPARENT offscreen — preserve alpha.
+    // The drawing canvas has a transparent background; only stroke pixels have
+    // non-zero alpha. Using alpha as the ink signal is colour-agnostic: it
+    // works for any future stroke colour (indigo, gradient, etc.).
     const drawnSmall = document.createElement("canvas");
-    drawnSmall.width = SZ;
-    drawnSmall.height = SZ;
+    drawnSmall.width = SZ; drawnSmall.height = SZ;
     const dCtx = drawnSmall.getContext("2d")!;
-    dCtx.fillStyle = "#ffffff";
-    dCtx.fillRect(0, 0, SZ, SZ);
+    dCtx.clearRect(0, 0, SZ, SZ);           // transparent (no white fill)
     dCtx.drawImage(canvasRef.current!, 0, 0, SZ, SZ);
-    const drawnData = dCtx.getImageData(0, 0, SZ, SZ).data;
+    const drawnRaw = dCtx.getImageData(0, 0, SZ, SZ).data;
 
-    // Soft IoU: treat darkness as a continuous 0–1 value
-    let refSum = 0, drawnSum = 0, inter = 0;
+    // Use ALPHA CHANNEL [0,1] as the ink density — not RGB darkness.
+    // Both canvases are transparent where there is no ink, so we get a
+    // consistent 0–1 scale regardless of stroke or font colour.
+    const refDark   = new Float32Array(SZ * SZ);
+    const drawnDark = new Float32Array(SZ * SZ);
+    let drawnTotal  = 0;
     for (let i = 0; i < SZ * SZ; i++) {
-      const ri = i * 4;
-      const refDark  = 1 - (refData[ri]   + refData[ri+1]   + refData[ri+2])   / (3 * 255);
-      const drawnDark = 1 - (drawnData[ri] + drawnData[ri+1] + drawnData[ri+2]) / (3 * 255);
-      refSum   += refDark;
-      drawnSum += drawnDark;
-      inter    += Math.min(refDark, drawnDark);
+      refDark[i]   = refRaw[i * 4 + 3]   / 255;   // alpha of reference
+      drawnDark[i] = drawnRaw[i * 4 + 3] / 255;   // alpha of drawn strokes
+      drawnTotal  += drawnDark[i];
     }
 
-    const union = refSum + drawnSum - inter;
-    const iou = union > 0 ? inter / union : 0;
+    if (drawnTotal < 8) return { score: 0, feedback: "Canvas is empty — try drawing the character!" };
 
-    // Empty canvas check
-    if (drawnSum < 5) return { score: 0, feedback: "Canvas is empty - try drawing the character!" };
+    // Dilate drawn strokes; smooth reference
+    const drawnBlurred = boxBlur(drawnDark, SZ, SZ, DRAWN_BLUR);
+    const refBlurred   = boxBlur(refDark,   SZ, SZ, REF_BLUR);
 
-    // Scale IoU to score. A well-drawn character typically yields IoU ~0.25–0.50
-    const raw = Math.round(Math.min(iou * 220, 100));
+    // Recall = how much of the reference did the user cover?
+    // Precision = how much of the user's drawing is within the reference?
+    let refSum = 0, drawnBlurSum = 0, inter = 0;
+    for (let i = 0; i < SZ * SZ; i++) {
+      refSum       += refBlurred[i];
+      drawnBlurSum += drawnBlurred[i];
+      inter        += Math.min(drawnBlurred[i], refBlurred[i]);
+    }
+    const recall    = refSum       > 0 ? inter / refSum       : 0;
+    const precision = drawnBlurSum > 0 ? inter / drawnBlurSum : 0;
 
-    if (raw < 15) return { score: raw, feedback: "That doesn't look like the target character. Check the guide and try again!" };
-    if (raw < 35) return { score: raw, feedback: "Getting closer! Follow the stroke direction more carefully." };
+    // F₂ score: β=2 weights recall 4× — extra strokes are forgiven, missing shape is not
+    const beta  = 2;
+    const fScore = (recall + precision) > 0
+      ? (1 + beta * beta) * precision * recall / (beta * beta * precision + recall)
+      : 0;
+
+    const raw = Math.round(Math.min(fScore * 145, 100));
+
+    if (raw < 15) return { score: raw, feedback: "That doesn't match — check the guide and try again!" };
+    if (raw < 35) return { score: raw, feedback: "Getting closer! Follow the stroke directions more carefully." };
     if (raw < 55) return { score: raw, feedback: "Good effort! Focus on matching the overall shape." };
     if (raw < 70) return { score: raw, feedback: "Nearly there! A bit more precision in the strokes." };
-    if (raw < 85) return { score: raw, feedback: "Good job! Your strokes are looking right." };
-    return              { score: raw, feedback: "Excellent! The character is well-drawn." };
+    if (raw < 85) return { score: raw, feedback: "Good work! Your strokes are looking right." };
+    return               { score: raw, feedback: "Excellent! The character is well-drawn." };
   }
 
   async function evaluate() {

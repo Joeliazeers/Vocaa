@@ -41,7 +41,7 @@ export type SendResult = {
   evaluation: Evaluation | null;
 };
 
-export async function sendMessage(sessionId: string, content: string): Promise<SendResult> {
+export async function sendMessage(sessionId: string, content: string, showFurigana = false): Promise<SendResult> {
   const session = await getSession();
   if (!session) return { ok: false, reply: "", evaluation: null };
 
@@ -69,6 +69,7 @@ export async function sendMessage(sessionId: string, content: string): Promise<S
     level: profile.level ?? "beginner",
     history,
     userMessage: content,
+    showFurigana,
   });
 
   // Persist user message (with evaluation) and AI reply.

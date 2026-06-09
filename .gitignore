@@ -3,6 +3,7 @@ node_modules
 out
 build
 *.log
+docs/
 
 # Local DB
 prisma/dev.db

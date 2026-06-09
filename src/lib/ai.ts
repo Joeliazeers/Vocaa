@@ -25,6 +25,7 @@ export interface AIService {
     level: string;
     history: ChatTurn[];
     userMessage: string;
+    showFurigana?: boolean;
   }): Promise<ChatResult>;
 }
 
@@ -130,12 +131,23 @@ const LANG_NAME: Record<string, string> = {
   ja: "Japanese", zh: "Mandarin Chinese", id: "Indonesian", en: "English",
 };
 
-function buildSystemPrompt(scenario: ConversationScenario, languageCode: string, level: string): string {
+function buildSystemPrompt(
+  scenario: ConversationScenario,
+  languageCode: string,
+  level: string,
+  showFurigana = false,
+): string {
   const scenarioTitle = SCENARIOS.find((s) => s.id === scenario)?.title ?? scenario;
   const lang = LANG_NAME[languageCode] ?? "English";
+
+  const furiganaInstruction =
+    showFurigana && languageCode === "ja"
+      ? `\nFurigana mode is ON. In the "reply" field, annotate every kanji word and difficult kana using {text|reading} notation. Example: {ご注文|ちゅうもん}はお{決|き}まりでしょうか？ Annotate all kanji characters; leave plain hiragana/katakana unannotated.`
+      : "";
+
   return `You are a conversational AI roleplaying a "${scenarioTitle}" scenario to help someone learn ${lang}.
 Speak exclusively in ${lang}. User level: ${level}.
-Reply naturally in character (1-2 sentences), then evaluate the user's message.
+Reply naturally in character (1-2 sentences), then evaluate the user's message.${furiganaInstruction}
 
 Respond ONLY with valid JSON (no markdown fences):
 {
@@ -202,15 +214,23 @@ class ClaudeAIService implements AIService {
     level: string;
     history: ChatTurn[];
     userMessage: string;
+    showFurigana?: boolean;
   }): Promise<ChatResult> {
-    const systemPrompt = buildSystemPrompt(args.scenario, args.languageCode, args.level);
+    const systemPrompt = buildSystemPrompt(args.scenario, args.languageCode, args.level, args.showFurigana);
     const fallback = mockEvaluate(args.userMessage);
 
+    // Anthropic requires messages to start with a user turn.
+    // The history may begin with the AI opener (role "assistant"); prepend a
+    // synthetic user acknowledgement so the sequence is always user-first.
+    const historyMapped: Anthropic.MessageParam[] = args.history.map((h) => ({
+      role: (h.role === "ai" ? "assistant" : "user") as "user" | "assistant",
+      content: h.content,
+    }));
+    const prependSynthetic =
+      historyMapped.length > 0 && historyMapped[0].role === "assistant";
     const messages: Anthropic.MessageParam[] = [
-      ...args.history.map((h) => ({
-        role: (h.role === "ai" ? "assistant" : "user") as "user" | "assistant",
-        content: h.content,
-      })),
+      ...(prependSynthetic ? [{ role: "user" as const, content: "." }] : []),
+      ...historyMapped,
       { role: "user", content: args.userMessage },
     ];
 
@@ -241,8 +261,9 @@ class OpenAIService implements AIService {
     level: string;
     history: ChatTurn[];
     userMessage: string;
+    showFurigana?: boolean;
   }): Promise<ChatResult> {
-    const systemPrompt = buildSystemPrompt(args.scenario, args.languageCode, args.level);
+    const systemPrompt = buildSystemPrompt(args.scenario, args.languageCode, args.level, args.showFurigana);
     const fallback = mockEvaluate(args.userMessage);
 
     const messages = [
@@ -260,7 +281,13 @@ class OpenAIService implements AIService {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
-      body: JSON.stringify({ model: "gpt-4o-mini", messages, temperature: 0.7, max_tokens: 300 }),
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages,
+        temperature: 0.7,
+        max_tokens: 400,
+        response_format: { type: "json_object" },
+      }),
     });
 
     if (!response.ok) {
@@ -287,6 +314,7 @@ class MockAIService implements AIService {
     level: string;
     history: ChatTurn[];
     userMessage: string;
+    showFurigana?: boolean;
   }): Promise<ChatResult> {
     const evaluation = mockEvaluate(args.userMessage);
     const turnCount = args.history.filter((h) => h.role === "user").length;

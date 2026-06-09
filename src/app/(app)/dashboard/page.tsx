@@ -138,7 +138,7 @@ export default async function DashboardPage() {
           />
           <div>
             <h1 className="text-2xl font-black text-ink-900 dark:text-white">
-              Hi, {p.username}! <Hand className="w-6 h-6 inline-block" />
+              Hi, {p.username}! 👋
             </h1>
             <p className="mt-1 font-semibold text-ink-500">
               Learning{" "}

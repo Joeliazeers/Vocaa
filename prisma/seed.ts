@@ -24,12 +24,17 @@ type Q = {
   answerData: string; // JSON: accepted[] for fill_blank; [[l,r]...] for matching; [idx...] for reorder
   skillTag: string;
 };
+type PatternEx = { pattern: string; examples: string[] };
 type ModSeed = {
   title: string;
   objectives: string[];
+  warmUp?: string;
+  canDo?: string[];
   grammar: string;
   reading: string;
   dialogue: D[];
+  patternExamples?: PatternEx[];
+  cultureNote?: string;
   vocab: V[];
   quiz: Q[];
 };
@@ -79,30 +84,30 @@ const japaneseSkills: SkillSeed[] = [
     prereqTitles: [],
     autoCompleteLevel: "intermediate,advanced",
     modules: [
-      // ① Vowels
       {
         title: "Vowels — あいうえお",
         objectives: ["Read the 5 Japanese vowels", "Recognize them in simple words"],
+        warmUp: "Think of a Japanese word you already know. Can you guess what sounds are in it?",
+        canDo: ["Read and write the 5 hiragana vowels: あいうえお", "Recognize these vowels in simple Japanese words"],
         grammar: `Hiragana is a phonetic syllabary — each character is one sound.
 The 5 vowels are the foundation:
 
-あ (a) — like "ah"   い (i) — like "ee"   う (u) — lips forward, like "oo" but unrounded
-え (e) — like "eh"   お (o) — like "oh"
-
-Every other hiragana character is one of these vowels preceded by a consonant.`,
+あ (a) — like "ah"   い (i) — like "ee"   う (u) — lips forward, unrounded
+え (e) — like "eh"   お (o) — like "oh"`,
         reading: `Tip: learn to write each character as you learn its sound.
-あ → い → う → え → お is the order you'll find in every Japanese dictionary.
-Words you already know: アイスクリーム(ice cream) — the vowels a-i are in there!`,
+あ → い → う → え → お is the order found in every Japanese dictionary.`,
         dialogue: [
-          { speaker: "A", text: "あ、いいえき！", translation: "Oh, a nice station!" },
-          { speaker: "B", text: "うん、おおきいね。", translation: "Yeah, it's big, isn't it." },
+          { speaker: "ハナ", text: "あ、いいえき！", translation: "Oh, a nice station!" },
+          { speaker: "サトウ", text: "うん、おおきいね。", translation: "Yeah, it's big, isn't it." },
         ],
+        patternExamples: [],
+        cultureNote: "Hiragana was developed in the 9th century by Japanese women at court who were forbidden from using kanji. It's now the first script all Japanese children learn.",
         vocab: [
           { term: "あお", reading: "ao", meaning: "blue", example: "そらはあおい。(The sky is blue.)" },
-          { term: "いえ", reading: "ie", meaning: "house / no", example: "おおきいいえ。(A big house.)" },
+          { term: "いえ", reading: "ie", meaning: "house", example: "おおきいいえ。(A big house.)" },
           { term: "うえ", reading: "ue", meaning: "above / top", example: "うえをみて。(Look up.)" },
           { term: "えき", reading: "eki", meaning: "train station", example: "えきはどこ？(Where is the station?)" },
-          { term: "おかし", reading: "okashi", meaning: "sweets / snacks", example: "おかしがすき。(I like sweets.)" },
+          { term: "おかし", reading: "okashi", meaning: "sweets", example: "おかしがすき。(I like sweets.)" },
         ],
         quiz: [
           q("'い' is pronounced…", ["ah","ee","oh","eh"], 1, "hiragana-vowels"),
@@ -111,60 +116,55 @@ Words you already know: アイスクリーム(ice cream) — the vowels a-i are 
           q("'えき' means…", ["snacks","house","train station","above"], 2, "vocab"),
         ],
       },
-      // ② K-row
       {
         title: "K-row — かきくけこ",
         objectives: ["Read か・き・く・け・こ", "Use common K-row vocabulary"],
-        grammar: `The K-row adds the 'k' consonant to each vowel:
-か(ka)  き(ki)  く(ku)  け(ke)  こ(ko)
-
-Note: き is special — it slightly resembles the number 4 with a flag.
-Pattern: か → き → く → け → こ`,
-        reading: `Common words using K-row:
-かわ(river)  きく(listen/chrysanthemum)  くも(cloud)  けさ(this morning)  こども(child)
-
-Practice reading: こどもがかわでさかなをみた。(A child saw a fish in the river.)`,
+        warmUp: "Say the English word 'cat' slowly. What sound does it start with? That's the 'ka' sound!",
+        canDo: ["Read and write か・き・く・け・こ", "Use K-row characters in common words"],
+        grammar: `K-row: か(ka) き(ki) く(ku) け(ke) こ(ko)
+Note: き slightly resembles the number 4 with a flag.`,
+        reading: `Common words: かわ(river) きく(listen) くも(cloud) けさ(this morning) こども(child)
+Practice: こどもがかわでさかなをみた。(A child saw a fish in the river.)`,
         dialogue: [
-          { speaker: "A", text: "けさはくもがおおい。", translation: "There are many clouds this morning." },
-          { speaker: "B", text: "こどもはかわにいる？", translation: "Are the kids at the river?" },
+          { speaker: "ハナ", text: "けさはくもがおおい。", translation: "There are many clouds this morning." },
+          { speaker: "サトウ", text: "こどもはかわにいる？", translation: "Are the kids at the river?" },
         ],
+        patternExamples: [],
+        cultureNote: "Japanese dictionaries (and vocabulary lists) follow the order of the hiragana chart: あかさたなはまやらわ. Knowing this order helps you look things up!",
         vocab: [
-          { term: "かわ", reading: "kawa", meaning: "river", example: "かわでおよぐ。(Swim in the river.)" },
-          { term: "きく", reading: "kiku", meaning: "to listen; chrysanthemum", example: "おんがくをきく。(Listen to music.)" },
-          { term: "くも", reading: "kumo", meaning: "cloud; spider", example: "くもがおおい。(There are many clouds.)" },
-          { term: "けさ", reading: "kesa", meaning: "this morning", example: "けさはさむい。(It's cold this morning.)" },
-          { term: "こども", reading: "kodomo", meaning: "child", example: "こどもがわらう。(The child laughs.)" },
+          { term: "かわ", reading: "kawa", meaning: "river", example: "かわでおよぐ。" },
+          { term: "きく", reading: "kiku", meaning: "to listen", example: "おんがくをきく。" },
+          { term: "くも", reading: "kumo", meaning: "cloud", example: "くもがおおい。" },
+          { term: "けさ", reading: "kesa", meaning: "this morning", example: "けさはさむい。" },
+          { term: "こども", reading: "kodomo", meaning: "child", example: "こどもがわらう。" },
         ],
         quiz: [
           q("'か' reads as…", ["ga","ka","ko","ki"], 1, "hiragana-k"),
-          qFill("Write the hiragana for the sound 'ku':", ["く"], "hiragana-k"),
-          qMatch("Match the hiragana to its meaning:", [["かわ","river"],["きく","to listen"],["こども","child"]], "vocab"),
-          qReorder("Put in correct dictionary order:", ["こ","か","き","け","く"], [1,2,4,3,0], "hiragana-k"),
+          qFill("Write the hiragana for 'ku':", ["く"], "hiragana-k"),
+          qMatch("Match hiragana to meaning:", [["かわ","river"],["きく","to listen"],["こども","child"]], "vocab"),
+          qReorder("Put in dictionary order:", ["こ","か","き","け","く"], [1,2,4,3,0], "hiragana-k"),
         ],
       },
-      // ③ S-row
       {
         title: "S-row — さしすせそ",
         objectives: ["Read さ・し・す・せ・そ", "Note that し = 'shi' not 'si'"],
-        grammar: `S-row:  さ(sa)  し(shi)  す(su)  せ(se)  そ(so)
-
-⚠ Important exception: し is read 'shi', not 'si'. This is one of the irregular sounds in Japanese.
-
-そ looks like the number 3 — a helpful memory hook.`,
-        reading: `Key vocabulary:
-さかな(fish)  しごと(work/job)  すし(sushi!)  せかい(world)  そら(sky)
-
-Japanese sushi (すし) uses all hiragana you've learned so far: s+u and s+i.`,
+        warmUp: "You already know the word 'sushi'. Can you find the hiragana for it once you learn this row?",
+        canDo: ["Read and write さ・し・す・せ・そ", "Spell the word すし (sushi) in hiragana"],
+        grammar: `S-row: さ(sa) し(shi) す(su) せ(se) そ(so)
+⚠ Important: し = 'shi' not 'si'. そ looks like the number 3.`,
+        reading: `Key vocabulary: さかな(fish) しごと(work) すし(sushi) せかい(world) そら(sky)`,
         dialogue: [
-          { speaker: "A", text: "しごとはどう？", translation: "How's work?" },
-          { speaker: "B", text: "いそがしい。でも、すしをたべた！", translation: "Busy. But I ate sushi!" },
+          { speaker: "キム", text: "しごとはどう？", translation: "How's work?" },
+          { speaker: "ハナ", text: "いそがしい。でも、すしをたべた！", translation: "Busy. But I ate sushi!" },
         ],
+        patternExamples: [],
+        cultureNote: "Sushi (すし) originally meant vinegared rice. The fish on top is called 'neta'. In Japan, sushi chefs train for years just to learn proper rice preparation.",
         vocab: [
-          { term: "さかな", reading: "sakana", meaning: "fish", example: "さかなをたべる。(Eat fish.)" },
-          { term: "しごと", reading: "shigoto", meaning: "work / job", example: "しごとがある。(I have work.)" },
-          { term: "すし", reading: "sushi", meaning: "sushi", example: "すしがすき！(I love sushi!)" },
-          { term: "せかい", reading: "sekai", meaning: "world", example: "せかいはひろい。(The world is wide.)" },
-          { term: "そら", reading: "sora", meaning: "sky", example: "そらがあおい。(The sky is blue.)" },
+          { term: "さかな", reading: "sakana", meaning: "fish", example: "さかなをたべる。" },
+          { term: "しごと", reading: "shigoto", meaning: "work / job", example: "しごとがある。" },
+          { term: "すし", reading: "sushi", meaning: "sushi", example: "すしがすき！" },
+          { term: "せかい", reading: "sekai", meaning: "world", example: "せかいはひろい。" },
+          { term: "そら", reading: "sora", meaning: "sky", example: "そらがあおい。" },
         ],
         quiz: [
           q("'し' is pronounced…", ["si","su","shi","se"], 2, "hiragana-s"),
@@ -173,267 +173,236 @@ Japanese sushi (すし) uses all hiragana you've learned so far: s+u and s+i.`,
           q("Which S-row character looks like '3'?", ["さ","し","せ","そ"], 3, "hiragana-s"),
         ],
       },
-      // ④ T-row
       {
         title: "T-row — たちつてと",
         objectives: ["Read た・ち・つ・て・と", "Note ち='chi' and つ='tsu'"],
-        grammar: `T-row:  た(ta)  ち(chi)  つ(tsu)  て(te)  と(to)
-
-⚠ Two more exceptions:
-  ち = 'chi' (not 'ti')
-  つ = 'tsu' (not 'tu')
-
+        warmUp: "The word 'tsunami' comes from Japanese. Can you guess which hiragana characters are in it?",
+        canDo: ["Read and write た・ち・つ・て・と", "Spot the irregular pronunciations ち(chi) and つ(tsu)"],
+        grammar: `T-row: た(ta) ち(chi) つ(tsu) て(te) と(to)
+⚠ ち = 'chi' (not 'ti')   つ = 'tsu' (not 'tu')
 て is one of the most-used characters — it forms the て-form of verbs.`,
-        reading: `Words to know:
-たべもの(food)  ちず(map)  つき(moon)  てがみ(letter)  とり(bird)
-
-Practice: とりがつきをみている。(A bird is looking at the moon.)`,
+        reading: `Words: たべもの(food) ちず(map) つき(moon) てがみ(letter) とり(bird)`,
         dialogue: [
-          { speaker: "A", text: "てがみをかいた？", translation: "Did you write a letter?" },
-          { speaker: "B", text: "うん、とりのえをかいた。", translation: "Yeah, I drew a picture of a bird." },
+          { speaker: "サトウ", text: "てがみをかいた？", translation: "Did you write a letter?" },
+          { speaker: "ハナ", text: "うん、ちずもかいた！", translation: "Yes, I drew a map too!" },
         ],
+        patternExamples: [],
+        cultureNote: "The word 'tsunami' (つなみ) is now used worldwide. It means 'harbor wave' — つ(tsu) + なみ(nami = wave). Japanese has contributed many words to international use.",
         vocab: [
-          { term: "たべもの", reading: "tabemono", meaning: "food", example: "たべものがすき。(I like food.)" },
-          { term: "ちず", reading: "chizu", meaning: "map", example: "ちずをみる。(Look at the map.)" },
-          { term: "つき", reading: "tsuki", meaning: "moon / month", example: "つきがきれい。(The moon is beautiful.)" },
-          { term: "てがみ", reading: "tegami", meaning: "letter (written)", example: "てがみをかく。(Write a letter.)" },
-          { term: "とり", reading: "tori", meaning: "bird", example: "とりがとぶ。(A bird flies.)" },
+          { term: "たべもの", reading: "tabemono", meaning: "food", example: "たべものがすき。" },
+          { term: "ちず", reading: "chizu", meaning: "map", example: "ちずをみる。" },
+          { term: "つき", reading: "tsuki", meaning: "moon", example: "つきがきれい。" },
+          { term: "てがみ", reading: "tegami", meaning: "letter", example: "てがみをかく。" },
+          { term: "とり", reading: "tori", meaning: "bird", example: "とりがとぶ。" },
         ],
         quiz: [
-          q("'ち' reads as…", ["ti","chi","tchi","shi"], 1, "hiragana-t"),
-          q("'つ' reads as…", ["tu","tsu","su","chu"], 1, "hiragana-t"),
-          q("'つき' means…", ["food","map","moon","bird"], 2, "vocab"),
-          q("'て' is special because it forms…", ["nouns","verb て-form","numbers","colors"], 1, "hiragana-t"),
+          q("'ち' is read as…", ["ti","chi","tchi","tsi"], 1, "hiragana-t"),
+          q("'つ' is read as…", ["tu","tsu","chu","su"], 1, "hiragana-t"),
+          q("'たべもの' means…", ["map","letter","food","bird"], 2, "vocab"),
+          qFill("Write hiragana for 'te':", ["て"], "hiragana-t"),
         ],
       },
-      // ⑤ N-row
       {
         title: "N-row — なにぬねの",
-        objectives: ["Read な・に・ぬ・ね・の", "Use の as a possessive particle"],
-        grammar: `N-row:  な(na)  に(ni)  ぬ(nu)  ね(ne)  の(no)
-
-の is the possessive particle (like 's in English):
-わたしのほん = my book (literally "I's book")
-にほんのたべもの = Japanese food
-
-に is the location/direction particle: えきに = to/at the station.`,
-        reading: `Vocabulary:
-なまえ(name)  にほん(Japan)  ぬの(cloth)  ねこ(cat)  のみもの(drink)
-
-わたしのねこのなまえはクロ。(My cat's name is Kuro.)`,
+        objectives: ["Read な・に・ぬ・ね・の", "Use の as a connecting particle"],
+        warmUp: "In English we say 'my book', 'his car'. How do you think Japanese connects nouns?",
+        canDo: ["Read and write な・に・ぬ・ね・の", "Use の to connect two nouns (e.g. わたしのなまえ = my name)"],
+        grammar: `N-row: な(na) に(ni) ぬ(nu) ね(ne) の(no)
+の = possessive particle: わたしのほん (my book), にほんのたべもの (Japanese food)`,
+        reading: `の is one of the most common hiragana — it connects nouns.
+にほん(Japan) + の + たべもの(food) = にほんのたべもの (Japanese food)`,
         dialogue: [
-          { speaker: "A", text: "なまえはなに？", translation: "What is your name?" },
-          { speaker: "B", text: "にほんのたなかです。のみものはある？", translation: "I'm Tanaka from Japan. Is there a drink?" },
+          { speaker: "ハナ", text: "これはだれのほん？", translation: "Whose book is this?" },
+          { speaker: "サトウ", text: "わたしのほんです。", translation: "It's my book." },
         ],
+        patternExamples: [
+          { pattern: "[A]の[B]", examples: ["わたしのほん (my book)", "にほんのたべもの (Japanese food)", "サトウさんのかばん (Mr. Sato's bag)"] },
+        ],
+        cultureNote: "の is one of the most frequently written hiragana in Japanese. Some Japanese people even use の alone informally as a question particle at the end of a sentence.",
         vocab: [
-          { term: "なまえ", reading: "namae", meaning: "name", example: "なまえをかいて。(Write your name.)" },
-          { term: "にほん", reading: "nihon", meaning: "Japan", example: "にほんがすき。(I like Japan.)" },
-          { term: "ぬの", reading: "nuno", meaning: "cloth / fabric", example: "あかいぬの。(Red cloth.)" },
-          { term: "ねこ", reading: "neko", meaning: "cat", example: "ねこがいる。(There is a cat.)" },
-          { term: "のみもの", reading: "nomimono", meaning: "drink / beverage", example: "のみものをください。(A drink please.)" },
+          { term: "なまえ", reading: "namae", meaning: "name", example: "なまえはなんですか。" },
+          { term: "にほん", reading: "nihon", meaning: "Japan", example: "にほんにいきたい。" },
+          { term: "ねこ", reading: "neko", meaning: "cat", example: "ねこがかわいい。" },
+          { term: "の", reading: "no", meaning: "possessive particle", example: "わたしのほん。" },
+          { term: "なに", reading: "nani", meaning: "what", example: "なにをたべる？" },
         ],
         quiz: [
-          q("の is used as…", ["topic particle","possessive particle","direction particle","question marker"], 1, "particle-no"),
-          q("'ねこ' means…", ["dog","cat","bird","fish"], 1, "vocab"),
-          q("'にほん' means…", ["China","Korea","Japan","USA"], 2, "vocab"),
-          q("'わたしのほん' means…", ["your book","my book","a book","books"], 1, "particle-no"),
+          q("の is used to…", ["end a sentence","connect nouns (possessive)","make questions","mark the subject"], 1, "particle-no"),
+          q("'わたしのほん' means…", ["I read a book","my book","a Japanese book","this book"], 1, "particle-no"),
+          qFill("Write the hiragana for 'ne':", ["ね"], "hiragana-n"),
+          q("'なまえ' means…", ["number","name","country","Japan"], 1, "vocab"),
         ],
       },
-      // ⑥ H-row
       {
         title: "H-row — はひふへほ",
-        objectives: ["Read は・ひ・ふ・へ・ほ", "Use は as the topic particle"],
-        grammar: `H-row:  は(ha)  ひ(hi)  ふ(fu)  へ(he)  ほ(ho)
-
-⚠ Exception: ふ = 'fu' (not 'hu') — made with lips close together.
-
-は as a particle is read 'wa' (not 'ha'):
-わたしはがくせいです。= I am a student.
-
-へ as a particle means 'toward':
-えきへ = toward the station.`,
-        reading: `Vocabulary:
-はな(flower/nose)  ひと(person)  ふゆ(winter)  へや(room)  ほん(book)
-
-はなのへやにほんがある。(There are books in the flower room.)`,
+        objectives: ["Read は・ひ・ふ・へ・ほ", "Know that は can be read 'wa' as a particle"],
+        warmUp: "You've probably seen 'は' before — it appears in おはよう! Can you hear the 'ha' sound?",
+        canDo: ["Read and write は・ひ・ふ・へ・ほ", "Recognize は as the topic particle (read as 'wa')"],
+        grammar: `H-row: は(ha) ひ(hi) ふ(fu) へ(he) ほ(ho)
+⚠ ふ = 'fu' not 'hu'
+⚠ は = 'wa' when used as the topic particle: わたし**は**ハナです。`,
+        reading: `は marks the topic of a sentence.
+わたしはハナです。(I am Hana.)  にほんはきれいです。(Japan is beautiful.)`,
         dialogue: [
-          { speaker: "A", text: "ほんはへやにある。", translation: "The books are in the room." },
-          { speaker: "B", text: "ふゆは、ほんをたくさんよむ。", translation: "In winter I read many books." },
+          { speaker: "ハナ", text: "わたしはハナです。", translation: "I am Hana." },
+          { speaker: "サトウ", text: "はじめまして！わたしはサトウです。", translation: "Nice to meet you! I am Sato." },
         ],
+        patternExamples: [
+          { pattern: "[topic]は[comment]です。", examples: ["わたしはハナです。(I am Hana.)", "これはほんです。(This is a book.)", "にほんはきれいです。(Japan is beautiful.)"] },
+        ],
+        cultureNote: "は as a topic particle is one of the most important building blocks of Japanese grammar. Unlike English 'is/am/are', it doesn't say anything about the subject's existence — it just sets the topic for discussion.",
         vocab: [
-          { term: "はな", reading: "hana", meaning: "flower; nose", example: "はながきれい。(The flower is beautiful.)" },
-          { term: "ひと", reading: "hito", meaning: "person / people", example: "ひとがおおい。(There are many people.)" },
+          { term: "はな", reading: "hana", meaning: "flower / nose", example: "はながきれい。(The flower is beautiful.)" },
+          { term: "ひと", reading: "hito", meaning: "person", example: "いいひとです。(He is a good person.)" },
           { term: "ふゆ", reading: "fuyu", meaning: "winter", example: "ふゆはさむい。(Winter is cold.)" },
-          { term: "へや", reading: "heya", meaning: "room", example: "へやをそうじする。(Clean the room.)" },
           { term: "ほん", reading: "hon", meaning: "book", example: "ほんをよむ。(Read a book.)" },
+          { term: "は", reading: "wa", meaning: "topic particle", example: "わたしはがくせいです。" },
         ],
         quiz: [
-          q("'ふ' is pronounced…", ["hu","fu","pu","bu"], 1, "hiragana-h"),
-          q("When は is a particle it reads as…", ["ha","he","wa","wo"], 2, "particle-wa"),
-          q("'ほん' means…", ["flower","room","book","person"], 2, "vocab"),
-          q("'へや' means…", ["winter","book","flower","room"], 3, "vocab"),
+          q("'ふ' is read as…", ["hu","fu","pu","bu"], 1, "hiragana-h"),
+          q("は as a particle is read…", ["ha","ho","wa","hi"], 2, "particle-wa"),
+          q("'わたしはハナです' means…", ["Where is Hana?","I am Hana.","Hana is here.","Is this Hana?"], 1, "particle-wa"),
+          qFill("Write the hiragana for 'ho':", ["ほ"], "hiragana-h"),
         ],
       },
-      // ⑦ M-row
       {
-        title: "M-row — まみむめも",
-        objectives: ["Read ま・み・む・め・も", "Use も (also) as a particle"],
-        grammar: `M-row:  ま(ma)  み(mi)  む(mu)  め(me)  も(mo)
+        title: "M / Y / R / W rows + ん",
+        objectives: ["Read ま・み・む・め・も, や・ゆ・よ, ら・り・る・れ・ろ, わ・を, ん"],
+        warmUp: "Almost done with hiragana! How many characters have you learned so far?",
+        canDo: ["Read all remaining hiragana rows", "Use ん as a syllable-final nasal sound", "Use を as the object particle"],
+        grammar: `M-row: ま(ma) み(mi) む(mu) め(me) も(mo)
+Y-row: や(ya) ゆ(yu) よ(yo)
+R-row: ら(ra) り(ri) る(ru) れ(re) ろ(ro)
+W-row: わ(wa) を(wo/o) ん(n)
 
-も means 'also / too':
-わたしもがくせいです。= I am also a student.
-ねこもいぬもいる。= There are both cats and dogs.`,
-        reading: `Vocabulary:
-まち(town)  みず(water)  むし(insect)  めがね(glasses)  もり(forest)
-
-もりのまちにむしがたくさんいる。(There are many insects in the forest town.)`,
+を = object particle (marks the direct object): ほんをよむ (read a book)
+ん = standalone 'n': きん(gold), みんな(everyone)`,
+        reading: `You now know all 46 base hiragana! Practice with: まいにちにほんごをよみます。(I read Japanese every day.)`,
         dialogue: [
-          { speaker: "A", text: "まちにいく？", translation: "Going to town?" },
-          { speaker: "B", text: "うん。みずもかう。めがねもなおす。", translation: "Yeah. Also buying water. Also fixing glasses." },
+          { speaker: "キム", text: "まいにちにほんごをよみますか？", translation: "Do you read Japanese every day?" },
+          { speaker: "ハナ", text: "はい、まいあさよみます！", translation: "Yes, I read every morning!" },
         ],
+        patternExamples: [
+          { pattern: "[object]を[verb]", examples: ["ほんをよむ (read a book)", "みずをのむ (drink water)", "おんがくをきく (listen to music)"] },
+        ],
+        cultureNote: "Congratulations! You now know all 46 hiragana. Japanese children spend their first year of school mastering these characters. You've just achieved what takes Japanese 6-year-olds months to learn.",
         vocab: [
-          { term: "まち", reading: "machi", meaning: "town / city", example: "まちをあるく。(Walk around town.)" },
-          { term: "みず", reading: "mizu", meaning: "water", example: "みずをのむ。(Drink water.)" },
-          { term: "むし", reading: "mushi", meaning: "insect / bug", example: "むしがいる。(There is a bug.)" },
-          { term: "めがね", reading: "megane", meaning: "glasses / spectacles", example: "めがねをかける。(Put on glasses.)" },
-          { term: "もり", reading: "mori", meaning: "forest", example: "もりをさんぽ。(Walk in the forest.)" },
+          { term: "まいにち", reading: "mainichi", meaning: "every day", example: "まいにちべんきょうします。" },
+          { term: "みんな", reading: "minna", meaning: "everyone", example: "みんなげんき？" },
+          { term: "よむ", reading: "yomu", meaning: "to read", example: "ほんをよむ。" },
+          { term: "を", reading: "wo/o", meaning: "object particle", example: "みずをのむ。" },
+          { term: "ん", reading: "n", meaning: "syllabic n", example: "にほん(Japan)、みんな(everyone)" },
         ],
         quiz: [
-          q("も as a particle means…", ["also/too","but","because","if"], 0, "particle-mo"),
-          q("'みず' means…", ["forest","town","water","insect"], 2, "vocab"),
-          q("'めがね' means…", ["glasses","water","insect","bug"], 0, "vocab"),
-          q("'まちももりもある' means…", ["There is town","There is forest","There are both town and forest","Neither town nor forest"], 2, "particle-mo"),
+          q("を is used to mark…", ["the subject","the topic","the direct object","the location"], 2, "particle-wo"),
+          q("ん is…", ["a vowel","a standalone consonant n","always silent","only at the start of words"], 1, "hiragana-n"),
+          qFill("Write hiragana for 'mu':", ["む"], "hiragana-m"),
+          qMatch("Match rows to characters:", [["M-row","も"],["Y-row","よ"],["R-row","る"]], "hiragana-rows"),
         ],
       },
-      // ⑧ Y-row + W-row + N
       {
-        title: "Y・W rows + ん — やゆよ / わをん",
-        objectives: ["Read やゆよ and わをん", "Use を as the object particle", "Understand ん (n)"],
-        grammar: `Y-row: や(ya)  ゆ(yu)  よ(yo)  (only 3 characters — no yi or ye)
-W-row: わ(wa)  を(wo)  ん(n)
+        title: "Dakuten & Combo Characters",
+        objectives: ["Read voiced characters (ga, za, da, ba, pa)", "Read combo characters (kya, sha, etc.)"],
+        warmUp: "You know か(ka). What do you think adding two small dots changes it to?",
+        canDo: ["Read dakuten characters: が・ざ・だ・ば and handakuten: ぱ", "Read combination characters like きゃ・しゃ・ちょ"],
+        grammar: `Dakuten (゛): makes consonant voiced
+か→が(ga)  き→ぎ(gi)  さ→ざ(za)  た→だ(da)  は→ば(ba)
 
-を is the object marker — always follows the thing being acted on:
-りんごをたべる。= Eat an apple.  (りんご=apple、たべる=eat)
+Handakuten (゜): only on H-row, makes 'p'
+は→ぱ(pa)  ひ→ぴ(pi)
 
-ん is the only standalone consonant; it always follows a vowel or another ん.`,
-        reading: `Vocabulary:
-やま(mountain)  ゆき(snow)  よる(night)  わたし(I/me)  を(object particle)
-
-ゆきのやまによるいく。(Go to the snowy mountain at night.)`,
+Combo characters: small や/ゆ/よ after い-row
+き+ゃ = きゃ(kya)  し+ゃ = しゃ(sha)  ち+ょ = ちょ(cho)`,
+        reading: `Words with dakuten: がくせい(student) ざっし(magazine) でんしゃ(train) ばんごはん(dinner)
+Combos: きゃく(guest) しゃしん(photo) ちょっと(a little)`,
         dialogue: [
-          { speaker: "A", text: "よる、やまにいく？", translation: "Going to the mountain at night?" },
-          { speaker: "B", text: "ゆきをみたい！わたしもいく。", translation: "I want to see snow! I'll go too." },
+          { speaker: "ハナ", text: "しゃしんをとってもいいですか？", translation: "May I take a photo?" },
+          { speaker: "サトウ", text: "ちょっとまって！じゅんびします。", translation: "Wait a moment! I'll get ready." },
         ],
+        patternExamples: [],
+        cultureNote: "Dakuten characters roughly double the size of the hiragana set. The handakuten (circle) only appears on the H-row — a historical quirk because the H-row originally had a 'p' sound that shifted to 'h' over centuries.",
         vocab: [
-          { term: "やま", reading: "yama", meaning: "mountain", example: "やまにのぼる。(Climb a mountain.)" },
-          { term: "ゆき", reading: "yuki", meaning: "snow", example: "ゆきがふる。(Snow falls.)" },
-          { term: "よる", reading: "yoru", meaning: "night / evening", example: "よるはくらい。(Night is dark.)" },
-          { term: "わたし", reading: "watashi", meaning: "I / me", example: "わたしはがくせい。(I am a student.)" },
-          { term: "を", reading: "wo/o", meaning: "object particle", example: "りんごをたべる。(Eat an apple.)" },
+          { term: "がくせい", reading: "gakusei", meaning: "student", example: "わたしはがくせいです。" },
+          { term: "でんしゃ", reading: "densha", meaning: "train", example: "でんしゃにのる。" },
+          { term: "しゃしん", reading: "shashin", meaning: "photo", example: "しゃしんをとる。" },
+          { term: "ちょっと", reading: "chotto", meaning: "a little / just a moment", example: "ちょっとまって。" },
+          { term: "ざっし", reading: "zasshi", meaning: "magazine", example: "ざっしをよむ。" },
         ],
         quiz: [
-          q("を marks the…", ["subject","topic","object","location"], 2, "particle-wo"),
-          q("'ゆき' means…", ["mountain","snow","night","I"], 1, "vocab"),
-          q("The Y-row has how many characters?", ["5","4","3","2"], 2, "hiragana-y"),
-          q("ん is…", ["a vowel","the only standalone consonant","a particle","a verb ending"], 1, "hiragana-n"),
+          q("か + dakuten becomes…", ["が","ば","さ","ざ"], 0, "dakuten"),
+          q("は + handakuten becomes…", ["ぱ","ば","ひ","ぺ"], 0, "handakuten"),
+          q("きゃ is read as…", ["kiya","kya","gia","kia"], 1, "combo"),
+          q("'でんしゃ' means…", ["airplane","bus","train","bicycle"], 2, "vocab"),
         ],
       },
-      // ⑨ R-row
       {
-        title: "R-row — らりるれろ",
-        objectives: ["Read ら・り・る・れ・ろ", "Note the Japanese 'r' sound"],
-        grammar: `R-row: ら(ra)  り(ri)  る(ru)  れ(re)  ろ(ro)
+        title: "Long Vowels & Small つ",
+        objectives: ["Read long vowels (おかあさん, おにいさん)", "Read double consonants with small っ"],
+        warmUp: "Say 'rock' and 'lock' slowly. Now say them with a tiny pause before the final consonant. That's what っ does!",
+        canDo: ["Distinguish long vs short vowels in hiragana", "Read double consonants written with small っ"],
+        grammar: `Long vowels: hold the vowel for 2 beats
+おかあさん(mother): お-か-あ-さ-ん — the あ extends か
+おにいさん(older brother): に is held 2 beats
 
-The Japanese 'r' is NOT like English 'r'. It's closer to a light 'd' or 'l' sound — the tongue briefly taps the roof of the mouth.
-
-Many dictionary forms of verbs end in る: たべる(eat)、みる(see)、する(do).`,
-        reading: `Vocabulary:
-らいねん(next year)  りんご(apple)  るすばん(house-sitting)  れきし(history)  ろうか(corridor)`,
+Small っ = geminate consonant (double it):
+きって(stamp): き-っ-て → ki-t-te
+ざっし(magazine): ざ-っ-し → za-s-shi`,
+        reading: `Long vowels change meaning:
+おじさん(uncle) vs おじいさん(grandfather)
+おばさん(aunt) vs おばあさん(grandmother)`,
         dialogue: [
-          { speaker: "A", text: "りんごをたべる？", translation: "Will you eat an apple?" },
-          { speaker: "B", text: "らいねん、れきしをべんきょうする。", translation: "Next year, I'll study history." },
+          { speaker: "キム", text: "おかあさんはおげんきですか？", translation: "Is your mother doing well?" },
+          { speaker: "ハナ", text: "はい、げんきです。きってをあつめています。", translation: "Yes, she's fine. She collects stamps." },
         ],
+        patternExamples: [],
+        cultureNote: "Long vowels are critically important in Japanese — a short vs. long vowel can completely change meaning. Learners who ignore them often get confused. Train your ear carefully!",
         vocab: [
-          { term: "らいねん", reading: "rainen", meaning: "next year", example: "らいねんにほんにいく。(Going to Japan next year.)" },
-          { term: "りんご", reading: "ringo", meaning: "apple", example: "りんごをたべた。(I ate an apple.)" },
-          { term: "るすばん", reading: "rusuban", meaning: "house-sitting / being home alone", example: "るすばんをする。(House-sit.)" },
-          { term: "れきし", reading: "rekishi", meaning: "history", example: "れきしがすき。(I like history.)" },
-          { term: "ろうか", reading: "rouka", meaning: "corridor / hallway", example: "ろうかをあるく。(Walk down the hallway.)" },
+          { term: "おかあさん", reading: "okaasan", meaning: "mother (polite)", example: "おかあさんはどこ？" },
+          { term: "おにいさん", reading: "oniisan", meaning: "older brother (polite)", example: "おにいさんはがくせいです。" },
+          { term: "きって", reading: "kitte", meaning: "stamp", example: "きってをはる。" },
+          { term: "ざっし", reading: "zasshi", meaning: "magazine", example: "ざっしをよむ。" },
+          { term: "きっぷ", reading: "kippu", meaning: "ticket", example: "きっぷをかう。" },
         ],
         quiz: [
-          q("The Japanese 'r' sound is closest to…", ["English r","English l or d","English w","silent"], 1, "hiragana-r"),
-          q("'りんご' means…", ["next year","history","apple","corridor"], 2, "vocab"),
-          q("Many verb dictionary forms end in…", ["ん","の","る","も"], 2, "hiragana-r"),
-          q("'れきし' means…", ["apple","history","corridor","house-sitting"], 1, "vocab"),
+          q("Small っ indicates…", ["a long vowel","a silent vowel","a double consonant","a question mark"], 2, "small-tsu"),
+          q("'おじいさん' means…", ["uncle","grandfather","father","older brother"], 1, "long-vowels"),
+          q("'きっぷ' is read as…", ["kipu","kippu","kibu","kibbu"], 1, "small-tsu"),
+          qFill("What doubles in ざっし?", ["s","ss"], "small-tsu"),
         ],
       },
-      // ⑩ Dakuten — voiced consonants
       {
-        title: "Dakuten — Voiced Consonants (が・ざ・だ・ば・ぱ)",
-        objectives: ["Understand dakuten (゛) and handakuten (゜)", "Read voiced K/S/T/H rows"],
-        grammar: `Adding ゛(dakuten) to an unvoiced character voices it:
-  か→が(ga)  き→ぎ(gi)  く→ぐ(gu)  け→げ(ge)  こ→ご(go)
-  さ→ざ(za)  し→じ(ji)  す→ず(zu)  せ→ぜ(ze)  そ→ぞ(zo)
-  た→だ(da)  ち→ぢ(ji*)  つ→づ(zu*)  て→で(de)  と→ど(do)
-  は→ば(ba)  ひ→び(bi)  ふ→ぶ(bu)  へ→べ(be)  ほ→ぼ(bo)
-
-Adding ゜(handakuten) to H-row gives P sounds:
-  は→ぱ(pa)  ひ→ぴ(pi)  ふ→ぷ(pu)  へ→ぺ(pe)  ほ→ぽ(po)
-
-*ぢ and づ are rare; じ and ず are used in most words.`,
-        reading: `Key words:
-がっこう(school)  ざっし(magazine)  だいがく(university)  ばしょ(place)  ぱん(bread)
-
-だいがくのがっこうはおおきい。(The university campus is big.)`,
+        title: "Hiragana Reading Practice",
+        objectives: ["Read natural hiragana sentences", "Build reading fluency"],
+        warmUp: "You know all the hiragana! Let's see how quickly you can read a full sentence.",
+        canDo: ["Read short Japanese sentences written entirely in hiragana", "Recognize common patterns from all hiragana rows"],
+        grammar: `Review of key particles:
+は (topic)  を (object)  に (location/time)  で (location of action)  が (subject)
+わたしはがくせいです。/ えきにいきます。/ こうえんでたべます。`,
+        reading: `はなはインドネシアからきました。まいにちにほんごをべんきょうしています。
+サトウさんはにほんじんです。やさしいひとです。
+キムさんはかんこくからきました。さかなとすしがすきです。`,
         dialogue: [
-          { speaker: "A", text: "がっこうはどこ？", translation: "Where is the school?" },
-          { speaker: "B", text: "えきのそば。ぱんをかってから、ざっしをよむ。", translation: "Near the station. After buying bread, I'll read a magazine." },
+          { speaker: "ハナ", text: "にほんごはむずかしいですか？", translation: "Is Japanese difficult?" },
+          { speaker: "サトウ", text: "むずかしいけど、たのしいですよ！", translation: "It's difficult, but it's fun!" },
+          { speaker: "キム", text: "わたしもそうおもいます。", translation: "I think so too." },
         ],
+        patternExamples: [
+          { pattern: "[place]に いきます", examples: ["えきにいきます (I'm going to the station)", "がっこうにいきます (I'm going to school)"] },
+          { pattern: "[place]で [action]します", examples: ["こうえんでたべます (I eat in the park)", "うちでべんきょうします (I study at home)"] },
+        ],
+        cultureNote: "Young children's books in Japan are written entirely in hiragana. Once you can read this script fluently, you can start enjoying children's literature like 'はじめてのおつかい' (My First Errand).",
         vocab: [
-          { term: "がっこう", reading: "gakkou", meaning: "school", example: "がっこうにいく。(Go to school.)" },
-          { term: "ざっし", reading: "zasshi", meaning: "magazine", example: "ざっしをよむ。(Read a magazine.)" },
-          { term: "だいがく", reading: "daigaku", meaning: "university", example: "だいがくでべんきょうする。(Study at university.)" },
-          { term: "ばしょ", reading: "basho", meaning: "place / location", example: "ばしょをおしえて。(Tell me the place.)" },
-          { term: "ぱん", reading: "pan", meaning: "bread", example: "ぱんをたべる。(Eat bread.)" },
+          { term: "むずかしい", reading: "muzukashii", meaning: "difficult", example: "にほんごはむずかしい。" },
+          { term: "たのしい", reading: "tanoshii", meaning: "fun", example: "がっこうはたのしい。" },
+          { term: "べんきょう", reading: "benkyou", meaning: "study", example: "まいにちべんきょうする。" },
+          { term: "にほんじん", reading: "nihonjin", meaning: "Japanese person", example: "サトウさんはにほんじんです。" },
+          { term: "かんこく", reading: "kankoku", meaning: "South Korea", example: "キムさんはかんこくからです。" },
         ],
         quiz: [
-          q("Dakuten (゛) makes a sound…", ["higher","lower/voiced","softer","longer"], 1, "hiragana-dakuten"),
-          q("か + ゛= ?", ["さ","が","ざ","た"], 1, "hiragana-dakuten"),
-          q("'がっこう' means…", ["magazine","bread","school","university"], 2, "vocab"),
-          q("Handakuten (゜) on H-row produces…", ["G sounds","Z sounds","P sounds","B sounds"], 2, "hiragana-handakuten"),
-        ],
-      },
-      // ⑪ Combination sounds
-      {
-        title: "Combination Sounds — 拗音 (きゃ・しゃ・ちゃ…)",
-        objectives: ["Read combination (yoon) characters", "Recognize them in common words"],
-        grammar: `Combining an i-column character with small や/ゆ/よ creates one syllable:
-
-き+ゃ = きゃ(kya)   き+ゅ = きゅ(kyu)   き+ょ = きょ(kyo)
-し+ゃ = しゃ(sha)   し+ゅ = しゅ(shu)   し+ょ = しょ(sho)
-ち+ゃ = ちゃ(cha)   ち+ゅ = ちゅ(chu)   ち+ょ = ちょ(cho)
-に+ゃ = にゃ(nya)   ひ+ゃ = ひゃ(hya)   み+ゃ = みゃ(mya)
-り+ゃ = りゃ(rya)
-
-The small や/ゆ/よ is written smaller than normal.`,
-        reading: `Common words:
-きゃく(guest)  しゃしん(photo)  ちゃいろ(brown)  しゅくだい(homework)  びょういん(hospital)`,
-        dialogue: [
-          { speaker: "A", text: "しゃしんをとっていい？", translation: "May I take a photo?" },
-          { speaker: "B", text: "きゃくさんは、どうぞ。ちゃいろのかばんもいい？", translation: "Guests, please go ahead. The brown bag too?" },
-        ],
-        vocab: [
-          { term: "きゃく", reading: "kyaku", meaning: "guest / customer", example: "きゃくがくる。(A guest is coming.)" },
-          { term: "しゃしん", reading: "shashin", meaning: "photo / photograph", example: "しゃしんをとる。(Take a photo.)" },
-          { term: "ちゃいろ", reading: "chairо", meaning: "brown (color)", example: "ちゃいろのいぬ。(A brown dog.)" },
-          { term: "しゅくだい", reading: "shukudai", meaning: "homework", example: "しゅくだいをする。(Do homework.)" },
-          { term: "びょういん", reading: "byouin", meaning: "hospital", example: "びょういんにいく。(Go to the hospital.)" },
-        ],
-        quiz: [
-          q("きゃ is how many sounds/syllables?", ["2","3","1","4"], 2, "hiragana-yoon"),
-          q("し + small ゃ = ?", ["しや","しゃ","さや","しあ"], 1, "hiragana-yoon"),
-          q("'しゃしん' means…", ["homework","photo","guest","hospital"], 1, "vocab"),
-          q("'びょういん' means…", ["photo","school","hospital","station"], 2, "vocab"),
+          qReorder("Build: 'I study Japanese every day':", ["にほんごを","まいにち","べんきょうします","わたしは"], [3,1,0,2], "hiragana-practice"),
+          q("'むずかしい' means…", ["easy","fun","difficult","interesting"], 2, "vocab"),
+          qMatch("Match the particle to its use:", [["は","topic"],["を","object"],["に","location/direction"]], "particles"),
+          q("'にほんじん' means…", ["Japanese language","Japanese person","Japan","Japanese food"], 1, "vocab"),
         ],
       },
     ],
@@ -443,176 +412,124 @@ The small や/ゆ/よ is written smaller than normal.`,
   {
     title: "Katakana",
     levelLabel: "N5",
-    description: "Master all katakana used in foreign loanwords across 8 lessons.",
+    description: "Master all 46 katakana characters — essential for reading loanwords.",
     prereqTitles: ["Hiragana"],
     autoCompleteLevel: "intermediate,advanced",
     modules: [
-      // ① Vowels
       {
-        title: "Katakana Vowels — アイウエオ",
-        objectives: ["Read ア・イ・ウ・エ・オ", "Recognize loanwords using the vowels"],
-        grammar: `Katakana has the same sounds as Hiragana but different shapes. It's used for:
-• Foreign loanwords (コーヒー = coffee)
-• Foreign names (アメリカ = America)
-• Emphasis or technical terms
+        title: "Vowels & A-K rows — ア行～カ行",
+        objectives: ["Read ア・イ・ウ・エ・オ and カ・キ・ク・ケ・コ", "Recognize katakana in loanwords"],
+        warmUp: "Look at a Japanese menu or product label. Can you spot any angular-looking characters? Those are katakana!",
+        canDo: ["Read katakana vowels and K-row", "Identify loanwords written in katakana"],
+        grammar: `Katakana vowels: ア(a) イ(i) ウ(u) エ(e) オ(o)
+K-row: カ(ka) キ(ki) ク(ku) ケ(ke) コ(ko)
 
-Vowels:  ア(a)  イ(i)  ウ(u)  エ(e)  オ(o)
-
-ー (long dash) extends any vowel: コー = koo (as in coffee こーひー)`,
-        reading: `ア→イ→ウ→エ→オ. Notice how they look more angular/sharp than hiragana.
-Tip: ア looks like hiragana あ missing one stroke.`,
+Katakana is used for: loanwords, foreign names, emphasis, onomatopoeia.
+Long vowel in katakana uses ー: コーヒー(coffee) ケーキ(cake)`,
+        reading: `Loanwords: アイスクリーム(ice cream) エアコン(air conditioner) コーヒー(coffee) ケーキ(cake)`,
         dialogue: [
-          { speaker: "A", text: "アイスクリームをください。", translation: "An ice cream, please." },
-          { speaker: "B", text: "ウーロンティーもあります。", translation: "We also have oolong tea." },
+          { speaker: "ハナ", text: "コーヒーとケーキ、ください。", translation: "Coffee and cake, please." },
+          { speaker: "サトウ", text: "アイスクリームはどうですか？", translation: "How about ice cream?" },
         ],
+        patternExamples: [],
+        cultureNote: "Japanese borrows heavily from English, French, and German. Modern Japanese has tens of thousands of loanwords (外来語 gaikokugo). Reading katakana unlocks menus, products, and modern Japanese media.",
         vocab: [
-          { term: "アイス", reading: "aisu", meaning: "ice (cream)", example: "アイスをたべる。(Eat ice cream.)" },
-          { term: "エアコン", reading: "eakon", meaning: "air conditioner", example: "エアコンをつける。(Turn on the AC.)" },
-          { term: "ウール", reading: "uuru", meaning: "wool", example: "ウールのセーター。(A wool sweater.)" },
-          { term: "オーブン", reading: "oobun", meaning: "oven", example: "オーブンでやく。(Bake in the oven.)" },
-          { term: "イメージ", reading: "imeeji", meaning: "image", example: "イメージをもつ。(Have an image/idea.)" },
+          { term: "コーヒー", reading: "koohii", meaning: "coffee", example: "コーヒーをのむ。" },
+          { term: "ケーキ", reading: "keeki", meaning: "cake", example: "ケーキをたべる。" },
+          { term: "アイスクリーム", reading: "aisukuriimu", meaning: "ice cream", example: "アイスクリームがすき。" },
+          { term: "エアコン", reading: "eakon", meaning: "air conditioner", example: "エアコンをつける。" },
+          { term: "カメラ", reading: "kamera", meaning: "camera", example: "カメラをかう。" },
         ],
         quiz: [
-          q("ア corresponds to which hiragana?", ["い","う","あ","え"], 2, "katakana-vowels"),
-          q("'ー' in katakana indicates…", ["a pause","a long vowel","a new word","a question"], 1, "katakana-long"),
-          q("'アイス' means…", ["air","ice","oven","wool"], 1, "vocab"),
-          q("Katakana is mainly used for…", ["verbs","particles","loanwords","grammar"], 2, "katakana-usage"),
+          q("ア reads as…", ["i","u","a","e"], 2, "katakana-vowels"),
+          q("Long vowel ー in コーヒー extends…", ["the previous vowel","the next vowel","the consonant","nothing"], 0, "long-vowel"),
+          q("'ケーキ' means…", ["coffee","cake","camera","car"], 1, "vocab"),
+          qMatch("Match katakana to hiragana equivalent:", [["ア","あ"],["イ","い"],["コ","こ"]], "katakana-match"),
         ],
       },
-      // ② K-row
       {
-        title: "K-row Katakana — カキクケコ",
-        objectives: ["Read カ・キ・ク・ケ・コ", "Identify K-row loanwords"],
-        grammar: `K-row katakana:  カ(ka)  キ(ki)  ク(ku)  ケ(ke)  コ(ko)
+        title: "S & T rows — サ行・タ行",
+        objectives: ["Read サ・シ・ス・セ・ソ and タ・チ・ツ・テ・ト", "Spot irregular sounds シ・チ・ツ"],
+        warmUp: "Can you guess what テレビ (terebi) means? It's a loanword you definitely know!",
+        canDo: ["Read S-row and T-row katakana", "Decode common loanwords using these rows"],
+        grammar: `S-row: サ(sa) シ(shi) ス(su) セ(se) ソ(so)
+T-row: タ(ta) チ(chi) ツ(tsu) テ(te) ト(to)
 
-Compare with hiragana:  か(ka)  き(ki)  く(ku)  け(ke)  こ(ko)
-Katakana tends to be more angular and straight-lined.`,
-        reading: `Loanwords using K-row:
-カメラ(camera)  キロ(kilo)  クラス(class)  ケーキ(cake)  コーヒー(coffee)`,
+Double consonants with ッ: テスト→テッスト? No — テスト(test) is fine.
+ッ doubles the next consonant: ベッド(bed), ポット(pot)`,
+        reading: `Loanwords: テレビ(TV) スーパー(supermarket) タクシー(taxi) チケット(ticket)`,
         dialogue: [
-          { speaker: "A", text: "コーヒーとケーキをください。", translation: "Coffee and cake, please." },
-          { speaker: "B", text: "カメラもありますか？", translation: "Do you also have a camera?" },
+          { speaker: "キム", text: "スーパーでテレビをみた？", translation: "Did you see the TV at the supermarket?" },
+          { speaker: "ハナ", text: "タクシーでいったの？チケットはかった？", translation: "Did you go by taxi? Did you buy a ticket?" },
         ],
+        patternExamples: [],
+        cultureNote: "テレビ (terebi) comes from 'television'. Japanese often shortens loanwords: テレビジョン→テレビ, アパートメント→アパート. These shortened forms are uniquely Japanese!",
         vocab: [
-          { term: "カメラ", reading: "kamera", meaning: "camera", example: "カメラでとる。(Take with a camera.)" },
-          { term: "キロ", reading: "kiro", meaning: "kilo(gram/metre)", example: "ごキロ。(5 kilo.)" },
-          { term: "ケーキ", reading: "keeki", meaning: "cake", example: "ケーキをつくる。(Make a cake.)" },
-          { term: "コーヒー", reading: "koohii", meaning: "coffee", example: "コーヒーがすき。(I like coffee.)" },
-          { term: "クラス", reading: "kurasu", meaning: "class", example: "クラスにいる。(Be in class.)" },
+          { term: "テレビ", reading: "terebi", meaning: "television", example: "テレビをみる。" },
+          { term: "スーパー", reading: "suupaa", meaning: "supermarket", example: "スーパーでかう。" },
+          { term: "タクシー", reading: "takushii", meaning: "taxi", example: "タクシーにのる。" },
+          { term: "チケット", reading: "chiketto", meaning: "ticket", example: "チケットをかう。" },
+          { term: "テスト", reading: "tesuto", meaning: "test / exam", example: "テストはむずかしい。" },
         ],
         quiz: [
-          q("コーヒー means…", ["cake","camera","coffee","class"], 2, "vocab"),
-          q("ケ reads as…", ["ki","ku","ke","ko"], 2, "katakana-k"),
-          q("'ケーキ' means…", ["camera","cake","coffee","kilo"], 1, "vocab"),
-          q("カ corresponds to which hiragana?", ["き","か","く","こ"], 1, "katakana-k"),
+          q("テレビ means…", ["telephone","telescope","television","terminal"], 2, "vocab"),
+          q("ッ (small tsu) indicates…", ["a long vowel","a double consonant","silence","question"], 1, "small-tsu"),
+          q("スーパー means…", ["super hero","supervisor","supermarket","super fast"], 2, "vocab"),
+          qFill("Write the katakana for 'te':", ["テ"], "katakana-t"),
         ],
       },
-      // ③ S-row
       {
-        title: "S-row Katakana — サシスセソ",
-        objectives: ["Read サ・シ・ス・セ・ソ", "Spot S-row katakana in menus and signs"],
-        grammar: `S-row:  サ(sa)  シ(shi)  ス(su)  セ(se)  ソ(so)
-Note: シ and ツ look similar! Remember: シ = 'shi' (strokes go /) and ツ = 'tsu' (strokes go \\).`,
-        reading: `Loanwords:
-サラダ(salad)  シャツ(shirt/T-shirt)  スポーツ(sports)  セール(sale)  ソファ(sofa)`,
+        title: "N & H rows — ナ行・ハ行",
+        objectives: ["Read ナ・ニ・ヌ・ネ・ノ and ハ・ヒ・フ・ヘ・ホ"],
+        warmUp: "ハンバーガー — can you read this katakana word? What do you think it means?",
+        canDo: ["Read N-row and H-row katakana", "Read food-related loanwords"],
+        grammar: `N-row: ナ(na) ニ(ni) ヌ(nu) ネ(ne) ノ(no)
+H-row: ハ(ha) ヒ(hi) フ(fu) ヘ(he) ホ(ho)
+
+Note: フ = 'fu' (same as hiragana ふ)`,
+        reading: `Food loanwords: ハンバーガー(hamburger) ホットドッグ(hot dog) フライドポテト(french fries) ノート(notebook)`,
         dialogue: [
-          { speaker: "A", text: "スポーツはすきですか？", translation: "Do you like sports?" },
-          { speaker: "B", text: "サッカーがすき。シャツもセールでかった。", translation: "I like soccer. I also bought a shirt on sale." },
+          { speaker: "ハナ", text: "ハンバーガーとフライドポテトをください。", translation: "A hamburger and french fries, please." },
+          { speaker: "サトウ", text: "ホットドッグはどうですか？", translation: "How about a hot dog?" },
         ],
+        patternExamples: [],
+        cultureNote: "Japan's fast food culture blends loanwords with Japanese: マクドナルド (McDonald's) is called 'Makudo' by locals. Japanese fast food menus are a great resource for katakana reading practice!",
         vocab: [
-          { term: "サラダ", reading: "sarada", meaning: "salad", example: "サラダをたべる。(Eat a salad.)" },
-          { term: "シャツ", reading: "shatsu", meaning: "shirt / T-shirt", example: "しろいシャツ。(A white shirt.)" },
-          { term: "スポーツ", reading: "supootsu", meaning: "sports", example: "スポーツをする。(Play sports.)" },
-          { term: "セール", reading: "seeru", meaning: "sale", example: "セールちゅう。(On sale now.)" },
-          { term: "ソファ", reading: "sofa", meaning: "sofa / couch", example: "ソファにすわる。(Sit on the sofa.)" },
+          { term: "ハンバーガー", reading: "hanbaagaa", meaning: "hamburger", example: "ハンバーガーをたべる。" },
+          { term: "ホットドッグ", reading: "hottodoggu", meaning: "hot dog", example: "ホットドッグがすき。" },
+          { term: "フライドポテト", reading: "furaidopoteto", meaning: "french fries", example: "フライドポテトをたのむ。" },
+          { term: "ノート", reading: "nooto", meaning: "notebook", example: "ノートにかく。" },
+          { term: "ニュース", reading: "nyuusu", meaning: "news", example: "ニュースをきく。" },
         ],
         quiz: [
-          q("The difference between シ and ツ is…", ["size","stroke direction","vowel sound","usage"], 1, "katakana-shi-tsu"),
-          q("'サラダ' means…", ["shirt","salad","sofa","sale"], 1, "vocab"),
-          q("シ reads as…", ["sa","su","si","shi"], 3, "katakana-s"),
-          q("'スポーツ' means…", ["sports","shirt","sofa","sale"], 0, "vocab"),
+          q("ハンバーガー means…", ["hot dog","hamburger","sandwich","pizza"], 1, "vocab"),
+          q("フ reads as…", ["hu","fu","pu","bu"], 1, "katakana-h"),
+          q("ノート means…", ["note","notebook","noodle","novel"], 1, "vocab"),
+          qFill("Write katakana for 'na':", ["ナ"], "katakana-n"),
         ],
       },
-      // ④ T-row
       {
-        title: "T-row Katakana — タチツテト",
-        objectives: ["Read タ・チ・ツ・テ・ト", "Distinguish ツ from シ"],
-        grammar: `T-row:  タ(ta)  チ(chi)  ツ(tsu)  テ(te)  ト(to)
+        title: "M & Y rows — マ行・ヤ行",
+        objectives: ["Read マ・ミ・ム・メ・モ and ヤ・ユ・ヨ"],
+        warmUp: "メニュー — you've seen this word before. What does it mean?",
+        canDo: ["Read M-row and Y-row katakana", "Read restaurant and daily-life loanwords"],
+        grammar: `M-row: マ(ma) ミ(mi) ム(mu) メ(me) モ(mo)
+Y-row: ヤ(ya) ユ(yu) ヨ(yo)
 
-Memory tricks:
-• タ looks like a tent → 'ta'
-• テ looks like a TV antenna → 'te'
-• ト looks like a totem → 'to'
-• ツ = 'tsu', strokes go downward \\`,
-        reading: `Loanwords:
-タクシー(taxi)  チケット(ticket)  ツアー(tour)  テスト(test)  トイレ(toilet)`,
+ヨーグルト(yogurt), メニュー(menu), ミルク(milk)`,
+        reading: `Cafe vocabulary: メニュー(menu) ミルク(milk) ヨーグルト(yogurt) マヨネーズ(mayonnaise)`,
         dialogue: [
-          { speaker: "A", text: "タクシーでテストのばしょへいく？", translation: "Going to the test location by taxi?" },
-          { speaker: "B", text: "いや、ツアーバス。チケットもある。", translation: "No, tour bus. I have a ticket too." },
+          { speaker: "キム", text: "メニューをみてもいいですか？", translation: "May I look at the menu?" },
+          { speaker: "サトウ", text: "どうぞ。ヨーグルトとミルクがおすすめです。", translation: "Please go ahead. The yogurt and milk are recommended." },
         ],
+        patternExamples: [],
+        cultureNote: "Japanese cafes (カフェ) are beloved — Japan has the highest density of cafes in Asia. Ordering in katakana is your first real-world Japanese skill!",
         vocab: [
-          { term: "タクシー", reading: "takushii", meaning: "taxi", example: "タクシーをよぶ。(Call a taxi.)" },
-          { term: "チケット", reading: "chiketto", meaning: "ticket", example: "チケットをかう。(Buy a ticket.)" },
-          { term: "ツアー", reading: "tsuaa", meaning: "tour", example: "ツアーにさんか。(Join the tour.)" },
-          { term: "テスト", reading: "tesuto", meaning: "test / exam", example: "テストをうける。(Take a test.)" },
-          { term: "トイレ", reading: "toire", meaning: "toilet / restroom", example: "トイレはどこ？(Where is the restroom?)" },
-        ],
-        quiz: [
-          q("ツ reads as…", ["ti","chi","tsu","tu"], 2, "katakana-t"),
-          q("'タクシー' means…", ["ticket","taxi","tour","test"], 1, "vocab"),
-          q("'トイレ' means…", ["test","toilet","ticket","taxi"], 1, "vocab"),
-          q("ツ and シ are different in…", ["sound and stroke direction","only sound","only shape","nothing"], 0, "katakana-shi-tsu"),
-        ],
-      },
-      // ⑤ N-row + H-row
-      {
-        title: "N & H rows — ナニヌネノ / ハヒフヘホ",
-        objectives: ["Read all N-row and H-row katakana", "Identify loanwords using these rows"],
-        grammar: `N-row:  ナ(na)  ニ(ni)  ヌ(nu)  ネ(ne)  ノ(no)
-H-row:  ハ(ha)  ヒ(hi)  フ(fu)  ヘ(he)  ホ(ho)
-
-ノ looks like a simple slash — easy to remember as 'no'.
-フ = 'fu' just like in hiragana.`,
-        reading: `Loanwords:
-ナイフ(knife)  ニュース(news)  ネット(net/internet)  ハンバーガー(hamburger)  ホテル(hotel)  ヒーロー(hero)`,
-        dialogue: [
-          { speaker: "A", text: "ホテルでニュースをみた。", translation: "I watched the news at the hotel." },
-          { speaker: "B", text: "ハンバーガーとナイフがあった？", translation: "Was there a hamburger and a knife?" },
-        ],
-        vocab: [
-          { term: "ナイフ", reading: "naifu", meaning: "knife", example: "ナイフをつかう。(Use a knife.)" },
-          { term: "ニュース", reading: "nyuusu", meaning: "news", example: "ニュースをみる。(Watch the news.)" },
-          { term: "ネット", reading: "netto", meaning: "internet / net", example: "ネットでしらべる。(Look it up online.)" },
-          { term: "ハンバーガー", reading: "hanbaagaa", meaning: "hamburger", example: "ハンバーガーをたべる。(Eat a hamburger.)" },
-          { term: "ホテル", reading: "hoteru", meaning: "hotel", example: "ホテルにとまる。(Stay at a hotel.)" },
-        ],
-        quiz: [
-          q("ノ reads as…", ["na","ni","nu","no"], 3, "katakana-n"),
-          q("'ホテル' means…", ["hotel","hero","news","hamburger"], 0, "vocab"),
-          q("'ニュース' means…", ["knife","net","news","hotel"], 2, "vocab"),
-          q("'ハンバーガー' means…", ["hamburger","knife","net","news"], 0, "vocab"),
-        ],
-      },
-      // ⑥ M-row + Y-row
-      {
-        title: "M & Y rows — マミムメモ / ヤユヨ",
-        objectives: ["Read マ-row and ヤ-row katakana"],
-        grammar: `M-row:  マ(ma)  ミ(mi)  ム(mu)  メ(me)  モ(mo)
-Y-row:  ヤ(ya)  ユ(yu)  ヨ(yo)  (only 3 characters)
-
-Tip: ユ looks like the letter U — sounds like 'yu'.`,
-        reading: `Loanwords:
-マップ(map)  ミルク(milk)  メニュー(menu)  マスク(mask)  ヨーグルト(yogurt)  ユーモア(humor)`,
-        dialogue: [
-          { speaker: "A", text: "メニューをみて。ヨーグルトもある。", translation: "Look at the menu. There's yogurt too." },
-          { speaker: "B", text: "マップはある？ミルクをかいたい。", translation: "Is there a map? I want to buy milk." },
-        ],
-        vocab: [
-          { term: "マップ", reading: "mappu", meaning: "map", example: "マップをみる。(Look at a map.)" },
-          { term: "ミルク", reading: "miruku", meaning: "milk", example: "ミルクをのむ。(Drink milk.)" },
-          { term: "メニュー", reading: "menyuu", meaning: "menu", example: "メニューをください。(Menu, please.)" },
-          { term: "ヨーグルト", reading: "yooguruto", meaning: "yogurt", example: "ヨーグルトをたべる。(Eat yogurt.)" },
-          { term: "マスク", reading: "masuku", meaning: "mask", example: "マスクをつける。(Put on a mask.)" },
+          { term: "メニュー", reading: "menyuu", meaning: "menu", example: "メニューをください。" },
+          { term: "ミルク", reading: "miruku", meaning: "milk", example: "ミルクをのむ。" },
+          { term: "ヨーグルト", reading: "yooguruto", meaning: "yogurt", example: "ヨーグルトをたべる。" },
+          { term: "マスク", reading: "masuku", meaning: "mask", example: "マスクをつける。" },
+          { term: "ユニフォーム", reading: "yunifoomu", meaning: "uniform", example: "ユニフォームをきる。" },
         ],
         quiz: [
           q("ユ reads as…", ["ma","mi","yu","yo"], 2, "katakana-y"),
@@ -621,27 +538,27 @@ Tip: ユ looks like the letter U — sounds like 'yu'.`,
           q("The Y-row has how many characters?", ["5","4","3","2"], 2, "katakana-y"),
         ],
       },
-      // ⑦ R-row + W-row + ン
       {
-        title: "R & W rows + ン — ラリルレロ / ワヲン",
+        title: "R & W rows + ン — ラ行・ワ行・ン",
         objectives: ["Complete all katakana rows", "Read ン (n) at end of syllables"],
-        grammar: `R-row:  ラ(ra)  リ(ri)  ル(ru)  レ(le/re)  ロ(ro)
-W-row:  ワ(wa)  ヲ(wo) — ヲ is very rare in loanwords
-ン = the only katakana standalone consonant (same as ん)
-
-You now know ALL 46 basic katakana characters! 🎉`,
-        reading: `Loanwords:
-ラジオ(radio)  リモコン(remote control)  レストラン(restaurant)  ロボット(robot)  ワイン(wine)`,
+        warmUp: "レストラン — can you decode this word? It's somewhere you eat!",
+        canDo: ["Read all 46 base katakana characters", "Read standalone ン at the end of syllables"],
+        grammar: `R-row: ラ(ra) リ(ri) ル(ru) レ(re) ロ(ro)
+W-row: ワ(wa) ヲ(wo) — ヲ is very rare in loanwords
+ン = standalone 'n': レストラン(restaurant), ワイン(wine)`,
+        reading: `Loanwords: ラジオ(radio) リモコン(remote control) レストラン(restaurant) ロボット(robot) ワイン(wine)`,
         dialogue: [
-          { speaker: "A", text: "レストランでワインをのんだ。", translation: "I drank wine at the restaurant." },
-          { speaker: "B", text: "ラジオでロボットのニュースをきいた。", translation: "I heard news about robots on the radio." },
+          { speaker: "ハナ", text: "レストランでワインをのんだ。", translation: "I drank wine at the restaurant." },
+          { speaker: "キム", text: "ラジオでロボットのニュースをきいた。", translation: "I heard robot news on the radio." },
         ],
+        patternExamples: [],
+        cultureNote: "You now know all 46 basic katakana! Japanese wine culture (ワイン文化) has exploded since the 1990s. Many Japanese wine words are French loanwords written in katakana.",
         vocab: [
-          { term: "ラジオ", reading: "rajio", meaning: "radio", example: "ラジオをきく。(Listen to the radio.)" },
-          { term: "リモコン", reading: "rimokon", meaning: "remote control", example: "リモコンはどこ？(Where is the remote?)" },
-          { term: "レストラン", reading: "resutoran", meaning: "restaurant", example: "レストランにいく。(Go to the restaurant.)" },
-          { term: "ロボット", reading: "robotto", meaning: "robot", example: "ロボットがいる。(There is a robot.)" },
-          { term: "ワイン", reading: "wain", meaning: "wine", example: "ワインをのむ。(Drink wine.)" },
+          { term: "ラジオ", reading: "rajio", meaning: "radio", example: "ラジオをきく。" },
+          { term: "リモコン", reading: "rimokon", meaning: "remote control", example: "リモコンはどこ？" },
+          { term: "レストラン", reading: "resutoran", meaning: "restaurant", example: "レストランにいく。" },
+          { term: "ロボット", reading: "robotto", meaning: "robot", example: "ロボットがいる。" },
+          { term: "ワイン", reading: "wain", meaning: "wine", example: "ワインをのむ。" },
         ],
         quiz: [
           q("ン is…", ["a vowel","a standalone 'n' consonant","a particle","a verb ending"], 1, "katakana-n"),
@@ -650,30 +567,26 @@ You now know ALL 46 basic katakana characters! 🎉`,
           q("After this lesson, how many base katakana do you know?", ["40","44","46","50"], 2, "katakana-complete"),
         ],
       },
-      // ⑧ Dakuten + Extended sounds
       {
-        title: "Katakana Dakuten & Extended Sounds",
-        objectives: ["Read voiced katakana", "Read extended katakana for foreign sounds: ファ, ティ, ウィ"],
-        grammar: `Dakuten works exactly the same as in hiragana:
-ガ(ga)  ザ(za)  ダ(da)  バ(ba)  パ(pa)  ビ(bi)  ブ(bu) etc.
-
-Extended katakana for sounds not in Japanese:
-ファ(fa)  フィ(fi)  フェ(fe)  フォ(fo)
-ティ(ti/thi)  ディ(di)  ウィ(wi)  ウェ(we)  ウォ(wo)
-チェ(che)  シェ(she)  ジェ(je)`,
-        reading: `Fashion loanwords use many extended sounds:
-ファッション(fashion)  ティッシュ(tissue)  ディスカウント(discount)
-ウィンドウ(window)  チェック(check)  バッグ(bag)`,
+        title: "Dakuten & Extended Sounds",
+        objectives: ["Read voiced katakana", "Read extended katakana: ファ, ティ, ウィ"],
+        warmUp: "You know ファッション means 'fashion'. Can you figure out what sound ファ makes?",
+        canDo: ["Read dakuten katakana: ガ・ザ・ダ・バ", "Read extended sounds ファ・ティ・ウィ for foreign names"],
+        grammar: `Dakuten: カ→ガ(ga) サ→ザ(za) タ→ダ(da) ハ→バ(ba) ハ→パ(pa)
+Extended: ファ(fa) フィ(fi) フェ(fe) フォ(fo) ティ(ti) ディ(di) ウィ(wi)`,
+        reading: `Fashion vocabulary: ファッション(fashion) ティッシュ(tissue) ディスカウント(discount) バッグ(bag)`,
         dialogue: [
-          { speaker: "A", text: "ファッションのバッグをチェックして。", translation: "Check out the fashion bag." },
-          { speaker: "B", text: "ティッシュもディスカウントだ！", translation: "The tissues are discounted too!" },
+          { speaker: "ハナ", text: "ファッションのバッグをチェックして。", translation: "Check out the fashion bag." },
+          { speaker: "キム", text: "ティッシュもディスカウントだ！", translation: "The tissues are discounted too!" },
         ],
+        patternExamples: [],
+        cultureNote: "Extended katakana sounds like ファ and ティ were created to write foreign words more accurately. As Japan globalized, the katakana system expanded to handle sounds not native to Japanese.",
         vocab: [
-          { term: "ファッション", reading: "fasshon", meaning: "fashion", example: "ファッションがすき。(I like fashion.)" },
-          { term: "ティッシュ", reading: "tisshu", meaning: "tissue (paper)", example: "ティッシュをとる。(Take a tissue.)" },
-          { term: "バッグ", reading: "baggu", meaning: "bag", example: "バッグをかう。(Buy a bag.)" },
-          { term: "チェック", reading: "chekku", meaning: "check / checkered", example: "チェックする。(Check it.)" },
-          { term: "ウィンドウ", reading: "windou", meaning: "window (computing/display)", example: "ウィンドウをひらく。(Open a window.)" },
+          { term: "ファッション", reading: "fasshon", meaning: "fashion", example: "ファッションがすき。" },
+          { term: "ティッシュ", reading: "tisshu", meaning: "tissue", example: "ティッシュをとる。" },
+          { term: "バッグ", reading: "baggu", meaning: "bag", example: "バッグをかう。" },
+          { term: "チェック", reading: "chekku", meaning: "check", example: "チェックする。" },
+          { term: "ディスカウント", reading: "disukaunto", meaning: "discount", example: "ディスカウントセール！" },
         ],
         quiz: [
           q("ファ represents which sound?", ["ha","pa","fa","ba"], 2, "katakana-extended"),
@@ -685,675 +598,474 @@ Extended katakana for sounds not in Japanese:
     ],
   },
 
-  // ── N5 Content Skills ──────────────────────────────────────────────────────
+  // ── N5 Content Skills (Marugoto A1 redesign) ──────────────────────────────
   {
-    title: "Greetings",
+    title: "はじめまして",
     levelLabel: "N5",
-    description: "Everyday greetings and common expressions.",
+    description: "Greet people, introduce yourself, and exchange basic personal information.",
     prereqTitles: ["Hiragana"],
-    autoCompleteLevel: "advanced",
-    modules: [
-      {
-        title: "Daily Greetings",
-        objectives: ["Greet at different times of day", "Say thank you, sorry, excuse me"],
-        grammar: `Time-of-day greetings:
-おはようございます (Good morning — formal) / おはよう (casual)
-こんにちは (Hello / Good afternoon)
-こんばんは (Good evening)
-
-Common expressions:
-ありがとうございます (Thank you very much) / ありがとう (casual)
-すみません (Excuse me / I'm sorry — general polite)
-ごめんなさい (I'm sorry — apology)
-どういたしまして (You're welcome)`,
-        reading: `Japanese greetings change based on the time of day and your relationship with the person.
-With friends: use casual forms (おはよう、ありがとう)
-With teachers, customers, seniors: use polite forms (おはようございます、ありがとうございます)`,
-        dialogue: [
-          { speaker: "A", text: "おはようございます！", translation: "Good morning!" },
-          { speaker: "B", text: "おはよう！げんきですか？", translation: "Morning! How are you?" },
-          { speaker: "A", text: "げんきです。ありがとう！", translation: "I'm fine. Thank you!" },
-        ],
-        vocab: [
-          { term: "おはよう", reading: "ohayou", meaning: "good morning (casual)", example: "おはよう、みんな！(Morning, everyone!)" },
-          { term: "こんにちは", reading: "konnichiwa", meaning: "hello / good afternoon", example: "こんにちは、せんせい。(Hello, teacher.)" },
-          { term: "こんばんは", reading: "konbanwa", meaning: "good evening", example: "こんばんは！(Good evening!)" },
-          { term: "ありがとう", reading: "arigatou", meaning: "thank you", example: "ありがとうございます。(Thank you very much.)" },
-          { term: "すみません", reading: "sumimasen", meaning: "excuse me / sorry", example: "すみません、えきはどこ？(Excuse me, where is the station?)" },
-          { term: "ごめんなさい", reading: "gomennasai", meaning: "I'm sorry (apology)", example: "ごめんなさい！(I'm sorry!)" },
-        ],
-        quiz: [
-          q("Which greeting is used in the morning?", ["こんにちは","こんばんは","おはよう","さようなら"], 2, "greetings"),
-          q("'ありがとう' means…", ["hello","goodbye","thank you","sorry"], 2, "greetings"),
-          q("'すみません' is used to…", ["say goodbye","get attention or apologize lightly","say good morning","express anger"], 1, "greetings"),
-          q("Formal 'good morning' is…", ["おはよう","こんにちは","おはようございます","ありがとうございます"], 2, "greetings"),
-        ],
-      },
-    ],
-  },
-  {
-    title: "Numbers",
-    levelLabel: "N5",
-    description: "Numbers 1–100, counters, and telling time.",
-    prereqTitles: ["Greetings"],
-    autoCompleteLevel: "advanced",
-    modules: [
-      {
-        title: "Numbers 1–10",
-        objectives: ["Count 1 to 10 in Japanese", "Read kanji numerals"],
-        grammar: `いち(1)  に(2)  さん(3)  し/よん(4)  ご(5)
-ろく(6)  なな/しち(7)  はち(8)  きゅう/く(9)  じゅう(10)
-
-4 and 7 have two readings each:
-  4 = し (in compounds like 4月 shigatsu) or よん (when counting)
-  7 = しち (in time/months) or なな (general counting)`,
-        reading: `Combine numbers for 11–99:
-じゅういち(11) = じゅう + いち
-にじゅう(20) = に + じゅう
-さんじゅうご(35) = さん + じゅう + ご
-ひゃく(100)`,
-        dialogue: [
-          { speaker: "A", text: "りんごをみっつください。", translation: "Three apples, please." },
-          { speaker: "B", text: "さんびゃくえんです。", translation: "That's 300 yen." },
-          { speaker: "A", text: "じゅうえんたりない！", translation: "I'm 10 yen short!" },
-        ],
-        vocab: [
-          { term: "いち", reading: "ichi", meaning: "one (1)", example: "いちじ。(One o'clock.)" },
-          { term: "に", reading: "ni", meaning: "two (2)", example: "にまい。(Two sheets.)" },
-          { term: "さん", reading: "san", meaning: "three (3)", example: "さんにん。(Three people.)" },
-          { term: "じゅう", reading: "juu", meaning: "ten (10)", example: "じっぷん。(Ten minutes.)" },
-          { term: "ひゃく", reading: "hyaku", meaning: "one hundred (100)", example: "ひゃくえん。(100 yen.)" },
-        ],
-        quiz: [
-          q("'さん' is…", ["1","2","3","4"], 2, "numbers"),
-          q("'じゅう' means…", ["7","8","9","10"], 3, "numbers"),
-          q("How do you say 11 in Japanese?", ["いちじゅう","じゅうに","じゅういち","いちいち"], 2, "numbers"),
-          q("4 can be read as し or…", ["さん","ご","よん","ろく"], 2, "numbers"),
-        ],
-      },
-      {
-        title: "Telling the Time",
-        objectives: ["Say what time it is", "Use じ (o'clock) and ふん (minutes)"],
-        grammar: `じ = o'clock:  いちじ(1:00)  にじ(2:00)  さんじ(3:00)
-ふん / ぷん = minutes:  いっぷん(1 min)  ごふん(5 min)  じっぷん(10 min)  さんじっぷん(30 min)
-はん = half (past): にじはん = 2:30
-
-Asking the time: いまなんじですか？(What time is it now?)`,
-        reading: `Common time expressions:
-ごぜん = AM  ごご = PM
-あさ = morning  ひる = noon  よる = night
-まいにち = every day  まいあさ = every morning`,
-        dialogue: [
-          { speaker: "A", text: "いまなんじですか？", translation: "What time is it now?" },
-          { speaker: "B", text: "さんじはんです。", translation: "It's 3:30." },
-          { speaker: "A", text: "じゅうごふんはやい！", translation: "15 minutes early!" },
-        ],
-        vocab: [
-          { term: "なんじ", reading: "nanji", meaning: "what time", example: "なんじですか？(What time is it?)" },
-          { term: "〜じ", reading: "~ji", meaning: "o'clock", example: "よじ。(4 o'clock.)" },
-          { term: "〜ふん", reading: "~fun/pun", meaning: "minutes", example: "じっぷん。(10 minutes.)" },
-          { term: "はん", reading: "han", meaning: "half past", example: "いちじはん。(1:30.)" },
-          { term: "ごぜん", reading: "gozen", meaning: "AM / morning", example: "ごぜんじゅうじ。(10 AM.)" },
-        ],
-        quiz: [
-          q("'さんじ' means…", ["3 minutes","3 o'clock","30 minutes","13 o'clock"], 1, "time"),
-          q("'はん' means…", ["hour","minutes","half past","second"], 2, "time"),
-          q("ごぜん means…", ["PM","noon","AM","evening"], 2, "time"),
-          q("'にじじゅうごふん' is…", ["2:05","2:15","2:25","2:50"], 1, "time"),
-        ],
-      },
-    ],
-  },
-  {
-    title: "Daily Conversation",
-    levelLabel: "N5",
-    description: "Self-introduction, describing yourself, and small talk.",
-    prereqTitles: ["Numbers"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Self Introduction",
-        objectives: ["Introduce yourself politely", "State nationality and occupation"],
-        grammar: `はじめまして。= Nice to meet you. (first meeting)
-わたしは〔name〕です。= I am [name].
-〔country〕からきました。= I came from [country].
-〔occupation〕です。= I am a [occupation].
-よろしくおねがいします。= Please treat me well. (standard phrase at introductions)`,
-        reading: `A standard Japanese self-introduction follows this order:
-1. はじめまして。
-2. わたしは〔name〕です。
-3. 〔country〕からきました。
-4. よろしくおねがいします。`,
-        dialogue: [
-          { speaker: "A", text: "はじめまして。わたしはアンナです。アメリカからきました。がくせいです。よろしく！", translation: "Nice to meet you. I'm Anna. I came from America. I'm a student. Pleased to meet you!" },
-          { speaker: "B", text: "こちらこそ、よろしく。わたしはたなかです。", translation: "Likewise, pleased to meet you. I'm Tanaka." },
+        title: "はじめまして — Nice to Meet You",
+        objectives: ["Introduce yourself in Japanese", "Ask and answer 'what is your name?'"],
+        warmUp: "Imagine you're meeting a Japanese person for the first time. What information would you want to share about yourself?",
+        canDo: [
+          "Introduce yourself: なまえ、くに、しごと",
+          "Respond to はじめまして with はじめまして・どうぞよろしく",
+          "Ask someone's name politely: おなまえは？",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "ハナ", text: "はじめまして。わたしはハナです。インドネシアからきました。", translation: "Nice to meet you. I'm Hana. I came from Indonesia." },
+          { speaker: "サトウ", text: "はじめまして、サトウです。にほんじんです。どうぞよろしく。", translation: "Nice to meet you, I'm Sato. I'm Japanese. Pleased to meet you." },
+          { speaker: "ハナ", text: "こちらこそ、よろしくおねがいします。", translation: "Likewise, pleased to meet you." },
+          { speaker: "キム", text: "わたしはキムです。かんこくからです。よろしく！", translation: "I'm Kim. I'm from Korea. Nice to meet you!" },
+        ],
+        patternExamples: [
+          { pattern: "わたしは[なまえ]です。", examples: ["わたしはハナです。(I am Hana.)", "わたしはサトウです。(I am Sato.)"] },
+          { pattern: "[くに]からきました。", examples: ["インドネシアからきました。(I came from Indonesia.)", "かんこくからきました。(I came from Korea.)"] },
+          { pattern: "はじめまして。どうぞよろしく。", examples: ["A: はじめまして！B: はじめまして、どうぞよろしく。"] },
+        ],
+        cultureNote: "In Japan, the first meeting (初対面 shote-imen) follows a specific ritual: bow, exchange names, say はじめまして, then どうぞよろしく. Business cards (名刺 meishi) are given and received with two hands and a bow — never written on or stuffed in a pocket!",
         vocab: [
-          { term: "はじめまして", reading: "hajimemashite", meaning: "nice to meet you (first meeting)", example: "はじめまして！(Nice to meet you!)" },
-          { term: "〜からきました", reading: "~kara kimashita", meaning: "came from ~", example: "にほんからきました。(I came from Japan.)" },
-          { term: "がくせい", reading: "gakusei", meaning: "student", example: "わたしはがくせいです。(I am a student.)" },
-          { term: "よろしくおねがいします", reading: "yoroshiku onegaishimasu", meaning: "pleased to meet you / please take care of me", example: "よろしくおねがいします！" },
-          { term: "しごと", reading: "shigoto", meaning: "job / work", example: "しごとはなんですか？(What is your job?)" },
+          { term: "はじめまして", reading: "hajimemashite", meaning: "nice to meet you (first meeting)", example: "はじめまして、ハナです。" },
+          { term: "どうぞよろしく", reading: "douzo yoroshiku", meaning: "pleased to meet you", example: "どうぞよろしくおねがいします。" },
+          { term: "わたし", reading: "watashi", meaning: "I / me", example: "わたしはがくせいです。" },
+          { term: "からきました", reading: "kara kimashita", meaning: "came from", example: "インドネシアからきました。" },
+          { term: "にほんじん", reading: "nihonjin", meaning: "Japanese person", example: "サトウさんはにほんじんです。" },
         ],
         quiz: [
-          q("'はじめまして' is said when…", ["parting","angry","meeting someone for the first time","asking a question"], 2, "self-intro"),
-          q("'〜からきました' means…", ["I live in ~","I came from ~","I like ~","I work at ~"], 1, "grammar-kara"),
-          q("'がくせい' means…", ["teacher","student","doctor","worker"], 1, "vocab"),
-          q("'よろしく' is said…", ["at the end of introductions","at meals","when leaving","when thanking"], 0, "self-intro"),
+          q("はじめまして is used when…", ["you see a friend","you meet someone for the first time","you say goodbye","you thank someone"], 1, "greetings"),
+          q("'わたしはハナです' means…", ["Where is Hana?","Hana is here.","I am Hana.","This is Hana."], 2, "self-intro"),
+          qFill("Complete: 'インドネシア___ きました' (came from Indonesia):", ["から"], "particles"),
+          qMatch("Match to meaning:", [["はじめまして","nice to meet you"],["どうぞよろしく","pleased to meet you"],["わたし","I/me"]], "vocab"),
+        ],
+      },
+      {
+        title: "しごとはなんですか — What Do You Do?",
+        objectives: ["Say your job or student status", "Ask and answer questions about occupation"],
+        warmUp: "In Japan, people often ask about your job when first meeting. How do you feel about that? Is it the same in your country?",
+        canDo: [
+          "Say your occupation: ～です / ～をしています",
+          "Ask someone's job politely: しごとはなんですか？",
+          "Respond to questions about yourself",
+        ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "サトウ", text: "ハナさん、しごとはなんですか？", translation: "Hana, what is your job?" },
+          { speaker: "ハナ", text: "わたしはがくせいです。にほんごをべんきょうしています。", translation: "I'm a student. I'm studying Japanese." },
+          { speaker: "サトウ", text: "そうですか。どこのがっこうですか？", translation: "Is that so? Which school?" },
+          { speaker: "ハナ", text: "とうきょうのにほんごがっこうです。", translation: "A Japanese language school in Tokyo." },
+          { speaker: "キム", text: "わたしもがくせいです。かんこくごのきょうしです。", translation: "I'm a student too. I'm also a Korean language teacher." },
+        ],
+        patternExamples: [
+          { pattern: "わたしは[しごと]です。", examples: ["わたしはがくせいです。(I am a student.)", "わたしはきょうしです。(I am a teacher.)", "わたしはかいしゃいんです。(I am a company employee.)"] },
+          { pattern: "[subject]をしています。", examples: ["にほんごをべんきょうしています。(I am studying Japanese.)", "しごとをしています。(I am working.)"] },
+        ],
+        cultureNote: "In Japan, people often introduce themselves by their company rather than their job title: '○○会社のサトウです' (I'm Sato from ○○ Company). Group identity (所属 shozoku) is very important in Japanese culture.",
+        vocab: [
+          { term: "がくせい", reading: "gakusei", meaning: "student", example: "わたしはがくせいです。" },
+          { term: "きょうし", reading: "kyoushi", meaning: "teacher", example: "きょうしをしています。" },
+          { term: "かいしゃいん", reading: "kaishain", meaning: "company employee", example: "かいしゃいんです。" },
+          { term: "しごと", reading: "shigoto", meaning: "work / job", example: "しごとはなんですか？" },
+          { term: "べんきょう", reading: "benkyou", meaning: "study", example: "にほんごをべんきょうします。" },
+        ],
+        quiz: [
+          q("'がくせい' means…", ["teacher","student","employee","doctor"], 1, "occupations"),
+          q("'しごとはなんですか' asks…", ["where are you from?","what is your job?","do you like your work?","where do you work?"], 1, "questions"),
+          qFill("Complete: 'にほんごを___しています' (studying):", ["べんきょう"], "vocab"),
+          qReorder("Build: 'I am a company employee':", ["です","わたし","かいしゃいん","は"], [1,3,2,0], "sentence"),
         ],
       },
     ],
   },
+
   {
-    title: "Shopping",
+    title: "これはなんですか",
     levelLabel: "N5",
-    description: "Buy things, ask prices, and shop in Japanese.",
-    prereqTitles: ["Numbers"],
+    description: "Ask what things are, use demonstratives, and talk about objects around you.",
+    prereqTitles: ["はじめまして"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Shopping Expressions",
-        objectives: ["Ask 'how much?'", "Use shopping vocabulary"],
-        grammar: `いくらですか？= How much is it?
-〜をください。= Please give me ~ / I'll take ~.
-〜はありますか？= Do you have ~?
-〜えんです。= It is ~ yen.
-おつりをください。= Change please.
-たかい(expensive) / やすい(cheap)`,
-        reading: `At a Japanese shop:
-1. Find what you want.
-2. Ask: いくらですか？(How much?)
-3. Decide: 〜をください。(I'll take ~.)
-4. Pay and check: おつりはいくら？(How much change?)`,
-        dialogue: [
-          { speaker: "Customer", text: "すみません、このりんごはいくらですか？", translation: "Excuse me, how much is this apple?" },
-          { speaker: "Staff", text: "ひゃくえんです。", translation: "It's 100 yen." },
-          { speaker: "Customer", text: "みっつください。", translation: "Three, please." },
+        title: "これ・それ・あれ — This, That, That over there",
+        objectives: ["Use これ/それ/あれ to refer to objects", "Ask 'what is this?' and understand the answer"],
+        warmUp: "Look around you right now. Pick up an object near you and one far away. How would you talk about each in Japanese?",
+        canDo: [
+          "Point to nearby objects: これはなんですか？",
+          "Point to objects near listener: それは～です",
+          "Point to distant objects: あれは～です",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "ハナ", text: "すみません、これはなんですか？", translation: "Excuse me, what is this?" },
+          { speaker: "サトウ", text: "ああ、それはおみやげです。きょうとのおかしですよ。", translation: "Oh, that's a souvenir. It's sweets from Kyoto." },
+          { speaker: "ハナ", text: "おいしそう！あれもおみやげですか？", translation: "Looks delicious! Is that over there also a souvenir?" },
+          { speaker: "サトウ", text: "いいえ、あれはわたしのかばんです。", translation: "No, that over there is my bag." },
+        ],
+        patternExamples: [
+          { pattern: "これ / それ / あれ は [noun] です。", examples: ["これはほんです。(This is a book.)", "それはおみやげです。(That is a souvenir.)", "あれはわたしのかばんです。(That over there is my bag.)"] },
+          { pattern: "この / その / あの [noun]", examples: ["このほんはおもしろい。(This book is interesting.)", "そのバッグはだれのですか？(Whose is that bag?)"] },
+        ],
+        cultureNote: "Souvenirs (お土産 omiyage) are deeply important in Japanese culture. When you travel or return from a trip, you're expected to bring back sweets or treats for everyone. Failing to do so is considered rude!",
         vocab: [
-          { term: "いくら", reading: "ikura", meaning: "how much (price)", example: "いくらですか？(How much is it?)" },
-          { term: "〜をください", reading: "~wo kudasai", meaning: "please give me ~", example: "みずをください。(Water please.)" },
-          { term: "たかい", reading: "takai", meaning: "expensive / tall/high", example: "たかい！(Expensive!)" },
-          { term: "やすい", reading: "yasui", meaning: "cheap / inexpensive", example: "やすい！かう！(Cheap! I'll buy it!)" },
-          { term: "おつり", reading: "otsuri", meaning: "change (money)", example: "おつりをください。(Change please.)" },
+          { term: "これ", reading: "kore", meaning: "this (near speaker)", example: "これはなんですか？" },
+          { term: "それ", reading: "sore", meaning: "that (near listener)", example: "それはわたしのです。" },
+          { term: "あれ", reading: "are", meaning: "that (far from both)", example: "あれはなんですか？" },
+          { term: "おみやげ", reading: "omiyage", meaning: "souvenir / gift from travel", example: "おみやげをかいました。" },
+          { term: "なんですか", reading: "nan desu ka", meaning: "what is it?", example: "これはなんですか？" },
         ],
         quiz: [
-          q("'いくらですか' means…", ["Where is it?","How much is it?","What is it?","Do you have it?"], 1, "shopping"),
-          q("'〜をください' means…", ["Please take ~","Please give me ~","~ is here","~ is expensive"], 1, "shopping"),
-          q("'やすい' means…", ["expensive","tall","cheap","small"], 2, "vocab"),
-          q("'おつり' means…", ["receipt","price tag","change (money)","total"], 2, "vocab"),
+          q("これ is used for…", ["objects near the listener","objects far from both","objects near the speaker","any object"], 2, "demonstratives"),
+          q("'それはなんですか' means…", ["What is this?","What is that (near you)?","Is that yours?","Where is that?"], 1, "demonstratives"),
+          qMatch("Match demonstrative to location:", [["これ","near speaker"],["それ","near listener"],["あれ","far from both"]], "demonstratives"),
+          q("'おみやげ' means…", ["food","souvenir","bag","gift shop"], 1, "vocab"),
+        ],
+      },
+      {
+        title: "いくらですか — How Much Is It?",
+        objectives: ["Count money in Japanese", "Ask prices and respond"],
+        warmUp: "Have you ever been to a Japanese convenience store? What was surprising about the shopping experience?",
+        canDo: [
+          "Say numbers up to 10,000 yen",
+          "Ask the price: いくらですか？",
+          "Respond: ～えんです",
+        ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "ハナ", text: "すみません、このおかしはいくらですか？", translation: "Excuse me, how much are these sweets?" },
+          { speaker: "サトウ", text: "それは300えんです。", translation: "Those are 300 yen." },
+          { speaker: "ハナ", text: "じゃあ、ふたつください。600えんですね。", translation: "Then, two please. That's 600 yen, right?" },
+          { speaker: "サトウ", text: "はい、そうです。ありがとうございます。", translation: "Yes, that's right. Thank you very much." },
+        ],
+        patternExamples: [
+          { pattern: "[item]はいくらですか？", examples: ["このほんはいくらですか？(How much is this book?)", "そのバッグはいくらですか？(How much is that bag?)"] },
+          { pattern: "～えんです。", examples: ["300えんです。(It's 300 yen.)", "2000えんです。(It's 2,000 yen.)"] },
+          { pattern: "[counter]ください。", examples: ["ひとつください。(One please.)", "みっつください。(Three please.)"] },
+        ],
+        cultureNote: "Japan is famous for its convenience stores (コンビニ). With over 50,000 locations, コンビニ sell everything from onigiri to hot meals. Prices are always clearly marked and consumption tax (消費税) is added at checkout.",
+        vocab: [
+          { term: "いくら", reading: "ikura", meaning: "how much?", example: "これはいくらですか？" },
+          { term: "えん", reading: "en", meaning: "yen (Japanese currency)", example: "500えんです。" },
+          { term: "ください", reading: "kudasai", meaning: "please give me", example: "みずをください。" },
+          { term: "ひとつ", reading: "hitotsu", meaning: "one (item)", example: "ひとつください。" },
+          { term: "ふたつ", reading: "futatsu", meaning: "two (items)", example: "ふたつください。" },
+        ],
+        quiz: [
+          q("'いくらですか' asks…", ["what is this?","how much is it?","do you have it?","is it delicious?"], 1, "shopping"),
+          q("500えん = ___", ["50 yen","500 yen","5,000 yen","5 yen"], 1, "numbers"),
+          qFill("Complete: 'ふたつ___ ' (two please):", ["ください"], "shopping"),
+          qReorder("Ask: 'How much is this book?':", ["いくら","この","ですか？","ほんは"], [1,3,0,2], "shopping"),
         ],
       },
     ],
   },
-  // ── Family (家族) ──────────────────────────────────────────────────────────
+
   {
-    title: "Family (家族)",
+    title: "まいにちのせいかつ",
     levelLabel: "N5",
-    description: "Talk about your family members in Japanese.",
-    prereqTitles: ["Greetings"],
+    description: "Talk about daily routines, times, and what you do each day.",
+    prereqTitles: ["これはなんですか"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Family Members — かぞく",
-        objectives: ["Name close family members in Japanese", "Use family terms in simple sentences"],
-        grammar: `Japanese has two sets of family words:
-• Your own family (humble): ちち(father) はは(mother) あに(older brother) あね(older sister) おとうと(younger brother) いもうと(younger sister)
-• Someone else's family (polite): おとうさん おかあさん おにいさん おねえさん おとうとさん いもうとさん
-
-Use the humble form when talking about your own family.
-Use the polite form when talking about others'.`,
-        reading: `Introducing your family:
-わたしのちちはいしゃです。(My father is a doctor.)
-はははせんせいです。(My mother is a teacher.)
-あにはだいがくせいです。(My older brother is a university student.)
-
-Useful phrase: きょうだいはいますか？(Do you have siblings?)`,
-        dialogue: [
-          { speaker: "A", text: "ごかぞくはなんにんですか？", translation: "How many people are in your family?" },
-          { speaker: "B", text: "よにんです。ちちとははとあにとわたし。", translation: "Four. My father, mother, older brother and I." },
-          { speaker: "A", text: "おにいさんはおいくつですか？", translation: "How old is your older brother?" },
-          { speaker: "B", text: "にじゅうさんさいです。", translation: "He's 23 years old." },
+        title: "なんじですか — What Time Is It?",
+        objectives: ["Tell the time in Japanese", "Ask and answer time-related questions"],
+        warmUp: "What time do you usually wake up? What time do Japanese people typically start work?",
+        canDo: [
+          "Say what time it is: いまなんじですか？",
+          "Read times up to the half hour: ～じ、～じはん",
+          "Say AM/PM: ごぜん / ごご",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "キム", text: "すみません、いまなんじですか？", translation: "Excuse me, what time is it now?" },
+          { speaker: "サトウ", text: "えーと、くじはんです。", translation: "Let me see, it's 9:30." },
+          { speaker: "キム", text: "じゅぎょうはなんじからですか？", translation: "What time does class start?" },
+          { speaker: "ハナ", text: "じゅうじからです。あと30ぷんあります！", translation: "It starts at 10. There are 30 more minutes!" },
+        ],
+        patternExamples: [
+          { pattern: "いまなんじですか？ → ～じ(はん)です。", examples: ["いまくじです。(It's 9 o'clock now.)", "いまさんじはんです。(It's 3:30 now.)"] },
+          { pattern: "～じから～じまで", examples: ["くじからじゅうじまでべんきょうします。(I study from 9 to 10.)", "かいしゃはくじからごじまでです。(The office is from 9 to 5.)"] },
+        ],
+        cultureNote: "Japan runs on precise time. Trains are famously on-time — delays of even 1 minute prompt official apologies. Being late to a meeting is considered very rude. The phrase 時間を守る (jikan wo mamoru — keep time) is a core Japanese value.",
         vocab: [
-          { term: "かぞく", reading: "kazoku", meaning: "family", example: "かぞくをしょうかいします。(Let me introduce my family.)" },
-          { term: "ちち", reading: "chichi", meaning: "my father", example: "ちちはいしゃです。(My father is a doctor.)" },
-          { term: "はは", reading: "haha", meaning: "my mother", example: "はははりょうりがじょうずです。(My mother is good at cooking.)" },
-          { term: "あに", reading: "ani", meaning: "my older brother", example: "あにはとうきょうにいます。(My older brother is in Tokyo.)" },
-          { term: "あね", reading: "ane", meaning: "my older sister", example: "あねはかいしゃいんです。(My older sister is a company employee.)" },
-          { term: "おとうと", reading: "otouto", meaning: "my younger brother", example: "おとうとはちゅうがくせいです。(My younger brother is a junior high student.)" },
-          { term: "いもうと", reading: "imouto", meaning: "my younger sister", example: "いもうとはかわいいです。(My younger sister is cute.)" },
-          { term: "そふ", reading: "sofu", meaning: "my grandfather", example: "そふはとしょかんでほんをよみます。(My grandfather reads books at the library.)" },
+          { term: "なんじ", reading: "nanji", meaning: "what time?", example: "いまなんじですか？" },
+          { term: "じ", reading: "ji", meaning: "o'clock", example: "くじです。(It's 9 o'clock.)" },
+          { term: "はん", reading: "han", meaning: "half (past)", example: "さんじはんです。(It's 3:30.)" },
+          { term: "ごぜん", reading: "gozen", meaning: "AM", example: "ごぜんくじ (9 AM)" },
+          { term: "ごご", reading: "gogo", meaning: "PM", example: "ごごさんじ (3 PM)" },
         ],
         quiz: [
-          q("'はは' means (about your own family)…", ["older sister","mother","grandmother","aunt"], 1, "family"),
-          q("'あに' means…", ["younger brother","father","older brother","uncle"], 2, "family"),
-          qFill("Fill in: My mother is called ___ (your own family, humble form):", ["はは", "haha"], "family"),
-          qMatch("Match the family member to its Japanese term:", [["father","ちち"],["older sister","あね"],["grandfather","そふ"]], "family"),
-          qReorder("Arrange to say 'My older brother is in Tokyo':", ["とうきょうに","あには","います"], [1,0,2], "family"),
-          q("When talking about SOMEONE ELSE's mother, you say…", ["はは","おかあさん","かあさん","ははさん"], 1, "family-polite"),
+          q("'なんじ' means…", ["what day","what time","how long","which hour"], 1, "time"),
+          q("'さんじはん' means…", ["3 hours","3:15","3:30","3:00"], 2, "time"),
+          qFill("Complete: 'いまくじ___です' (it's 9:30):", ["はん"], "time"),
+          qMatch("Match to meaning:", [["ごぜん","AM"],["ごご","PM"],["はん","half past"]], "time-vocab"),
+        ],
+      },
+      {
+        title: "まいにちなにをしますか — Daily Activities",
+        objectives: ["Describe your daily routine in Japanese", "Use time expressions with activity verbs"],
+        warmUp: "Think about your typical weekday. From waking up to going to bed — what happens in between?",
+        canDo: [
+          "Describe daily activities: おきます、たべます、いきます",
+          "Say when you do things: ～じに～します",
+          "Talk about morning/evening routines",
+        ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "ハナ", text: "まいにち、なんじにおきますか？", translation: "What time do you wake up every day?" },
+          { speaker: "サトウ", text: "しちじにおきます。それからシャワーをあびて、あさごはんをたべます。", translation: "I wake up at 7. Then I take a shower and eat breakfast." },
+          { speaker: "ハナ", text: "しごとはなんじからですか？", translation: "What time does work start?" },
+          { speaker: "サトウ", text: "くじからです。まいあさでんしゃでかいしゃにいきます。", translation: "From 9 o'clock. Every morning I go to work by train." },
+          { speaker: "キム", text: "わたしはきょうごじにがっこうがおわります。そのあとじゅくにいきます。", translation: "My school finishes at 5 today. After that I go to cram school." },
+        ],
+        patternExamples: [
+          { pattern: "～じに～ます。", examples: ["しちじにおきます。(I wake up at 7.)", "はちじにがっこうにいきます。(I go to school at 8.)"] },
+          { pattern: "それから〜ます。", examples: ["シャワーをあびます。それからあさごはんをたべます。(I take a shower. Then I eat breakfast.)"] },
+          { pattern: "[vehicle]で[place]にいきます。", examples: ["でんしゃでかいしゃにいきます。(I go to work by train.)", "バスでがっこうにいきます。(I go to school by bus.)"] },
+        ],
+        cultureNote: "Japanese people commute an average of 48 minutes each way — one of the longest in the world. Many use this time to read, study apps, or sleep. 'Standing sleep' (立ち寝 tachineri) on trains is a famous phenomenon!",
+        vocab: [
+          { term: "おきます", reading: "okimasu", meaning: "to wake up / get up", example: "まいあさしちじにおきます。" },
+          { term: "たべます", reading: "tabemasu", meaning: "to eat", example: "あさごはんをたべます。" },
+          { term: "いきます", reading: "ikimasu", meaning: "to go", example: "がっこうにいきます。" },
+          { term: "でんしゃ", reading: "densha", meaning: "train", example: "でんしゃでいきます。" },
+          { term: "まいあさ", reading: "maiasa", meaning: "every morning", example: "まいあさシャワーをあびます。" },
+        ],
+        quiz: [
+          q("'おきます' means…", ["to sleep","to wake up","to eat","to go"], 1, "verbs"),
+          q("'でんしゃで' uses で to mean…", ["at the train station","by train (means of transport)","to the train","from the train"], 1, "particles"),
+          qFill("Complete: 'くじに___にいきます' (go to school at 9):", ["がっこう"], "daily-routine"),
+          qReorder("Build: 'I eat breakfast every morning':", ["たべます","まいあさ","あさごはんを","わたしは"], [3,1,2,0], "daily-routine"),
         ],
       },
     ],
   },
-  // ── Food & Drink (食べ物・飲み物) ─────────────────────────────────────────
+
   {
-    title: "Food & Drink (食べ物)",
+    title: "わたしのすきなもの",
     levelLabel: "N5",
-    description: "Vocabulary for food, drinks, and expressing taste.",
-    prereqTitles: ["Family (家族)"],
+    description: "Talk about likes and dislikes, food preferences, and hobbies.",
+    prereqTitles: ["まいにちのせいかつ"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Food Vocabulary — たべもの",
-        objectives: ["Name common Japanese foods", "Express food preferences with すき・きらい"],
-        grammar: `Expressing likes and dislikes:
-〜がすきです = I like ~    〜がきらいです = I dislike ~
-〜がだいすきです = I love ~   〜があまりすきじゃないです = I don't really like ~
-
-おいしい = delicious   まずい = bad tasting   からい = spicy
-あまい = sweet   しょっぱい = salty   すっぱい = sour`,
-        reading: `にほんのたべものはおいしいです。(Japanese food is delicious.)
-わたしはすしがだいすきです。(I love sushi.)
-らーめんもすきです。でも、からいたべものはあまりすきじゃないです。
-(I also like ramen. But I don't really like spicy food.)`,
-        dialogue: [
-          { speaker: "A", text: "なにたべたいですか？", translation: "What do you want to eat?" },
-          { speaker: "B", text: "すしがたべたいです！わたしはすしがだいすきです。", translation: "I want to eat sushi! I love sushi." },
-          { speaker: "A", text: "わたしはらーめんがすきです。からいらーめんがとくにすきです。", translation: "I like ramen. I especially like spicy ramen." },
-          { speaker: "B", text: "からいのはちょっと…にがてです。", translation: "Spicy things are a bit... not my strong suit." },
+        title: "すきですか — Do You Like It?",
+        objectives: ["Express likes and dislikes in Japanese", "Ask about preferences politely"],
+        warmUp: "What's your favorite food? Your least favorite? How do people express preferences in your language?",
+        canDo: [
+          "Say what you like: ～がすきです",
+          "Say what you dislike: ～がきらいです / ～はにがてです",
+          "Ask about preferences: ～はすきですか？",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "サトウ", text: "ハナさんはにほんりょうりはすきですか？", translation: "Hana, do you like Japanese cuisine?" },
+          { speaker: "ハナ", text: "はい、だいすきです！とくにすしとラーメンがすきです。", translation: "Yes, I love it! I especially like sushi and ramen." },
+          { speaker: "サトウ", text: "なっとうはどうですか？", translation: "How about natto?" },
+          { speaker: "ハナ", text: "うーん、ちょっとにがてです…においが…", translation: "Hmm, I'm not good with it... the smell..." },
+          { speaker: "キム", text: "わたしはなっとうがすきです！からいたべものもすきです。", translation: "I like natto! I also like spicy food." },
+        ],
+        patternExamples: [
+          { pattern: "～がすきです / きらいです / にがてです", examples: ["すしがすきです。(I like sushi.)", "なっとうがきらいです。(I dislike natto.)", "からいものはにがてです。(I'm bad with spicy food.)"] },
+          { pattern: "とくに～がすきです。", examples: ["とくにすしがすきです。(I especially like sushi.)", "とくにきょうとがすきです。(I especially like Kyoto.)"] },
+        ],
+        cultureNote: "Natto (納豆) — fermented soybeans — divides even Japanese people. Many Japanese from western Japan dislike it, while it's a breakfast staple in the east. It's a classic test for foreign visitors and often comes up in early conversations!",
         vocab: [
-          { term: "すし", reading: "sushi", meaning: "sushi", example: "すしをたべます。(I eat sushi.)" },
-          { term: "ラーメン", reading: "rāmen", meaning: "ramen (noodle soup)", example: "からいラーメンがすき。(I like spicy ramen.)" },
-          { term: "ごはん", reading: "gohan", meaning: "rice / meal", example: "ごはんをたべましょう。(Let's eat a meal.)" },
-          { term: "パン", reading: "pan", meaning: "bread", example: "あさはパンをたべます。(I eat bread in the morning.)" },
-          { term: "みず", reading: "mizu", meaning: "water", example: "みずをください。(Water please.)" },
-          { term: "おちゃ", reading: "ocha", meaning: "green tea", example: "おちゃをのみます。(I drink green tea.)" },
-          { term: "おいしい", reading: "oishii", meaning: "delicious / tasty", example: "このすしはおいしい！(This sushi is delicious!)" },
-          { term: "すきです", reading: "suki desu", meaning: "I like ~ (with が)", example: "すしがすきです。(I like sushi.)" },
+          { term: "すきです", reading: "suki desu", meaning: "to like", example: "すしがすきです。" },
+          { term: "だいすき", reading: "daisuki", meaning: "to love (really like)", example: "にほんがだいすきです。" },
+          { term: "きらい", reading: "kirai", meaning: "to dislike", example: "なっとうがきらいです。" },
+          { term: "にがて", reading: "nigate", meaning: "not good at / not fond of", example: "からいものはにがてです。" },
+          { term: "とくに", reading: "tokuni", meaning: "especially / particularly", example: "とくにすしがすきです。" },
         ],
         quiz: [
-          q("'おいしい' means…", ["spicy","cheap","delicious","expensive"], 2, "food-adj"),
-          qFill("Type the Japanese word for 'water':", ["みず", "mizu"], "food-vocab"),
-          qMatch("Match the food to its Japanese name:", [["sushi","すし"],["ramen","ラーメン"],["green tea","おちゃ"]], "food-vocab"),
-          qReorder("Build the sentence 'I love sushi':", ["が","すし","だいすきです","わたしは"], [3,1,0,2], "likes"),
+          q("'すきです' means…", ["to dislike","to like","to eat","to want"], 1, "likes"),
+          q("'きらいです' means…", ["to love","to dislike","to prefer","to be bad at"], 1, "likes"),
+          q("'にがてです' means…", ["it's bitter","I'm not good at it / not fond of it","it's difficult","I hate it"], 1, "likes"),
+          qFill("Complete: 'とくにすし___ すきです' (I especially like sushi):", ["が"], "particles"),
+        ],
+      },
+      {
+        title: "しゅみはなんですか — What Are Your Hobbies?",
+        objectives: ["Talk about hobbies and free time activities", "Use frequency adverbs: よく、ときどき、あまり"],
+        warmUp: "What do you do in your free time? How often? Think about the last weekend — what activities did you do?",
+        canDo: [
+          "Name common hobbies in Japanese",
+          "Say how often you do things: よく・ときどき・あまり～ない",
+          "Ask about someone's hobbies: しゅみはなんですか？",
+        ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "ハナ", text: "キムさん、しゅみはなんですか？", translation: "Kim, what are your hobbies?" },
+          { speaker: "キム", text: "しゃしんをとることです。よくこうえんでとります。ハナさんは？", translation: "It's taking photos. I often take them in the park. What about Hana?" },
+          { speaker: "ハナ", text: "わたしはりょうりがすきです。でも、うたをうたうこともすきです！", translation: "I like cooking. But I also like singing!" },
+          { speaker: "サトウ", text: "わたしはどくしょです。まいばんほんをよみます。ときどきまんがも。", translation: "Mine is reading. I read books every evening. Sometimes manga too." },
+        ],
+        patternExamples: [
+          { pattern: "しゅみは[verb-こと]です。", examples: ["しゅみはしゃしんをとることです。(My hobby is taking photos.)", "しゅみはりょうりをすることです。(My hobby is cooking.)"] },
+          { pattern: "よく / ときどき / あまり～ません", examples: ["よくえいがをみます。(I often watch movies.)", "ときどきうたをうたいます。(I sometimes sing.)", "あまりテレビをみません。(I don't watch TV much.)"] },
+        ],
+        cultureNote: "Manga (漫画) is Japan's most beloved art form — Japan publishes more comics than any other country. Weekly manga magazines sell millions of copies. Reading manga is a great way to practice Japanese because the dialogue uses natural, conversational speech!",
+        vocab: [
+          { term: "しゅみ", reading: "shumi", meaning: "hobby", example: "しゅみはなんですか？" },
+          { term: "よく", reading: "yoku", meaning: "often", example: "よくえいがをみます。" },
+          { term: "ときどき", reading: "tokidoki", meaning: "sometimes", example: "ときどきうたをうたいます。" },
+          { term: "どくしょ", reading: "dokusho", meaning: "reading (books)", example: "どくしょがすきです。" },
+          { term: "りょうり", reading: "ryouri", meaning: "cooking / cuisine", example: "りょうりをします。" },
+        ],
+        quiz: [
+          q("'しゅみ' means…", ["free time","hobby","sports","favorite thing"], 1, "vocab"),
+          q("'よく' means…", ["sometimes","rarely","often","always"], 2, "frequency"),
+          q("'ときどき' means…", ["often","always","sometimes","never"], 2, "frequency"),
+          qFill("Complete: 'あまりテレビを___ ません' (don't watch TV much):", ["み"], "negation"),
         ],
       },
     ],
   },
-  // ── Colors (色) ────────────────────────────────────────────────────────────
+
   {
-    title: "Colors (いろ)",
+    title: "わたしのまち",
     levelLabel: "N5",
-    description: "Learn color names and how to describe objects.",
-    prereqTitles: ["Food & Drink (食べ物)"],
+    description: "Ask for and give directions, describe your town, and navigate locations.",
+    prereqTitles: ["わたしのすきなもの"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Colors — いろ",
-        objectives: ["Name 8 basic colors in Japanese", "Use colors to describe objects"],
-        grammar: `Colors as い-adjectives or nouns:
-あかい(red) あおい(blue) きいろい(yellow) くろい(black) しろい(white) みどりの(green) むらさきの(purple) オレンジの(orange)
-
-Using colors with nouns:
-あかいくるま = red car   しろいいぬ = white dog
-Pattern: color + noun → あかいシャツ (red shirt)`,
-        reading: `いろのことば:
-そらはあおい。(The sky is blue.)
-ゆきはしろい。(Snow is white.)
-このリンゴはあかい。(This apple is red.)
-わたしのおきにいりのいろはあおです。(My favorite color is blue.)`,
-        dialogue: [
-          { speaker: "A", text: "すきないろはなんですか？", translation: "What is your favorite color?" },
-          { speaker: "B", text: "あおがすきです。そらのいろだから。", translation: "I like blue. Because it's the color of the sky." },
-          { speaker: "A", text: "わたしはあかがすきです。でも、くろいふくをよくきます。", translation: "I like red. But I often wear black clothes." },
+        title: "どこですか — Where Is It?",
+        objectives: ["Ask where places are", "Describe location using に・で・の"],
+        warmUp: "Think about your neighborhood. If someone was lost, what landmarks would you use to give directions?",
+        canDo: [
+          "Ask where something is: ～はどこですか？",
+          "Answer with location words: みぎ・ひだり・まっすぐ・ちかく",
+          "Use に and で for location",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "ハナ", text: "すみません、ゆうびんきょくはどこですか？", translation: "Excuse me, where is the post office?" },
+          { speaker: "サトウ", text: "あのかどをみぎにまがってください。まっすぐいくと、ひだりにあります。", translation: "Please turn right at that corner. If you go straight, it's on the left." },
+          { speaker: "ハナ", text: "とおいですか？", translation: "Is it far?" },
+          { speaker: "サトウ", text: "いいえ、ちかいです。あるいて5ふんくらいです。", translation: "No, it's close. About 5 minutes on foot." },
+        ],
+        patternExamples: [
+          { pattern: "～はどこですか？", examples: ["えきはどこですか？(Where is the station?)", "トイレはどこですか？(Where is the toilet?)"] },
+          { pattern: "[direction]に[verb]てください。", examples: ["みぎにまがってください。(Please turn right.)", "まっすぐいってください。(Please go straight.)"] },
+          { pattern: "あるいて～ふん", examples: ["あるいて5ふんです。(5 minutes on foot.)", "えきからあるいて10ぷんです。(10 minutes on foot from the station.)"] },
+        ],
+        cultureNote: "Japanese streets were historically laid out for defense — they're maze-like on purpose. Most Japanese addresses describe the block number, not the street name. Japanese people often give directions using landmarks: 'コンビニのとなりです' (next to the convenience store).",
         vocab: [
-          { term: "あか", reading: "aka", meaning: "red", example: "あかいはなをかいました。(I bought red flowers.)" },
-          { term: "あお", reading: "ao", meaning: "blue / green (traffic lights)", example: "そらはあおい。(The sky is blue.)" },
-          { term: "きいろ", reading: "kiiro", meaning: "yellow", example: "きいろいバナナ。(Yellow banana.)" },
-          { term: "しろ", reading: "shiro", meaning: "white", example: "しろいシャツがすき。(I like white shirts.)" },
-          { term: "くろ", reading: "kuro", meaning: "black", example: "くろいねこ。(Black cat.)" },
-          { term: "みどり", reading: "midori", meaning: "green", example: "みどりのき。(Green tree.)" },
-          { term: "むらさき", reading: "murasaki", meaning: "purple", example: "むらさきいろのはな。(Purple flower.)" },
-          { term: "いろ", reading: "iro", meaning: "color", example: "すきないろはなんですか？(What is your favorite color?)" },
+          { term: "どこ", reading: "doko", meaning: "where", example: "えきはどこですか？" },
+          { term: "みぎ", reading: "migi", meaning: "right", example: "みぎにまがる。" },
+          { term: "ひだり", reading: "hidari", meaning: "left", example: "ひだりにある。" },
+          { term: "まっすぐ", reading: "massugu", meaning: "straight ahead", example: "まっすぐいく。" },
+          { term: "ちかい", reading: "chikai", meaning: "near / close", example: "えきからちかい。" },
         ],
         quiz: [
-          qFill("Type the Japanese word for 'blue/green' (空の色):", ["あお", "ao"], "colors"),
-          qMatch("Match the color to its Japanese name:", [["red","あか"],["white","しろ"],["black","くろ"],["yellow","きいろ"]], "colors"),
-          q("'みどり' is…", ["purple","orange","green","yellow"], 2, "colors"),
-          qReorder("Say 'I like blue because it's the color of the sky':", ["あおが","だから","そらのいろ","すきです"], [0,3,2,1], "colors"),
+          q("'どこ' means…", ["what","when","where","who"], 2, "questions"),
+          q("'みぎにまがってください' means…", ["Go straight","Turn left","Turn right","Stop here"], 2, "directions"),
+          q("'ちかい' means…", ["far","near","expensive","easy"], 1, "vocab"),
+          qReorder("Ask: 'Where is the station?':", ["えきは","ですか？","どこ"], [0,2,1], "directions"),
+        ],
+      },
+      {
+        title: "こうつう — Getting Around",
+        objectives: ["Use transportation vocabulary", "Buy tickets and use public transit"],
+        warmUp: "How do you usually travel in your city? Have you ever used a subway or bullet train?",
+        canDo: [
+          "Name common transport: でんしゃ・バス・しんかんせん",
+          "Ask how to get somewhere: どうやっていきますか？",
+          "Buy a ticket: きっぷをかいます",
+        ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "キム", text: "とうきょうからきょうとまでどうやっていきますか？", translation: "How do you get from Tokyo to Kyoto?" },
+          { speaker: "サトウ", text: "しんかんせんでいきます。2じかんくらいです。", translation: "You go by Shinkansen. It's about 2 hours." },
+          { speaker: "キム", text: "きっぷはどこでかいますか？", translation: "Where do you buy tickets?" },
+          { speaker: "サトウ", text: "えきのじどうけんばいきでかえます。またはアプリでも。", translation: "You can buy them at the station vending machine. Or also on an app." },
+          { speaker: "ハナ", text: "しんかんせんにのりたいです！はやいですよね？", translation: "I want to ride the Shinkansen! It's fast, right?" },
+        ],
+        patternExamples: [
+          { pattern: "[vehicle]で[place]にいきます。", examples: ["しんかんせんできょうとにいきます。(I go to Kyoto by Shinkansen.)", "バスでえきにいきます。(I go to the station by bus.)"] },
+          { pattern: "[place A]から[place B]まで", examples: ["とうきょうからきょうとまで(from Tokyo to Kyoto)", "えきからがっこうまで(from the station to school)"] },
+        ],
+        cultureNote: "The Shinkansen (新幹線 bullet train) has been running since 1964 with zero passenger fatalities. Its average delay is under 1 minute per year. It's not just fast transport — it's a symbol of Japanese precision and engineering pride.",
+        vocab: [
+          { term: "しんかんせん", reading: "shinkansen", meaning: "bullet train", example: "しんかんせんにのる。" },
+          { term: "バス", reading: "basu", meaning: "bus", example: "バスでいく。" },
+          { term: "きっぷ", reading: "kippu", meaning: "ticket", example: "きっぷをかう。" },
+          { term: "のる", reading: "noru", meaning: "to ride / board", example: "でんしゃにのる。" },
+          { term: "から～まで", reading: "kara~made", meaning: "from ~ to ~", example: "えきからあるいて5ふん。" },
+        ],
+        quiz: [
+          q("'しんかんせん' is…", ["a local train","a bullet train","a bus","an airplane"], 1, "transport"),
+          q("'のる' means…", ["to walk","to run","to ride/board","to stop"], 2, "verbs"),
+          q("'きっぷをかいます' means…", ["I buy a ticket","I look at the map","I board the train","I use an app"], 0, "shopping"),
+          qFill("Complete: 'とうきょう___きょうとまで' (from Tokyo to Kyoto):", ["から"], "particles"),
         ],
       },
     ],
   },
-  // ── Days & Time (曜日・時間) ───────────────────────────────────────────────
+
   {
-    title: "Days & Time (曜日)",
+    title: "たべもの",
     levelLabel: "N5",
-    description: "Days of the week, telling time, and schedule expressions.",
-    prereqTitles: ["Colors (いろ)"],
+    description: "Order food, talk about meals, and discuss Japanese food culture.",
+    prereqTitles: ["わたしのまち"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Days of the Week — ようび",
-        objectives: ["Name all 7 days of the week", "Ask and say what day it is"],
-        grammar: `Days of the week — all end in ようび:
-にちようび (Sunday)   げつようび (Monday)   かようび (Tuesday)
-すいようび (Wednesday)   もくようび (Thursday)   きんようび (Friday)   どようび (Saturday)
-
-Memory trick: the kanji match the 5 elements + sun/moon:
-日(sun)月(moon)火(fire)水(water)木(tree)金(gold)土(earth)
-
-きょうはなんようびですか？= What day is today?
-きょうはかようびです。= Today is Tuesday.`,
-        reading: `スケジュール:
-げつようびからきんようびまでがっこうです。(School is Monday to Friday.)
-どようびとにちようびはやすみです。(Saturday and Sunday are days off.)
-まいにち = every day  |  まいしゅう = every week`,
-        dialogue: [
-          { speaker: "A", text: "きょうはなんようびですか？", translation: "What day is today?" },
-          { speaker: "B", text: "もくようびです。あしたはきんようびですね。", translation: "It's Thursday. Tomorrow is Friday, right?" },
-          { speaker: "A", text: "そうです！しゅうまつはなにをしますか？", translation: "That's right! What will you do on the weekend?" },
-          { speaker: "B", text: "どようびはかいものして、にちようびはやすみます。", translation: "On Saturday I'll shop, and on Sunday I'll rest." },
+        title: "レストランで — At the Restaurant",
+        objectives: ["Order food and drinks at a restaurant", "Use polite request expressions"],
+        warmUp: "Have you ever been to a Japanese restaurant? What did you order? What was challenging about it?",
+        canDo: [
+          "Call a waiter: すみません！",
+          "Order politely: ～をください / ～をおねがいします",
+          "Ask what's recommended: おすすめはなんですか？",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "ハナ", text: "すみません！", translation: "Excuse me!" },
+          { speaker: "サトウ", text: "はい、ごちゅうもんはおきまりですか？", translation: "Yes, have you decided on your order?" },
+          { speaker: "ハナ", text: "えーと、おすすめはなんですか？", translation: "Hmm, what do you recommend?" },
+          { speaker: "サトウ", text: "てんぷらていしょくがにんきです。", translation: "The tempura set meal is popular." },
+          { speaker: "ハナ", text: "じゃあ、それをひとつおねがいします。あと、おみずもください。", translation: "Then, one of that please. Also, some water please." },
+          { speaker: "サトウ", text: "かしこまりました。しょうしょうおまちください。", translation: "Certainly. Please wait a moment." },
+        ],
+        patternExamples: [
+          { pattern: "～をください / ～をおねがいします", examples: ["みずをください。(Water please.)", "てんぷらをおねがいします。(Tempura please.)", "これをひとつください。(One of this please.)"] },
+          { pattern: "おすすめはなんですか？", examples: ["このおみせのおすすめはなんですか？(What is this restaurant's recommendation?)"] },
+        ],
+        cultureNote: "In Japanese restaurants, you shout 'すみません!' to get attention — it's not rude! Many restaurants now use tablets for ordering. A set meal (定食 teishoku) typically includes a main dish, rice, miso soup, and pickles — excellent value and very filling.",
         vocab: [
-          { term: "にちようび", reading: "nichiyōbi", meaning: "Sunday", example: "にちようびはやすみです。(Sunday is a day off.)" },
-          { term: "げつようび", reading: "getsuyōbi", meaning: "Monday", example: "げつようびからしごとがはじまります。(Work starts from Monday.)" },
-          { term: "きんようび", reading: "kin'yōbi", meaning: "Friday", example: "きんようびのよるはたのしい！(Friday nights are fun!)" },
-          { term: "どようび", reading: "doyōbi", meaning: "Saturday", example: "どようびにえいがをみます。(I watch movies on Saturday.)" },
-          { term: "きょう", reading: "kyō", meaning: "today", example: "きょうはなんようびですか？(What day is today?)" },
-          { term: "あした", reading: "ashita", meaning: "tomorrow", example: "あしたはしけんです。(Tomorrow is the exam.)" },
-          { term: "しゅうまつ", reading: "shūmatsu", meaning: "weekend", example: "しゅうまつはなにをしますか？(What do you do on weekends?)" },
+          { term: "ていしょく", reading: "teishoku", meaning: "set meal", example: "てんぷらていしょくをください。" },
+          { term: "おすすめ", reading: "osusume", meaning: "recommendation", example: "おすすめはなんですか？" },
+          { term: "おねがいします", reading: "onegaishimasu", meaning: "please (requesting)", example: "みずをおねがいします。" },
+          { term: "ごちゅうもん", reading: "gochuumon", meaning: "your order (polite)", example: "ごちゅうもんはおきまりですか？" },
+          { term: "にんき", reading: "ninki", meaning: "popular", example: "このりょうりはにんきです。" },
         ],
         quiz: [
-          q("'きんようび' is…", ["Monday","Wednesday","Friday","Sunday"], 2, "days"),
-          qFill("Type the Japanese for 'today':", ["きょう", "kyou", "kyō"], "time-vocab"),
-          qMatch("Match the day to its English name:", [["げつようび","Monday"],["すいようび","Wednesday"],["どようび","Saturday"]], "days"),
-          qReorder("Order the weekdays: Mon → Tue → Wed → Thu →…", ["もくようび","かようび","げつようび","すいようび"], [2,1,3,0], "days"),
-        ],
-      },
-    ],
-  },
-  // ── N5 Kanji Basics (漢字) ─────────────────────────────────────────────────
-  {
-    title: "N5 Kanji Basics (漢字)",
-    levelLabel: "N5",
-    description: "Learn the most essential 20 kanji for everyday Japanese.",
-    prereqTitles: ["Days & Time (曜日)"],
-    autoCompleteLevel: "",
-    modules: [
-      {
-        title: "Nature Kanji — 日月火水木金土山川",
-        objectives: ["Read and write 9 nature kanji", "Recognize them in compound words"],
-        grammar: `Kanji have two readings: on'yomi (Chinese-derived) and kun'yomi (Japanese).
-日: にち/じつ (on) | ひ/か (kun) — 日曜日(Sunday), 今日(today)
-月: げつ/がつ (on) | つき (kun) — 月曜日(Monday), 今月(this month)
-火: か (on) | ひ (kun) — 火曜日(Tuesday), 火(fire)
-水: すい (on) | みず (kun) — 水曜日(Wednesday), 水(water)
-木: もく (on) | き (kun) — 木曜日(Thursday), 木(tree)
-金: きん (on) | かね/きん (kun) — 金曜日(Friday), お金(money)
-土: ど (on) | つち (kun) — 土曜日(Saturday), 土(soil)
-山: さん (on) | やま (kun) — 富士山(Mt.Fuji), 山(mountain)
-川: せん (on) | かわ (kun) — 川(river)`,
-        reading: `These 9 kanji appear in words you use every day:
-日本(にほん) = Japan  |  今日(きょう) = today  |  山川(やまかわ) = mountains and rivers
-お金(おかね) = money  |  水(みず) = water  |  木(き) = tree
-These kanji also give the days of the week their names!`,
-        dialogue: [
-          { speaker: "A", text: "「火」はなんとよみますか？", translation: "How do you read '火'?" },
-          { speaker: "B", text: "「ひ」または「か」とよみます。「火曜日」は「かようび」です。", translation: "It reads as 'hi' or 'ka'. '火曜日' is 'kayōbi' (Tuesday)." },
-          { speaker: "A", text: "「山」は？", translation: "And '山'?" },
-          { speaker: "B", text: "「やま」です。「ふじさん」はゆうめいですね。", translation: "'Yama'. Mt. Fuji is famous, isn't it." },
-        ],
-        vocab: [
-          { term: "日本", reading: "nihon", meaning: "Japan", example: "日本のたべものはおいしい。(Japanese food is delicious.)" },
-          { term: "今日", reading: "kyō", meaning: "today", example: "今日はさむい。(Today is cold.)" },
-          { term: "お金", reading: "okane", meaning: "money", example: "お金がありません。(I don't have money.)" },
-          { term: "山", reading: "yama", meaning: "mountain", example: "やまにのぼります。(I climb the mountain.)" },
-          { term: "川", reading: "kawa", meaning: "river", example: "かわでおよぎます。(I swim in the river.)" },
-          { term: "水", reading: "mizu", meaning: "water", example: "みずをのみます。(I drink water.)" },
-        ],
-        quiz: [
-          q("'日本' reads as…", ["にっぽん/にほん","げつほん","ひほん","かほん"], 0, "kanji-reading"),
-          q("'お金' means…", ["water","money","mountain","fire"], 1, "kanji-vocab"),
-          q("Which kanji means 'river'?", ["山","木","川","土"], 2, "kanji"),
-          q("'今日' reads as…", ["きのう","きょう","あした","こんにち"], 1, "kanji-reading"),
-        ],
-      },
-      {
-        title: "People & Body Kanji — 人口目耳手足",
-        objectives: ["Read 6 body/people kanji", "Use them in compound words"],
-        grammar: `人: じん/にん (on) | ひと (kun) — 日本人(Japanese person), 三人(3 people)
-口: こう/く (on) | くち (kun) — 人口(population), 口(mouth)
-目: もく (on) | め (kun) — 目(eye), 一番目(1st)
-耳: じ (on) | みみ (kun) — 耳(ear)
-手: しゅ (on) | て (kun) — 手(hand), 上手(skilled)
-足: そく (on) | あし (kun) — 足(foot/leg), 足りる(sufficient)`,
-        reading: `Body vocabulary:
-め(eye)  みみ(ear)  て(hand)  あし(foot/leg)  くち(mouth)  はな(nose)  あたま(head)
-Useful compound words:
-上手(じょうず) = skilled  |  下手(へた) = unskilled  |  人口(じんこう) = population`,
-        dialogue: [
-          { speaker: "A", text: "上手ですね！", translation: "You're skilled!" },
-          { speaker: "B", text: "ありがとう。でも、まだまだです。もっとれんしゅうします。", translation: "Thank you. But I still have a long way to go. I'll practice more." },
-          { speaker: "A", text: "日本語がとても上手ですよ。", translation: "Your Japanese is really good, you know." },
-        ],
-        vocab: [
-          { term: "人", reading: "hito/jin", meaning: "person / people", example: "日本人(Japanese person)" },
-          { term: "目", reading: "me", meaning: "eye", example: "めがおおきい。(Big eyes.)" },
-          { term: "耳", reading: "mimi", meaning: "ear", example: "みみをかたむける。(To lend an ear.)" },
-          { term: "手", reading: "te", meaning: "hand", example: "てをあらう。(Wash your hands.)" },
-          { term: "上手", reading: "jōzu", meaning: "skilled / good at", example: "えがじょうずですね。(Your drawing is good!)" },
-          { term: "人口", reading: "jinkō", meaning: "population", example: "とうきょうのじんこうはおおい。(Tokyo's population is large.)" },
-        ],
-        quiz: [
-          q("'上手' (じょうず) means…", ["unskilled","population","skilled/good at","hand"], 2, "kanji-vocab"),
-          q("'め' (目) means…", ["ear","nose","eye","mouth"], 2, "body"),
-          q("'人' can be read as…", ["ひと or じん","やま or さん","かわ or せん","き or もく"], 0, "kanji-reading"),
-          q("'てをあらう' means…", ["wash face","wash hands","wash feet","wash ears"], 1, "body-vocab"),
-        ],
-      },
-    ],
-  },
-  // ── Common Verbs 1 (動詞) ──────────────────────────────────────────────────
-  {
-    title: "Common Verbs 1 (動詞)",
-    levelLabel: "N5",
-    description: "Essential action verbs and the -ます polite form.",
-    prereqTitles: ["N5 Kanji Basics (漢字)"],
-    autoCompleteLevel: "",
-    modules: [
-      {
-        title: "Verbs — ます form",
-        objectives: ["Conjugate verbs in the polite ます form", "Use 10 essential verbs"],
-        grammar: `Polite verb forms (ます form):
-たべます (eat)   のみます (drink)   いきます (go)   きます (come)   みます (see/watch)
-きます (wear/put on) *different kanji   かきます (write)   よみます (read)   はなします (speak)
-します (do)   かいます (buy)   おきます (wake up)   ねます (sleep)
-
-Negative: 〜ません (do not)   Past: 〜ました (did)
-わたしはまいあさ６じにおきます。(I wake up at 6 every morning.)`,
-        reading: `まいにちのスケジュール:
-わたしはろくじにおきます。(I wake up at 6.)
-あさごはんをたべて、かいしゃにいきます。(I eat breakfast then go to work.)
-よるはほんをよんで、じゅういちじにねます。(At night I read a book, and sleep at 11.)`,
-        dialogue: [
-          { speaker: "A", text: "まいにちなにをしますか？", translation: "What do you do every day?" },
-          { speaker: "B", text: "あさはコーヒーをのんで、ほんをよみます。", translation: "In the morning I drink coffee and read books." },
-          { speaker: "A", text: "テレビはみますか？", translation: "Do you watch TV?" },
-          { speaker: "B", text: "あまりみません。えいがのほうがすきです。", translation: "I don't watch much. I prefer movies." },
-        ],
-        vocab: [
-          { term: "たべます", reading: "tabemasu", meaning: "eat", example: "すしをたべます。(I eat sushi.)" },
-          { term: "のみます", reading: "nomimasu", meaning: "drink", example: "みずをのみます。(I drink water.)" },
-          { term: "いきます", reading: "ikimasu", meaning: "go", example: "がっこうにいきます。(I go to school.)" },
-          { term: "みます", reading: "mimasu", meaning: "see / watch", example: "えいがをみます。(I watch a movie.)" },
-          { term: "よみます", reading: "yomimasu", meaning: "read", example: "ほんをよみます。(I read a book.)" },
-          { term: "かきます", reading: "kakimasu", meaning: "write", example: "てがみをかきます。(I write a letter.)" },
-          { term: "ねます", reading: "nemasu", meaning: "sleep / go to bed", example: "じゅういちじにねます。(I sleep at 11.)" },
-          { term: "おきます", reading: "okimasu", meaning: "wake up / get up", example: "しちじにおきます。(I wake up at 7.)" },
-        ],
-        quiz: [
-          q("'のみます' means…", ["eat","drink","sleep","go"], 1, "verbs"),
-          q("Negative of 'いきます' is…", ["いきました","いかない","いきません","いくます"], 2, "verb-neg"),
-          q("'ほんをよみます' means…", ["I buy a book","I write a book","I read a book","I see a book"], 2, "verbs"),
-          q("'おきます' means…", ["sleep","eat","wake up","drink"], 2, "verbs"),
-        ],
-      },
-    ],
-  },
-  // ── Adjectives (形容詞) ───────────────────────────────────────────────────
-  {
-    title: "Adjectives (形容詞)",
-    levelLabel: "N5",
-    description: "い-adjectives and な-adjectives for describing people and things.",
-    prereqTitles: ["Common Verbs 1 (動詞)"],
-    autoCompleteLevel: "",
-    modules: [
-      {
-        title: "い-Adjectives",
-        objectives: ["Use い-adjectives to describe things", "Form negatives with くない"],
-        grammar: `い-adjectives end in い and conjugate like this:
-Present: おおきい (big)   Negative: おおきくない (not big)
-Past: おおきかった (was big)   Past negative: おおきくなかった
-
-Common い-adjectives:
-おおきい (big)   ちいさい (small)   あたらしい (new)   ふるい (old)
-たかい (expensive/tall)   やすい (cheap/low)   むずかしい (difficult)   やさしい (easy/kind)
-おもしろい (interesting)   つまらない (boring)   たのしい (fun)   かなしい (sad)`,
-        reading: `このえいがはおもしろい！(This movie is interesting!)
-あのほんはむずかしくない。(That book is not difficult.)
-えきからとおいですか？(Is it far from the station?)
-いいえ、ちかいです。(No, it's close.)`,
-        dialogue: [
-          { speaker: "A", text: "この問題はむずかしいですか？", translation: "Is this problem difficult?" },
-          { speaker: "B", text: "むずかしくないですよ。でも、じかんがかかります。", translation: "It's not difficult. But it takes time." },
-          { speaker: "A", text: "そのしごとはたのしいですか？", translation: "Is that job fun?" },
-          { speaker: "B", text: "はい、とてもたのしいです！まいにちあたらしいことをまなびます。", translation: "Yes, very fun! Every day I learn new things." },
-        ],
-        vocab: [
-          { term: "おおきい", reading: "ōkii", meaning: "big / large", example: "おおきいいえにすみたい。(I want to live in a big house.)" },
-          { term: "ちいさい", reading: "chiisai", meaning: "small / little", example: "ちいさいこども。(A small child.)" },
-          { term: "あたらしい", reading: "atarashii", meaning: "new", example: "あたらしいスマホをかった。(I bought a new smartphone.)" },
-          { term: "むずかしい", reading: "muzukashii", meaning: "difficult", example: "にほんごはむずかしい。(Japanese is difficult.)" },
-          { term: "たのしい", reading: "tanoshii", meaning: "fun / enjoyable", example: "たのしいじゅぎょう。(A fun class.)" },
-          { term: "おもしろい", reading: "omoshiroi", meaning: "interesting / funny", example: "おもしろいほん。(An interesting book.)" },
-          { term: "やさしい", reading: "yasashii", meaning: "easy / kind", example: "やさしいせんせい。(A kind teacher.)" },
-        ],
-        quiz: [
-          q("'おおきくない' means…", ["very big","not big","was big","is big"], 1, "i-adj-neg"),
-          q("'むずかしい' means…", ["easy","interesting","difficult","fun"], 2, "adj-vocab"),
-          q("'たのしい' means…", ["sad","boring","fun/enjoyable","expensive"], 2, "adj-vocab"),
-          q("'あたらしい' means…", ["old","cheap","new","small"], 2, "adj-vocab"),
-        ],
-      },
-    ],
-  },
-  // ── At the Restaurant (レストランで) ──────────────────────────────────────
-  {
-    title: "At the Restaurant (レストランで)",
-    levelLabel: "N5",
-    description: "Order food, ask for the bill, and dine out in Japanese.",
-    prereqTitles: ["Adjectives (形容詞)"],
-    autoCompleteLevel: "",
-    modules: [
-      {
-        title: "Ordering Food — ちゅうもん",
-        objectives: ["Order food politely in a Japanese restaurant", "Ask for the bill and common requests"],
-        grammar: `Key restaurant phrases:
-すみません = excuse me (to call a waiter)
-〜をひとつ/ふたつください = one/two ~ please
-〜をおすすめはなんですか？= What do you recommend?
-おかいけいをおねがいします = Bill please (polite)
-〜はアレルギーがあります = I'm allergic to ~
-〜なしでおねがいします = Without ~ please
-
-Ordering: 〜にします / 〜をください / 〜をおねがいします`,
-        reading: `レストランでのかいわ:
-「いらっしゃいませ！なんめいさまですか？」= Welcome! How many people?
-「ふたりです。」= Two people.
-「ごちゅうもんはおきまりですか？」= Are you ready to order?
-「はい。ラーメンをひとつとぎょうざをふたつください。」= Yes. One ramen and two gyoza please.
-「おかいけいをおねがいします。」= Bill please.`,
-        dialogue: [
-          { speaker: "Staff", text: "いらっしゃいませ！なんめいさまですか？", translation: "Welcome! How many guests?" },
-          { speaker: "Customer", text: "ふたりです。", translation: "Two people." },
-          { speaker: "Staff", text: "こちらへどうぞ。ごちゅうもんはおきまりですか？", translation: "This way please. Are you ready to order?" },
-          { speaker: "Customer", text: "すみません、おすすめはなんですか？", translation: "Excuse me, what do you recommend?" },
-          { speaker: "Staff", text: "ほんじつはとんこつラーメンがおすすめです。", translation: "Today we recommend the tonkotsu ramen." },
-          { speaker: "Customer", text: "じゃあ、それをふたつください。あと、おかいけいもおねがいします。", translation: "Then two of those please. Also, the bill please." },
-        ],
-        vocab: [
-          { term: "すみません", reading: "sumimasen", meaning: "excuse me / sorry", example: "すみません！みずをください。(Excuse me! Water please.)" },
-          { term: "ちゅうもん", reading: "chuumon", meaning: "order", example: "ちゅうもんをとってください。(Please take our order.)" },
-          { term: "おすすめ", reading: "osusume", meaning: "recommendation", example: "おすすめはなんですか？(What's your recommendation?)" },
-          { term: "おかいけい", reading: "okaikei", meaning: "the bill / check", example: "おかいけいをおねがいします。(Bill please.)" },
-          { term: "〜をください", reading: "~wo kudasai", meaning: "please give me ~", example: "みずをふたつください。(Two waters please.)" },
-          { term: "なんめいさま", reading: "nanmei sama", meaning: "how many guests (polite)", example: "なんめいさまですか？(How many guests?)" },
-        ],
-        quiz: [
-          q("To call a waiter's attention, you say…", ["おかいけい","ちゅうもん","すみません","いただきます"], 2, "restaurant"),
-          q("'おかいけいをおねがいします' means…", ["Recommend something","Water please","Bill please","What is this?"], 2, "restaurant"),
-          q("'おすすめはなんですか？' means…", ["What is the price?","What do you recommend?","Is it spicy?","How many people?"], 1, "restaurant"),
-          q("To order 'two ramens', you say…", ["ラーメンをひとつ","ラーメンをふたつください","ラーメンをさんつ","ラーメンをよっつ"], 1, "ordering"),
-        ],
-      },
-    ],
-  },
-  // ── Transportation (交通) ──────────────────────────────────────────────────
-  {
-    title: "Transportation (交通)",
-    levelLabel: "N5",
-    description: "Getting around Japan — trains, buses, and asking for directions.",
-    prereqTitles: ["At the Restaurant (レストランで)"],
-    autoCompleteLevel: "",
-    modules: [
-      {
-        title: "Transport & Directions — こうつう",
-        objectives: ["Name transport types", "Ask and understand basic direction phrases"],
-        grammar: `Transport words:
-でんしゃ (train)   バス (bus)   タクシー (taxi)   じてんしゃ (bicycle)   ひこうき (airplane)   ふね (ship)
-
-Direction words:
-まっすぐ (straight ahead)   みぎ (right)   ひだり (left)   まがる (turn)
-〜をまがってください = please turn at ~
-〜まで = to/until ~ (destination particle)
-
-Asking directions:
-〜はどこですか？= Where is ~?
-〜にどうやっていきますか？= How do I get to ~?`,
-        reading: `えきへのいきかた:
-つぎのかどをみぎにまがってください。(Turn right at the next corner.)
-まっすぐいくと、ひだりにえきがあります。(Go straight and the station is on the left.)
-えきまでどのくらいかかりますか？(How long does it take to the station?)
-あるいて１０ぷんです。(It's 10 minutes on foot.)`,
-        dialogue: [
-          { speaker: "A", text: "すみません、えきはどこですか？", translation: "Excuse me, where is the station?" },
-          { speaker: "B", text: "まっすぐいって、つぎのしんごうをひだりにまがってください。", translation: "Go straight, then turn left at the next traffic light." },
-          { speaker: "A", text: "どのくらいかかりますか？", translation: "How long does it take?" },
-          { speaker: "B", text: "あるいてごふんです。バスでいけば２ふんです。", translation: "5 minutes on foot. 2 minutes by bus." },
-        ],
-        vocab: [
-          { term: "でんしゃ", reading: "densha", meaning: "train (electric)", example: "でんしゃでいきます。(I go by train.)" },
-          { term: "バス", reading: "basu", meaning: "bus", example: "バスにのります。(I take the bus.)" },
-          { term: "まっすぐ", reading: "massugu", meaning: "straight ahead", example: "まっすぐいってください。(Please go straight.)" },
-          { term: "みぎ", reading: "migi", meaning: "right", example: "みぎにまがってください。(Please turn right.)" },
-          { term: "ひだり", reading: "hidari", meaning: "left", example: "ひだりにえきがあります。(The station is on the left.)" },
-          { term: "〜まで", reading: "~made", meaning: "to / until (destination)", example: "えきまでどのくらい？(How far to the station?)" },
-          { term: "あるいて", reading: "aruite", meaning: "on foot / walking", example: "あるいて５ふんです。(5 minutes on foot.)" },
-        ],
-        quiz: [
-          q("'でんしゃ' means…", ["airplane","bus","bicycle","train"], 3, "transport"),
-          q("'ひだり' means…", ["straight","right","left","back"], 2, "directions"),
-          q("'まっすぐ' means…", ["turn right","turn left","straight ahead","stop here"], 2, "directions"),
-          q("'えきはどこですか？' means…", ["How far is the station?","Where is the station?","Is there a station?","What time does the train come?"], 1, "directions-q"),
+          q("To call a waiter in Japanese you say…", ["おねがいします","ありがとう","すみません","ください"], 2, "restaurant"),
+          q("'おすすめ' means…", ["order","recommendation","menu","popular dish"], 1, "vocab"),
+          q("'ていしょく' is…", ["a dessert","a set meal","a side dish","a buffet"], 1, "vocab"),
+          qReorder("Order: 'Tempura, please':", ["おねがいします","てんぷらを"], [1,0], "ordering"),
         ],
       },
     ],
   },
 ];
+
 
 // ─── ENGLISH ──────────────────────────────────────────────────────────────────
 
@@ -1361,1202 +1073,1184 @@ const englishSkills: SkillSeed[] = [
   {
     title: "Greetings & Introductions",
     levelLabel: "Beginner",
-    description: "Greet people and introduce yourself in English.",
+    description: "Meet people, introduce yourself, and exchange basic personal information.",
     prereqTitles: [],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Saying Hello",
-        objectives: ["Use common greetings", "Introduce yourself with 'I am'"],
-        grammar: `Use 'I am' / 'I'm' + name to introduce yourself.
-Use 'Nice to meet you' when meeting someone new.
-Greetings by time: Good morning / Good afternoon / Good evening.
-Reply to 'How are you?': I'm fine / I'm great / Not bad, thank you.`,
-        reading: `Hi! My name is Sam. Nice to meet you.
-How are you today? I'm doing well, thank you!
-This is my friend, Lisa. She's from Indonesia.`,
-        dialogue: [
-          { speaker: "A", text: "Hi, I'm Sam. Nice to meet you!", translation: "Halo, saya Sam. Senang bertemu denganmu!" },
-          { speaker: "B", text: "Nice to meet you too! I'm Maya. How are you?", translation: "Senang bertemu juga! Saya Maya. Apa kabar?" },
-          { speaker: "A", text: "I'm great, thanks!", translation: "Saya baik-baik saja, terima kasih!" },
+        title: "Nice to Meet You",
+        objectives: ["Greet people in English", "Introduce yourself with name, country, and job"],
+        warmUp: "Imagine meeting someone new at an international event. What's the first thing you'd say to break the ice?",
+        canDo: [
+          "Greet someone: Hi / Hello / Nice to meet you",
+          "Introduce yourself: My name is… / I'm from… / I work as…",
+          "Respond to 'How are you?'",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Andi", text: "Hi! I'm Andi. Nice to meet you!", translation: "Halo! Saya Andi. Senang bertemu kamu!" },
+          { speaker: "Sarah", text: "Nice to meet you too! I'm Sarah. Are you from Indonesia?", translation: "Senang bertemu kamu juga! Saya Sarah. Kamu dari Indonesia?" },
+          { speaker: "Andi", text: "Yes, I'm from Jakarta. What about you?", translation: "Ya, saya dari Jakarta. Kalau kamu?" },
+          { speaker: "Sarah", text: "I'm from Sydney, Australia. So, what do you do?", translation: "Saya dari Sydney, Australia. Jadi, apa pekerjaanmu?" },
+          { speaker: "Andi", text: "I'm a software engineer. I'm here for a conference.", translation: "Saya insinyur perangkat lunak. Saya di sini untuk konferensi." },
+        ],
+        patternExamples: [
+          { pattern: "I'm [name] / I'm from [place] / I work as [job]", examples: ["I'm Andi. (introduction)", "I'm from Jakarta, Indonesia. (origin)", "I work as a teacher. / I'm a teacher. (job)"] },
+          { pattern: "Nice to meet you → Nice to meet you too!", examples: ["A: Nice to meet you! B: Nice to meet you too!", "A: Pleased to meet you! B: Likewise!"] },
+        ],
+        cultureNote: "In English-speaking cultures, small talk is important when meeting new people. Common topics: weather, jobs, where you're from. It's normal to ask 'What do you do?' early on — it's not considered rude, unlike in some cultures.",
         vocab: [
-          { term: "hello", meaning: "a greeting", example: "Hello! How are you?" },
-          { term: "nice to meet you", meaning: "a polite greeting when first meeting someone", example: "Nice to meet you, I'm Andi." },
-          { term: "my name is", meaning: "used to introduce yourself", example: "My name is Sari." },
-          { term: "how are you?", meaning: "asking about someone's wellbeing", example: "Hi! How are you today?" },
-          { term: "fine / great / good", meaning: "common replies to 'how are you'", example: "I'm fine, thank you." },
+          { term: "nice to meet you", meaning: "polite greeting when meeting someone new", example: "Nice to meet you! I'm Andi." },
+          { term: "I'm from…", meaning: "used to say your country or city", example: "I'm from Jakarta, Indonesia." },
+          { term: "what do you do?", meaning: "asking about someone's job", example: "So, what do you do for work?" },
+          { term: "likewise", meaning: "the same; used to return a compliment", example: "A: Nice to meet you! B: Likewise!" },
+          { term: "conference", meaning: "a large professional meeting", example: "I'm here for a business conference." },
         ],
         quiz: [
-          q("Which is a greeting?", ["Goodbye","Hello","Sorry","Later"], 1, "greetings"),
-          q("Complete: 'Nice ___ meet you.'", ["to","for","at","of"], 0, "phrases"),
-          q("'My name ___' followed by your name.", ["am","be","is","are"], 2, "grammar"),
-          q("Reply to 'How are you?':", ["Yes please","Nice to meet you","I'm fine, thank you","Goodbye"], 2, "conversation"),
+          q("Someone says 'Nice to meet you!' You reply…", ["Yes, I do!","Nice to meet you too!","I'm fine, thanks.","See you later!"], 1, "greetings"),
+          q("'What do you do?' is asking about your…", ["hobby","health","job","plans"], 2, "introductions"),
+          qFill("Complete: 'I'm ___ Jakarta, Indonesia.'", ["from"], "grammar"),
+          qReorder("Build: 'Nice to meet you, I'm Andi from Jakarta.'", ["I'm","Nice to meet you,","from Jakarta.","Andi"], [1,0,3,2], "introductions"),
+        ],
+      },
+      {
+        title: "How Are You? — Small Talk",
+        objectives: ["Ask how someone is doing", "Give natural responses beyond 'I'm fine'"],
+        warmUp: "When someone asks 'How are you?' in your language, what do people really say? Is it always honest?",
+        canDo: [
+          "Ask and answer: How are you? / How's it going?",
+          "Give natural replies: Great! / Not bad. / Could be better.",
+          "Keep a short conversation going with follow-up questions",
+        ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Maya", text: "Hey Andi! How are you doing?", translation: "Hei Andi! Apa kabar?" },
+          { speaker: "Andi", text: "Pretty good, thanks! Just a bit tired from the flight. How about you?", translation: "Lumayan baik, terima kasih! Cuma agak lelah dari penerbangan. Kamu sendiri?" },
+          { speaker: "Maya", text: "I'm great, actually! I just got some good news.", translation: "Saya baik sekali! Saya baru dapat kabar baik." },
+          { speaker: "Andi", text: "Oh really? What happened?", translation: "Oh ya? Ada apa?" },
+          { speaker: "Maya", text: "I got into the graduate program I applied for!", translation: "Saya diterima di program pascasarjana yang saya daftar!" },
+        ],
+        patternExamples: [
+          { pattern: "How are you? / How's it going? / How are things?", examples: ["A: How are you? B: Pretty good, thanks!", "A: How's it going? B: Not bad! / Could be better."] },
+          { pattern: "Returning the question: How about you? / And you?", examples: ["I'm good, thanks. How about you?", "Not bad! And you?"] },
+        ],
+        cultureNote: "'How are you?' in English is often a greeting, not a real question. A short positive reply is expected. If you give a long detailed answer, it can feel unusual in casual encounters. Save the details for close friends!",
+        vocab: [
+          { term: "pretty good", meaning: "fairly good; quite well", example: "I'm pretty good, thanks." },
+          { term: "not bad", meaning: "okay; acceptable (informal)", example: "Not bad, could be better!" },
+          { term: "could be better", meaning: "not great but polite way to say so", example: "Honestly? Could be better — rough week." },
+          { term: "How about you?", meaning: "returning the same question", example: "I'm fine, thanks. How about you?" },
+          { term: "actually", meaning: "used to add emphasis or mild surprise", example: "I'm great, actually!" },
+        ],
+        quiz: [
+          q("'How are you?' in casual English is usually…", ["a deep personal question","a medical inquiry","a friendly greeting ritual","rude to ask"], 2, "small-talk"),
+          q("The most natural reply to 'How are you?'", ["Yes, I am.","I'm fine, thanks! And you?","Nice to meet you.","Not at all."], 1, "responses"),
+          qFill("Complete: 'I'm good, thanks. How ___ you?'", ["about"], "small-talk"),
+          qMatch("Match the reply to its tone:", [["Not bad!","neutral/okay"],["I'm great!","very positive"],["Could be better.","slightly negative"]], "responses"),
         ],
       },
     ],
   },
+
   {
-    title: "Present Simple",
+    title: "My Daily Life",
     levelLabel: "Beginner",
-    description: "Talk about habits and facts with the present simple.",
+    description: "Describe your daily routine, talk about time, and discuss habits.",
     prereqTitles: ["Greetings & Introductions"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Present Simple — Affirmative",
-        objectives: ["Form present simple sentences", "Add -s/-es for he/she/it"],
-        grammar: `Present simple structure:
-I / You / We / They + base verb: "I work." "They study."
-He / She / It + verb + -s: "She works." "He studies."
-
-Spelling rules for -s:
-• Most verbs: add -s → work→works
-• -sh/-ch/-x/-o: add -es → watch→watches, go→goes
-• Consonant + -y: change y→i + es → study→studies`,
-        reading: `Every day, Andi wakes up at 7 AM. He drinks coffee and reads the news.
-He works at a company in Jakarta. His sister studies at university.
-They both love Indonesian food!`,
-        dialogue: [
-          { speaker: "A", text: "What do you do every day?", translation: "Apa yang kamu lakukan setiap hari?" },
-          { speaker: "B", text: "I wake up early and exercise. Then I go to work.", translation: "Saya bangun pagi dan olahraga. Lalu pergi kerja." },
-          { speaker: "A", text: "My sister exercises too. She runs every morning.", translation: "Adik saya juga olahraga. Dia lari setiap pagi." },
+        title: "My Morning Routine",
+        objectives: ["Describe daily activities using the present simple", "Use time expressions: in the morning, at night, every day"],
+        warmUp: "What does your typical morning look like? From the moment your alarm goes off — what happens next?",
+        canDo: [
+          "Describe your morning routine: I wake up at…, I have breakfast…",
+          "Use present simple for habits and routines",
+          "Use time expressions: at 7 AM, in the morning, every day",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Sarah", text: "Andi, you look exhausted. What time did you get up this morning?", translation: "Andi, kamu terlihat kelelahan. Jam berapa kamu bangun pagi ini?" },
+          { speaker: "Andi", text: "I got up at 5:30. I always wake up early — I go running every morning.", translation: "Saya bangun jam 5:30. Saya selalu bangun pagi — saya lari setiap pagi." },
+          { speaker: "Sarah", text: "Wow! I could never do that. I'm not a morning person at all.", translation: "Wow! Saya tidak pernah bisa melakukan itu. Saya sama sekali bukan orang yang suka pagi." },
+          { speaker: "Andi", text: "It was hard at first! But now I love it. After running I have a shower, then breakfast.", translation: "Awalnya sulit! Tapi sekarang saya suka. Setelah lari, saya mandi, lalu sarapan." },
+          { speaker: "Maya", text: "I usually skip breakfast. I just grab a coffee on the way to class.", translation: "Saya biasanya melewatkan sarapan. Saya cuma ambil kopi dalam perjalanan ke kelas." },
+        ],
+        patternExamples: [
+          { pattern: "I [verb] at [time] / every [day/morning/etc.]", examples: ["I wake up at 6 AM every day.", "I have lunch at noon.", "I go to the gym every Monday."] },
+          { pattern: "I always / usually / sometimes / never [verb]", examples: ["I always brush my teeth before bed.", "I usually have coffee in the morning.", "I never skip breakfast."] },
+        ],
+        cultureNote: "In English-speaking countries, breakfast habits vary widely. In Australia and the UK, a 'proper breakfast' might mean eggs, toast, and beans. In the US, cereal or pancakes are common. In many Asian countries, locals find Western breakfast food unusual — and vice versa!",
         vocab: [
-          { term: "wake up", meaning: "to stop sleeping and get up", example: "I wake up at 7 AM." },
-          { term: "study", meaning: "to learn from books or classes", example: "She studies English every day." },
-          { term: "work", meaning: "to do a job", example: "He works in an office." },
-          { term: "exercise", meaning: "to do physical activity", example: "They exercise in the morning." },
-          { term: "every day", meaning: "daily; each day", example: "I eat breakfast every day." },
+          { term: "wake up", meaning: "to stop sleeping and become conscious", example: "I wake up at 6 every morning." },
+          { term: "get up", meaning: "to physically get out of bed (slightly different from wake up)", example: "I wake up at 6 but I don't get up until 6:30." },
+          { term: "skip", meaning: "to miss or not do something on purpose", example: "I often skip breakfast when I'm in a hurry." },
+          { term: "grab", meaning: "to take something quickly (informal)", example: "I grab a coffee before work." },
+          { term: "on the way to", meaning: "while travelling toward somewhere", example: "I listen to podcasts on the way to work." },
         ],
         quiz: [
-          q("'She ___ to school every day.'", ["go","goes","going","gone"], 1, "present-simple-s"),
-          qFill("Complete: 'He ___ the news every morning.' (read)", ["reads"], "present-simple-s"),
-          qMatch("Match the verb to its he/she/it form:", [["go","goes"],["study","studies"],["watch","watches"]], "spelling"),
-          qReorder("Build the sentence:", ["reads","every morning","He","the news"], [2,0,3,1], "present-simple"),
+          q("'I always wake up early' uses the present simple because…", ["it happened once","it's a habit","it happened yesterday","it will happen tomorrow"], 1, "present-simple"),
+          q("What's the difference between 'wake up' and 'get up'?", ["They're the same","Wake up = open eyes; get up = leave bed","Get up is formal","Wake up is past tense"], 1, "vocabulary"),
+          qFill("Complete: 'I ___ skip breakfast — I'm always in a hurry.' (negative habit)", ["usually","often","sometimes"], "frequency"),
+          qReorder("Build: 'I always have coffee on the way to work.'", ["on the way to work.","I","always","have coffee"], [1,2,3,0], "daily-routine"),
         ],
       },
       {
-        title: "Present Simple — Negative & Questions",
-        objectives: ["Make negative sentences with don't/doesn't", "Ask yes/no questions with do/does"],
-        grammar: `Negative:
-I/You/We/They + don't + base verb: "I don't eat meat."
-He/She/It + doesn't + base verb: "She doesn't like coffee."
-
-Questions:
-Do + I/you/we/they + verb? "Do you like sushi?"
-Does + he/she/it + verb? "Does she work here?"
-
-Short answers:
-Yes, I do. / No, I don't.  |  Yes, she does. / No, she doesn't.`,
-        reading: `Ria doesn't eat meat — she's vegetarian. She does eat fish, though.
-"Do you cook at home?" "Yes, I do! I cook every weekend."
-"Does your brother like cooking too?" "No, he doesn't. He orders food online."`,
-        dialogue: [
-          { speaker: "A", text: "Do you speak Japanese?", translation: "Apakah kamu berbicara bahasa Jepang?" },
-          { speaker: "B", text: "Yes, I do! But I don't speak Chinese.", translation: "Ya! Tapi saya tidak berbicara bahasa Mandarin." },
-          { speaker: "A", text: "Does your teacher speak Indonesian?", translation: "Apakah gurumu berbicara bahasa Indonesia?" },
-          { speaker: "B", text: "No, she doesn't.", translation: "Tidak." },
+        title: "Talking About the Weekend",
+        objectives: ["Use past simple to describe completed activities", "Talk about plans using 'going to'"],
+        warmUp: "What did you do last weekend? Was it relaxing, busy, or something in between?",
+        canDo: [
+          "Talk about past activities: I went to…, I watched…, I met…",
+          "Ask about someone's weekend: How was your weekend?",
+          "Share plans: I'm going to… this weekend",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Sarah", text: "Hey Maya! How was your weekend?", translation: "Hai Maya! Apa kabar akhir pekanmu?" },
+          { speaker: "Maya", text: "It was great! I went to a food festival on Saturday. The food was amazing.", translation: "Sangat menyenangkan! Saya pergi ke festival makanan hari Sabtu. Makanannya luar biasa." },
+          { speaker: "Sarah", text: "Oh nice! Did you try anything unusual?", translation: "Wah bagus! Apakah kamu mencoba sesuatu yang tidak biasa?" },
+          { speaker: "Maya", text: "Yes! I tried a crocodile burger. It tasted like chicken, honestly.", translation: "Ya! Saya mencoba burger buaya. Rasanya seperti ayam, jujur saja." },
+          { speaker: "Andi", text: "What are you going to do this coming weekend?", translation: "Apa yang akan kamu lakukan akhir pekan ini?" },
+          { speaker: "Maya", text: "I'm going to visit the botanical gardens. Want to join?", translation: "Saya akan mengunjungi kebun raya. Mau ikut?" },
+        ],
+        patternExamples: [
+          { pattern: "I went / I tried / I saw / I ate [past simple]", examples: ["I went to a food festival on Saturday.", "I tried a crocodile burger — it tasted like chicken!", "I saw a great movie last night."] },
+          { pattern: "How was [noun]? → It was [adjective]!", examples: ["How was your weekend? → It was great!", "How was the food? → It was amazing!", "How was the movie? → It was boring, actually."] },
+          { pattern: "I'm going to [verb] this [time]", examples: ["I'm going to visit the gardens this weekend.", "I'm going to cook dinner tonight."] },
+        ],
+        cultureNote: "Food festivals are hugely popular in Australia, the UK, and the US. They're a way communities celebrate diversity. You'll find everything from gourmet burgers to exotic meats — trying unusual foods is considered adventurous, not rude!",
         vocab: [
-          { term: "don't", meaning: "do not — used with I/you/we/they", example: "I don't like coffee." },
-          { term: "doesn't", meaning: "does not — used with he/she/it", example: "She doesn't eat meat." },
-          { term: "do you…?", meaning: "question form for I/you/we/they", example: "Do you live here?" },
-          { term: "does he/she…?", meaning: "question form for he/she/it", example: "Does she work here?" },
-          { term: "vegetarian", meaning: "a person who doesn't eat meat", example: "I'm vegetarian." },
+          { term: "food festival", meaning: "an event with many food stalls and vendors", example: "I went to a food festival last weekend." },
+          { term: "unusual", meaning: "not common; different from normal", example: "Did you try anything unusual?" },
+          { term: "honestly", meaning: "used when saying something surprising but true", example: "It tasted like chicken, honestly." },
+          { term: "botanical gardens", meaning: "a park with collections of plants and flowers", example: "The botanical gardens are beautiful in spring." },
+          { term: "join", meaning: "to come with someone; to participate", example: "We're going to the park — want to join?" },
         ],
         quiz: [
-          q("'He ___ like pizza.' (negative)", ["don't","doesn't","isn't","aren't"], 1, "present-simple-neg"),
-          qFill("Complete: '___ she speak Japanese?' (question form):", ["Does"], "present-simple-q"),
-          qReorder("Build the negative sentence:", ["meat","doesn't","She","eat"], [2,1,3,0], "present-simple-neg"),
-          qMatch("Match the subject to the correct auxiliary:", [["I","don't"],["She","doesn't"],["They","don't"]], "present-simple-neg"),
+          q("'How was your weekend?' expects a reply about…", ["the coming weekend","your job","the past weekend","your health"], 2, "past-simple"),
+          q("'I'm going to visit the gardens' describes…", ["a past event","a habit","a future plan","an obligation"], 2, "future"),
+          qFill("Complete: 'I ___ to a food festival on Saturday.' (past of go)", ["went"], "past-simple"),
+          qMatch("Match the tense to its use:", [["I went to…","completed past action"],["I'm going to…","future plan"],["I always go to…","habit/routine"]], "tenses"),
         ],
       },
     ],
   },
+
   {
-    title: "Past Simple",
+    title: "Food & Eating Out",
     levelLabel: "Beginner",
-    description: "Talk about completed actions in the past.",
-    prereqTitles: ["Present Simple"],
+    description: "Order food confidently, express preferences, and navigate a restaurant in English.",
+    prereqTitles: ["My Daily Life"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Past Simple — Regular & Irregular Verbs",
-        objectives: ["Form past simple with -ed", "Use common irregular past forms"],
-        grammar: `Regular verbs: add -ed
-  work → worked   study → studied   walk → walked   watch → watched
-
-Irregular verbs (memorize these):
-  go → went   eat → ate   have → had   see → saw   come → came
-  buy → bought   take → took   make → made   give → gave
-
-Negative: didn't + base verb (same for all subjects)
-  "He didn't go to school yesterday."
-
-Question: Did + subject + base verb?
-  "Did you eat breakfast?"`,
-        reading: `Yesterday, Budi went to the market. He bought vegetables and fruit.
-He cooked dinner and invited his friends. They ate together and had a great time.
-"Did you make the curry?" "Yes, I did! I also made rice."`,
-        dialogue: [
-          { speaker: "A", text: "Where did you go last weekend?", translation: "Kamu pergi ke mana akhir pekan lalu?" },
-          { speaker: "B", text: "I went to Bali. It was amazing! I saw a temple.", translation: "Saya pergi ke Bali. Luar biasa! Saya melihat kuil." },
-          { speaker: "A", text: "Did you eat local food?", translation: "Kamu makan makanan lokal?" },
-          { speaker: "B", text: "Yes! I ate nasi goreng every day.", translation: "Ya! Saya makan nasi goreng setiap hari." },
+        title: "At a Restaurant",
+        objectives: ["Order food and drinks politely", "Ask for recommendations and handle requests"],
+        warmUp: "Think of the last time you ate at a restaurant. How did you order? Was there anything on the menu you didn't understand?",
+        canDo: [
+          "Get a waiter's attention: Excuse me!",
+          "Order politely: I'd like… / Could I have… / I'll have…",
+          "Ask questions: What do you recommend? / Does this contain…?",
+          "Handle the bill: Could we have the check, please?",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Waiter", text: "Good evening! Are you ready to order?", translation: "Selamat malam! Apakah Anda siap memesan?" },
+          { speaker: "Andi", text: "Almost! Could you tell me what the special is today?", translation: "Hampir siap! Bisakah Anda memberi tahu apa menu spesial hari ini?" },
+          { speaker: "Waiter", text: "Today's special is grilled salmon with lemon butter sauce. It's very popular.", translation: "Menu spesial hari ini adalah salmon panggang dengan saus mentega lemon. Sangat populer." },
+          { speaker: "Andi", text: "That sounds great. I'll have that. And a glass of sparkling water, please.", translation: "Kedengarannya enak. Saya mau itu. Dan segelas air sparkling, tolong." },
+          { speaker: "Maya", text: "I'd like the pasta, please. Is it vegetarian?", translation: "Saya ingin pasta, tolong. Apakah itu vegetarian?" },
+          { speaker: "Waiter", text: "Yes, it is! No meat at all. Shall I bring some bread while you wait?", translation: "Ya! Tidak ada daging sama sekali. Haruskah saya bawakan roti sementara Anda menunggu?" },
+        ],
+        patternExamples: [
+          { pattern: "I'd like… / I'll have… / Could I have…", examples: ["I'd like the salmon, please. (polite, most common)", "I'll have the pasta. (casual but acceptable)", "Could I have a glass of water? (very polite)"] },
+          { pattern: "Does this contain [ingredient]? / Is this [dietary requirement]?", examples: ["Does this contain nuts? I'm allergic.", "Is the pasta vegetarian?", "Is this dish gluten-free?"] },
+        ],
+        cultureNote: "Tipping culture varies across English-speaking countries. In the US, 15-20% is expected. In Australia and New Zealand, tipping is optional. In the UK, 10-12.5% service charge is often already added. Always check the bill before tipping!",
         vocab: [
-          { term: "went", meaning: "past of 'go'", example: "I went to the shop." },
-          { term: "ate", meaning: "past of 'eat'", example: "She ate sushi for lunch." },
-          { term: "saw", meaning: "past of 'see'", example: "We saw a great movie." },
-          { term: "bought", meaning: "past of 'buy'", example: "He bought a new phone." },
-          { term: "didn't", meaning: "did not — past negative", example: "I didn't sleep well." },
+          { term: "I'd like", meaning: "polite form of 'I want' — use when ordering", example: "I'd like the grilled salmon, please." },
+          { term: "Could I have…?", meaning: "very polite way to request something", example: "Could I have the check, please?" },
+          { term: "the special", meaning: "today's featured dish, often not on the regular menu", example: "What's the special today?" },
+          { term: "sparkling water", meaning: "fizzy water with bubbles (vs. still water)", example: "Still or sparkling water?" },
+          { term: "vegetarian", meaning: "contains no meat or fish", example: "Is this dish vegetarian?" },
         ],
         quiz: [
-          qFill("Write the past tense of 'go':", ["went"], "irregular"),
-          q("'She ___ TV last night.' (watch)", ["watched","watch","watches","watchd"], 0, "past-regular"),
-          qMatch("Match the verb to its past form:", [["go","went"],["eat","ate"],["buy","bought"],["see","saw"]], "irregular"),
-          qReorder("Build the question:", ["did","the movie","you","see","?"], [0,2,3,1,4], "past-question"),
+          q("The most polite way to order is…", ["I want the pasta.","Give me the pasta.","I'd like the pasta, please.","Pasta!"], 2, "ordering"),
+          q("'Does this contain nuts?' is asked because…", ["nuts are expensive","the person may be allergic","nuts don't taste good","the dish looks unusual"], 1, "dietary"),
+          qFill("Complete: 'Could I ___ the check, please?'", ["have"], "polite-requests"),
+          qMatch("Match to politeness level:", [["I want","direct/informal"],["I'd like","polite"],["Could I have","very polite"]], "politeness"),
         ],
       },
     ],
   },
-  // ── Present Continuous ────────────────────────────────────────────────────
+
   {
-    title: "Present Continuous",
+    title: "Getting Around",
     levelLabel: "Beginner",
-    description: "Describe actions happening right now using am/is/are + -ing.",
-    prereqTitles: ["Past Simple"],
+    description: "Ask for and give directions, use public transport, and navigate a new city.",
+    prereqTitles: ["Food & Eating Out"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Present Continuous — am/is/are + -ing",
-        objectives: ["Form the present continuous tense", "Distinguish it from present simple"],
-        grammar: `Structure: subject + am/is/are + verb-ing
-
-I am eating.   She is working.   They are playing.
-
-Spelling rules for -ing:
-• Most verbs: add -ing → eat→eating, work→working
-• Verb ends in -e: drop e + ing → write→writing, make→making
-• Short vowel + consonant: double last letter + ing → run→running, sit→sitting
-
-Use it for: actions happening NOW, temporary situations, future plans.
-"I'm studying Japanese this year." (temporary ongoing)`,
-        reading: `Look around you right now:
-The teacher is writing on the board. Students are listening.
-Some are taking notes, and one student is sleeping!
-"What are you doing?" "I'm doing my homework."
-"Is she coming to the party?" "No, she's working tonight."`,
-        dialogue: [
-          { speaker: "A", text: "Where are you? You're late!", translation: "" },
-          { speaker: "B", text: "Sorry! I'm running to the bus stop. The bus is leaving!", translation: "" },
-          { speaker: "A", text: "Hurry up! Everyone is waiting for you.", translation: "" },
-          { speaker: "B", text: "I'm coming! I'm almost there.", translation: "" },
+        title: "Asking for Directions",
+        objectives: ["Ask for and give directions in English", "Use prepositions of place: next to, opposite, on the left"],
+        warmUp: "You're in a new city with no internet. A stranger asks you for directions to the nearest supermarket. What do you say?",
+        canDo: [
+          "Ask for directions: Excuse me, how do I get to…?",
+          "Give directions: Turn left/right at… / Go straight… / It's next to…",
+          "Describe distance: It's about a 5-minute walk",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Andi", text: "Excuse me! I'm looking for the City Library. Am I going the right way?", translation: "Permisi! Saya mencari Perpustakaan Kota. Apakah saya menuju arah yang benar?" },
+          { speaker: "Sarah", text: "Hmm, not quite. You need to go back one block and turn left on Queen Street.", translation: "Hmm, belum tepat. Kamu perlu kembali satu blok dan belok kiri di Queen Street." },
+          { speaker: "Andi", text: "Turn left on Queen Street — okay. Then what?", translation: "Belok kiri di Queen Street — oke. Lalu?" },
+          { speaker: "Sarah", text: "Walk straight for about two blocks. The library is on the right, opposite the park.", translation: "Jalan lurus sekitar dua blok. Perpustakaannya ada di kanan, di seberang taman." },
+          { speaker: "Andi", text: "Perfect, thank you so much! Is it far?", translation: "Sempurna, terima kasih banyak! Apakah itu jauh?" },
+          { speaker: "Sarah", text: "Not at all — maybe a 10-minute walk.", translation: "Tidak sama sekali — mungkin jalan kaki 10 menit." },
+        ],
+        patternExamples: [
+          { pattern: "Turn left/right at [place/street]", examples: ["Turn left at the traffic lights.", "Turn right at the corner.", "Turn left on Queen Street."] },
+          { pattern: "It's [location] the [landmark]", examples: ["It's next to the bank.", "It's opposite the park.", "It's on the corner of Main and Queen Street."] },
+          { pattern: "It's about a [time]-minute walk/drive", examples: ["It's about a 10-minute walk.", "It's about a 5-minute drive.", "It's only 2 minutes from here."] },
+        ],
+        cultureNote: "In Australia, Canada, and the US, city blocks are standard direction units ('go two blocks'). In the UK, people more often use landmarks. In many Asian cities, GPS apps have replaced asking strangers — but knowing how to ask is still a vital travel skill!",
         vocab: [
-          { term: "am/is/are + -ing", meaning: "present continuous form", example: "She is cooking dinner." },
-          { term: "right now", meaning: "at this moment", example: "What are you doing right now?" },
-          { term: "at the moment", meaning: "currently; right now", example: "I'm studying at the moment." },
-          { term: "currently", meaning: "at this time; now", example: "He is currently living in Jakarta." },
-          { term: "temporary", meaning: "lasting only a short time", example: "She is temporarily working from home." },
+          { term: "Excuse me!", meaning: "used to get someone's attention politely", example: "Excuse me! Do you know where the station is?" },
+          { term: "go straight", meaning: "continue in the same direction without turning", example: "Go straight for two blocks." },
+          { term: "on the right / left", meaning: "located to the right / left side", example: "The library is on the right." },
+          { term: "opposite", meaning: "directly across from something", example: "It's opposite the park." },
+          { term: "next to", meaning: "immediately beside something", example: "The cafe is next to the bookshop." },
         ],
         quiz: [
-          q("'She ___ (read) a book right now.'", ["reads","is reading","read","readed"], 1, "present-cont"),
-          q("'write' → -ing form is…", ["writeing","writting","writing","writhing"], 2, "spelling-ing"),
-          qFill("Write the -ing form of 'run':", ["running"], "spelling-ing"),
-          qReorder("Build: 'She is reading a book right now':", ["is","right now","She","a book","reading"], [2,0,4,3,1], "present-cont"),
+          q("'It's opposite the park' means…", ["beside the park","behind the park","in front of the park, across the street","inside the park"], 2, "prepositions"),
+          q("You want polite attention from a stranger. You say…", ["Hey you!","Hello there.","Excuse me!","Sorry sorry!"], 2, "polite-english"),
+          qFill("Complete: 'Turn ___ at the traffic lights, then go straight.'", ["left","right"], "directions"),
+          qReorder("Give directions: 'Go straight for two blocks, then turn right.'", ["then turn right.","Go straight","for two blocks,"], [1,2,0], "directions"),
         ],
       },
     ],
   },
-  // ── Future Tense ──────────────────────────────────────────────────────────
+
   {
-    title: "Future Tense",
+    title: "Shopping",
     levelLabel: "Beginner",
-    description: "Talk about future plans and predictions using will and going to.",
-    prereqTitles: ["Present Continuous"],
+    description: "Shop confidently — ask about prices, sizes, and availability in English.",
+    prereqTitles: ["Getting Around"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "will & going to",
-        objectives: ["Use 'will' for predictions and decisions", "Use 'going to' for plans"],
-        grammar: `WILL: subject + will + base verb
-Use for: predictions, spontaneous decisions, offers/promises.
-"It will rain tomorrow." (prediction)
-"I'll help you!" (spontaneous offer)
-
-GOING TO: subject + am/is/are + going to + base verb
-Use for: pre-planned intentions, things you can already see will happen.
-"I'm going to visit Japan next year." (planned)
-"Look at those clouds — it's going to rain!" (you can see it coming)
-
-Negative: won't (will not) | isn't/aren't going to`,
-        reading: `Next week is going to be busy!
-On Monday, I'm going to start a new project at work.
-I think it will be challenging, but I'll work hard.
-"Are you going to join us for dinner?" "No, I won't be able to. I'll be working late."
-"Don't worry. It will be fine!"`,
-        dialogue: [
-          { speaker: "A", text: "What are you going to do this weekend?", translation: "" },
-          { speaker: "B", text: "I'm going to visit my grandparents. What about you?", translation: "" },
-          { speaker: "A", text: "I'll probably just stay home. Maybe I'll watch a movie.", translation: "" },
-          { speaker: "B", text: "That sounds relaxing! I think the weather will be nice.", translation: "" },
+        title: "At a Shop",
+        objectives: ["Ask about prices and availability", "Describe what you're looking for"],
+        warmUp: "Describe something you recently bought. How did you decide to buy it? Was price, quality, or brand the deciding factor?",
+        canDo: [
+          "Ask for help: I'm looking for… / Do you have…?",
+          "Ask about price: How much is this? / How much does this cost?",
+          "Ask about size/colour: Do you have this in a medium? / Do you have it in blue?",
+          "Complete the purchase: I'll take it. / I'll leave it, thanks.",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Andi", text: "Excuse me, I'm looking for a gift for my friend. Something around $30?", translation: "Permisi, saya mencari hadiah untuk teman saya. Sekitar $30?" },
+          { speaker: "Sarah", text: "Sure! How about these scented candles? They're very popular.", translation: "Tentu! Bagaimana dengan lilin beraroma ini? Sangat populer." },
+          { speaker: "Andi", text: "Oh, they look nice! How much are they?", translation: "Oh, terlihat bagus! Berapa harganya?" },
+          { speaker: "Sarah", text: "These ones are $25 each. We also have gift sets for $45.", translation: "Yang ini $25 per buah. Kami juga punya set hadiah seharga $45." },
+          { speaker: "Andi", text: "I'll go with the $25 one. Do you gift-wrap?", translation: "Saya ambil yang $25. Apakah Anda memberikan pembungkus kado?" },
+          { speaker: "Sarah", text: "Absolutely! Free of charge. I'll wrap it beautifully for you.", translation: "Tentu saja! Gratis. Saya akan membungkusnya dengan indah untuk Anda." },
+        ],
+        patternExamples: [
+          { pattern: "I'm looking for [item] / something [description]", examples: ["I'm looking for a blue shirt.", "I'm looking for something around $30.", "I'm looking for a gift for my friend."] },
+          { pattern: "How much is/are [item]?", examples: ["How much is this candle?", "How much are these shoes?", "How much does this cost?"] },
+          { pattern: "Do you have this in [size/colour]?", examples: ["Do you have this in a medium?", "Do you have it in black?", "Do you have a smaller size?"] },
+        ],
+        cultureNote: "Sales tax (GST, VAT) varies across countries. In Australia and Canada, the price on the tag usually doesn't include tax — you find out the real price at the register. In Japan, tax is included in the displayed price. In the US, it varies by state!",
         vocab: [
-          { term: "will", meaning: "future auxiliary for predictions/decisions", example: "I will call you later." },
-          { term: "won't", meaning: "will not", example: "She won't be at the party." },
-          { term: "going to", meaning: "future for plans/intentions", example: "We are going to travel next month." },
-          { term: "probably", meaning: "likely; almost certainly", example: "It will probably rain today." },
-          { term: "plan", meaning: "an intention to do something", example: "I have plans to study abroad." },
+          { term: "I'm looking for…", meaning: "used to describe what you want to buy or find", example: "I'm looking for a pair of running shoes." },
+          { term: "How much is/are…?", meaning: "asking about price", example: "How much is this jacket?" },
+          { term: "gift-wrap", meaning: "to wrap a purchase as a gift with decorative paper", example: "Could you gift-wrap this for me?" },
+          { term: "free of charge", meaning: "at no cost; for free", example: "Gift-wrapping is free of charge." },
+          { term: "I'll take it.", meaning: "I'll buy it; I've decided to purchase it", example: "It's perfect — I'll take it!" },
         ],
         quiz: [
-          q("Best for a spontaneous decision: 'I ___ help you carry that.'", ["am going to","will","going to","am will"], 1, "will-vs-going-to"),
-          q("Best for a pre-made plan: 'We ___ move to a new house next month.'", ["will","might","are going to","would"], 2, "will-vs-going-to"),
-          q("Negative of 'will' is…", ["won't","willn't","will not going","wouldn't"], 0, "future-neg"),
-          q("'It ___ be cold tomorrow.' (prediction)", ["going to","is going","will","are going to"], 2, "future-pred"),
+          q("'How much are these shoes?' is asking about…", ["the size","the colour","the price","the brand"], 2, "shopping"),
+          q("'Do you have this in a medium?' is asking about…", ["colour","price","size","material"], 2, "shopping"),
+          q("'I'll take it' means…", ["I'll think about it","I want to buy it","Can I try it on?","Too expensive"], 1, "shopping"),
+          qFill("Complete: 'I'm ___ for a gift for my friend.'", ["looking"], "shopping"),
         ],
       },
     ],
   },
-  // ── Family & Relationships ────────────────────────────────────────────────
+
   {
-    title: "Family & Relationships",
+    title: "Work & Study",
     levelLabel: "Beginner",
-    description: "Talk about your family, describe relationships and introduce people.",
-    prereqTitles: ["Future Tense"],
+    description: "Talk about your job or studies, express ability, and discuss plans.",
+    prereqTitles: ["Shopping"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Family Vocabulary",
-        objectives: ["Name family members in English", "Describe family relationships"],
-        grammar: `Possessive 's: "My father's name is Ahmad."
-Relationship descriptions:
-~ is my + [family word] → "She is my sister."
-I have + [number] + [family word](s) → "I have two brothers."
-My ~ is [age/job/adjective] → "My mother is a nurse."`,
-        reading: `Let me tell you about my family.
-I have four people in my family: my father, mother, older sister, and me.
-My father is an engineer. My mother is a teacher. My sister is 25 and she works as a designer.
-We are a close family. We have dinner together every Sunday.`,
-        dialogue: [
-          { speaker: "A", text: "Do you have any brothers or sisters?", translation: "" },
-          { speaker: "B", text: "Yes, I have one older brother and one younger sister. What about you?", translation: "" },
-          { speaker: "A", text: "I'm an only child. But I have many cousins!", translation: "" },
-          { speaker: "B", text: "That sounds fun. My brother is married, so now I have a sister-in-law too.", translation: "" },
+        title: "What Do You Do?",
+        objectives: ["Talk about jobs and studies in English", "Use can/can't for ability and permission"],
+        warmUp: "If you could have any job in the world, what would it be? What skills would you need?",
+        canDo: [
+          "Describe your job or studies in English",
+          "Say what you can do: I can… / I'm good at…",
+          "Talk about career goals: I want to / I'm planning to…",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Maya", text: "So Andi, how long have you been working as an engineer?", translation: "Jadi Andi, sudah berapa lama kamu bekerja sebagai insinyur?" },
+          { speaker: "Andi", text: "About three years now. I work for a startup in Jakarta. We build mobile apps.", translation: "Sekitar tiga tahun. Saya bekerja untuk startup di Jakarta. Kami membangun aplikasi mobile." },
+          { speaker: "Maya", text: "That's cool! What kind of apps?", translation: "Keren! Aplikasi jenis apa?" },
+          { speaker: "Andi", text: "Mainly fintech — payment and banking apps. I'm good at backend development.", translation: "Terutama fintech — aplikasi pembayaran dan perbankan. Saya mahir dalam pengembangan backend." },
+          { speaker: "Sarah", text: "I wish I could code! I studied marketing, so I'm more of a people person.", translation: "Saya berharap bisa coding! Saya belajar pemasaran, jadi saya lebih ke tipe orang yang suka berinteraksi." },
+          { speaker: "Andi", text: "You can learn! There are great online courses. I taught myself Python in six months.", translation: "Kamu bisa belajar! Ada kursus online yang bagus. Saya otodidak Python dalam enam bulan." },
+        ],
+        patternExamples: [
+          { pattern: "I work for / at [company] / as a [job]", examples: ["I work for a startup in Jakarta.", "I work at a hospital as a nurse.", "I work as a software engineer."] },
+          { pattern: "I'm good at [noun/verb-ing]", examples: ["I'm good at backend development.", "I'm good at speaking in public.", "I'm not very good at cooking, honestly."] },
+          { pattern: "I can / can't [verb]", examples: ["I can speak three languages.", "I can't drive — I never learned.", "Can you help me with this?"] },
+        ],
+        cultureNote: "The gig economy and remote work have transformed how people in English-speaking countries describe their jobs. 'I freelance as a designer' or 'I work remotely for a US company' are now common answers to 'What do you do?'",
         vocab: [
-          { term: "parents", meaning: "father and mother together", example: "My parents live in Bandung." },
-          { term: "sibling", meaning: "a brother or sister", example: "I have three siblings." },
-          { term: "cousin", meaning: "child of your uncle or aunt", example: "My cousin lives in Surabaya." },
-          { term: "only child", meaning: "a person with no siblings", example: "She is an only child." },
-          { term: "married", meaning: "having a husband or wife", example: "My sister got married last year." },
-          { term: "relative", meaning: "a family member (broad)", example: "All my relatives came to the wedding." },
+          { term: "startup", meaning: "a newly established business, usually in tech", example: "I work for a startup — we have 20 employees." },
+          { term: "I'm good at…", meaning: "skilled or talented in something", example: "I'm good at problem-solving." },
+          { term: "taught myself", meaning: "learned something without formal training", example: "I taught myself to play guitar." },
+          { term: "mainly", meaning: "mostly; for the most part", example: "We mainly work on mobile apps." },
+          { term: "people person", meaning: "someone who enjoys and is good with people", example: "I'm a people person — I love networking." },
         ],
         quiz: [
-          q("Your mother's sister is your…", ["cousin","aunt","niece","grandmother"], 1, "family"),
-          q("'I have no brothers or sisters' means you are…", ["married","an only child","adopted","an uncle"], 1, "family"),
-          q("Your brother's son is your…", ["nephew","cousin","grandson","stepson"], 0, "family"),
-          q("'My parents' refers to…", ["all grandparents","your father and mother","your siblings","your relatives"], 1, "family"),
+          q("'I'm good at backend development' means…", ["I like backend development","I am skilled at backend development","I want to learn backend","I work in backend"], 1, "ability"),
+          q("'I taught myself Python' means…", ["someone taught me Python","I learned Python on my own","I studied Python at school","Python is easy"], 1, "vocabulary"),
+          qFill("Complete: 'I work ___ a startup in Jakarta.'", ["for"], "prepositions"),
+          qReorder("Build: 'I work as a software engineer for a startup.'", ["for a startup.","I work","as a software engineer"], [1,2,0], "work"),
         ],
       },
     ],
   },
-  // ── Food & Dining ─────────────────────────────────────────────────────────
+
   {
-    title: "Food & Dining",
+    title: "Describing People & Places",
     levelLabel: "Beginner",
-    description: "Vocabulary for meals, restaurants, and food preferences.",
-    prereqTitles: ["Family & Relationships"],
+    description: "Use adjectives to describe people, places, and things in detail.",
+    prereqTitles: ["Work & Study"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Meals & Food Vocabulary",
-        objectives: ["Name different meals and common foods", "Order food and express preferences"],
-        grammar: `Meal times: breakfast, lunch, dinner/supper, snack
-Expressing preferences:
-I love / like / enjoy + noun or verb-ing → "I love spicy food." "I enjoy cooking."
-I don't like / I can't stand / I hate + noun → "I can't stand broccoli."
-I'm allergic to ~ → "I'm allergic to nuts."
-Would you like ~? → polite offer → "Would you like some coffee?"`,
-        reading: `Eating out in Indonesia:
-When you enter a restaurant, the staff usually say "Selamat datang!" (Welcome).
-You can ask: "What do you recommend?" or "What's today's special?"
-To call a waiter: "Excuse me!" or raise your hand.
-After eating, ask for the bill: "Could we have the check, please?"`,
-        dialogue: [
-          { speaker: "Waiter", text: "Good evening! Are you ready to order?", translation: "" },
-          { speaker: "Customer", text: "Yes. I'd like the grilled chicken, please. Is it spicy?", translation: "" },
-          { speaker: "Waiter", text: "It's mildly spicy. Would you like extra sauce on the side?", translation: "" },
-          { speaker: "Customer", text: "Yes, please. And could I have a glass of water too?", translation: "" },
+        title: "What's It Like?",
+        objectives: ["Use adjectives to describe places and experiences", "Compare things using comparatives"],
+        warmUp: "Think of a place you've visited that really impressed you. What three words would you use to describe it?",
+        canDo: [
+          "Describe places with adjectives: beautiful, crowded, expensive",
+          "Compare two things: Tokyo is bigger than Sydney",
+          "Give opinions: I think… / In my opinion… / Personally, I feel…",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Sarah", text: "Andi, how would you describe Jakarta to someone who's never been?", translation: "Andi, bagaimana kamu menggambarkan Jakarta kepada seseorang yang belum pernah ke sana?" },
+          { speaker: "Andi", text: "Hmm, it's massive — one of the biggest cities in the world. Very lively, always something happening.", translation: "Hmm, kota ini sangat besar — salah satu kota terbesar di dunia. Sangat hidup, selalu ada sesuatu yang terjadi." },
+          { speaker: "Maya", text: "Is it expensive to live there?", translation: "Apakah mahal untuk tinggal di sana?" },
+          { speaker: "Andi", text: "It depends. Street food is super cheap, but rent is getting more expensive. It's more affordable than Tokyo, I think.", translation: "Tergantung. Makanan kaki lima sangat murah, tapi sewa makin mahal. Lebih terjangkau dari Tokyo, menurut saya." },
+          { speaker: "Sarah", text: "I've heard the traffic is terrible though?", translation: "Saya dengar lalu lintasnya sangat parah?" },
+          { speaker: "Andi", text: "Ha! Yes, honestly the traffic is the worst thing about it. But the food makes up for everything!", translation: "Ha! Ya, jujur saja lalu lintas adalah hal terburuk dari kota ini. Tapi makanannya mengcompensasi segalanya!" },
+        ],
+        patternExamples: [
+          { pattern: "[City/place] is [adjective]", examples: ["Jakarta is massive and lively.", "London is expensive but fascinating.", "Bali is beautiful and very relaxing."] },
+          { pattern: "[A] is [comparative adjective] than [B]", examples: ["Jakarta is bigger than Sydney.", "Street food is cheaper than restaurant food.", "The traffic is worse in the morning."] },
+          { pattern: "I think… / In my opinion… / Personally, I feel…", examples: ["I think Jakarta is more affordable than Tokyo.", "In my opinion, the food scene is the best part.", "Personally, I find the traffic stressful."] },
+        ],
+        cultureNote: "English uses comparatives constantly in conversation. '-er' for short adjectives (bigger, cheaper, worse), 'more' for longer ones (more expensive, more beautiful). Irregular forms: good→better→best, bad→worse→worst.",
         vocab: [
-          { term: "breakfast", meaning: "the first meal of the day", example: "I usually skip breakfast." },
-          { term: "recommend", meaning: "to suggest something good", example: "What do you recommend here?" },
-          { term: "allergic", meaning: "having a bad reaction to certain foods", example: "I'm allergic to seafood." },
-          { term: "would like", meaning: "polite form of 'want'", example: "I'd like the pasta, please." },
-          { term: "check / bill", meaning: "the paper showing how much to pay", example: "Could we have the check, please?" },
-          { term: "spicy", meaning: "having a hot, peppery flavor", example: "Is this dish spicy?" },
+          { term: "massive", meaning: "extremely large", example: "Jakarta is a massive city." },
+          { term: "lively", meaning: "full of life and energy", example: "The night market is very lively." },
+          { term: "it depends", meaning: "the answer varies according to the situation", example: "Is it expensive? It depends on the area." },
+          { term: "affordable", meaning: "reasonably priced; not too expensive", example: "Street food is very affordable." },
+          { term: "make up for", meaning: "to compensate for something negative", example: "The food makes up for the traffic." },
         ],
         quiz: [
-          q("A polite way to order food is…", ["I want the pasta","Give me pasta","I'd like the pasta, please","Pasta, now"], 2, "restaurant-english"),
-          q("'I'm allergic to nuts' means…", ["I don't like nuts","Nuts make me sick","I love nuts","I can't find nuts"], 1, "food-vocab"),
-          q("'Would you like some dessert?' is…", ["a command","a question","an offer","a complaint"], 2, "restaurant-english"),
-          q("'The bill, please' means…", ["More food please","Water please","I want to pay","Excuse me"], 2, "restaurant-english"),
-        ],
-      },
-    ],
-  },
-  // ── Jobs & Professions ────────────────────────────────────────────────────
-  {
-    title: "Jobs & Professions",
-    levelLabel: "Beginner",
-    description: "Talk about jobs, workplaces and daily work routines.",
-    prereqTitles: ["Food & Dining"],
-    autoCompleteLevel: "",
-    modules: [
-      {
-        title: "Professions & Workplaces",
-        objectives: ["Name common jobs in English", "Describe what people do at work"],
-        grammar: `Talking about jobs:
-"I am a/an + [job]." → "I am a teacher."
-"She works as a/an + [job]." → "She works as an engineer."
-"He works at/in + [place]." → "He works at a hospital."
-"What do you do (for a living)?" → Common question about jobs.
-
-Article rules: a/an before job title → "a doctor", "an artist" (an before vowel sounds)`,
-        reading: `People work in many different fields.
-Doctors and nurses work in hospitals to help sick people.
-Teachers work in schools to educate students.
-Engineers design and build things — from apps to bridges.
-Farmers grow food for everyone.
-No job is more important than another — every profession matters!`,
-        dialogue: [
-          { speaker: "A", text: "What do you do for a living?", translation: "" },
-          { speaker: "B", text: "I'm a software engineer. I work at a tech company. What about you?", translation: "" },
-          { speaker: "A", text: "I'm studying to become a doctor. It's a lot of work!", translation: "" },
-          { speaker: "B", text: "That's impressive. Where do you want to work after you graduate?", translation: "" },
-        ],
-        vocab: [
-          { term: "doctor", meaning: "a person who treats sick people", example: "The doctor examined the patient." },
-          { term: "engineer", meaning: "a person who designs or builds systems", example: "She is a civil engineer." },
-          { term: "teacher", meaning: "a person who educates others", example: "My teacher is very kind." },
-          { term: "nurse", meaning: "a person who cares for patients", example: "The nurse took my blood pressure." },
-          { term: "chef", meaning: "a professional cook", example: "The chef prepared a wonderful meal." },
-          { term: "for a living", meaning: "as a job / to earn money", example: "What do you do for a living?" },
-        ],
-        quiz: [
-          q("'What do you do for a living?' asks about…", ["your hobby","your health","your job","your family"], 2, "jobs"),
-          q("'I am ___ engineer.' (correct article)", ["a","an","the","—"], 1, "articles"),
-          q("Someone who works at a hospital and treats patients is a…", ["teacher","lawyer","doctor","pilot"], 2, "professions"),
-          q("'She works as a chef' means she…", ["eats a lot","cooks professionally","shops a lot","serves food"], 1, "professions"),
-        ],
-      },
-    ],
-  },
-  // ── Modal Verbs ───────────────────────────────────────────────────────────
-  {
-    title: "Modal Verbs",
-    levelLabel: "Intermediate",
-    description: "Express ability, permission, obligation and advice with can/should/must.",
-    prereqTitles: ["Jobs & Professions"],
-    autoCompleteLevel: "",
-    modules: [
-      {
-        title: "can / should / must",
-        objectives: ["Use can for ability and permission", "Use should for advice and must for obligation"],
-        grammar: `CAN: ability / permission
-"I can swim." (ability)   "Can I leave early?" (permission)
-Cannot / can't → "She can't drive yet."
-
-SHOULD: advice / recommendation
-"You should see a doctor." (advice)   "We shouldn't waste food."
-
-MUST: obligation / strong necessity
-"You must wear a seatbelt." (rule/law)   "I must finish this today." (strong need)
-Negative: mustn't (prohibited) vs. don't have to (not necessary)
-"You mustn't smoke here." (forbidden)   "You don't have to come." (optional)`,
-        reading: `Signs and rules use modals:
-"You must not enter." — forbidden
-"You should consult a doctor." — advice
-"Visitors can park here." — permission
-At work: "You must arrive on time." "You should dress professionally."
-"Can I help you?" — polite offer using can`,
-        dialogue: [
-          { speaker: "A", text: "I have a headache. What should I do?", translation: "" },
-          { speaker: "B", text: "You should rest and drink lots of water. Can you take the day off?", translation: "" },
-          { speaker: "A", text: "I can't. I must finish a report by noon.", translation: "" },
-          { speaker: "B", text: "Then you should at least take some medicine. You mustn't ignore your health.", translation: "" },
-        ],
-        vocab: [
-          { term: "can", meaning: "ability or permission", example: "Can you speak French?" },
-          { term: "can't / cannot", meaning: "inability or no permission", example: "You can't park here." },
-          { term: "should", meaning: "advice or recommendation", example: "You should exercise regularly." },
-          { term: "must", meaning: "strong obligation or necessity", example: "You must wear a helmet." },
-          { term: "mustn't", meaning: "prohibition — not allowed", example: "You mustn't smoke inside." },
-          { term: "don't have to", meaning: "not necessary / optional", example: "You don't have to come if you're busy." },
-        ],
-        quiz: [
-          q("'You ___ wear a seatbelt.' (it's the law)", ["should","can","must","might"], 2, "must"),
-          q("'You ___ smoke here.' (it's forbidden)", ["mustn't","shouldn't","can't","don't have to"], 0, "mustn't"),
-          q("Best for giving advice: 'You ___ see a doctor.'", ["must","should","can","will"], 1, "should"),
-          q("'don't have to' means…", ["it's forbidden","you are not allowed","it's not necessary","you must not"], 2, "modals"),
+          q("'Jakarta is bigger than Sydney' uses a…", ["superlative","comparative","adjective","adverb"], 1, "comparatives"),
+          q("'More expensive' vs 'cheaper' — which is a comparative?", ["Neither","Both","Only 'cheaper'","Only 'more expensive'"], 1, "grammar"),
+          qFill("Complete: 'The traffic is ___ in the morning than in the evening.' (bad→worse)", ["worse"], "comparatives"),
+          qReorder("Build: 'In my opinion, Jakarta is more affordable than Tokyo.'", ["In my opinion,","than Tokyo.","Jakarta is","more affordable"], [0,2,3,1], "comparatives"),
         ],
       },
     ],
   },
 ];
+
 
 // ─── INDONESIAN ────────────────────────────────────────────────────────────────
 
 const indonesianSkills: SkillSeed[] = [
   {
-    title: "Salam & Sapaan",
+    title: "Salam & Perkenalan",
     levelLabel: "Beginner",
-    description: "Greetings and daily expressions in Indonesian.",
+    description: "Menyapa orang, memperkenalkan diri, dan berbasa-basi dasar.",
     prereqTitles: [],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Sapaan Dasar",
-        objectives: ["Greet by time of day", "Respond to 'apa kabar?'"],
-        grammar: `Sapaan berdasarkan waktu:
-Selamat pagi (morning, before ~11)
-Selamat siang (midday, ~11–15)
-Selamat sore (afternoon, ~15–18)
-Selamat malam (evening/night)
-
-Respon untuk "Apa kabar?":
-Baik / Baik-baik saja (good / fine)
-Luar biasa! (great/amazing)
-Lumayan (not bad)`,
-        reading: `Percakapan umum:
-A: Selamat pagi! Apa kabar?
-B: Baik, terima kasih. Dan kamu?
-A: Luar biasa!
-
-Terima kasih = thank you  |  Sama-sama = you're welcome
-Permisi = excuse me  |  Maaf = sorry`,
-        dialogue: [
-          { speaker: "A", text: "Selamat pagi! Apa kabar?", translation: "Good morning! How are you?" },
-          { speaker: "B", text: "Baik-baik saja, terima kasih. Dan kamu?", translation: "Fine, thanks. And you?" },
-          { speaker: "A", text: "Luar biasa! Terima kasih.", translation: "Great! Thank you." },
+        title: "Halo! Nama Saya…",
+        objectives: ["Memperkenalkan diri dalam Bahasa Indonesia", "Menanyakan dan menjawab tentang nama, asal, dan pekerjaan"],
+        warmUp: "Bayangkan kamu bertemu orang baru dari Indonesia. Apa yang pertama kali ingin kamu katakan?",
+        canDo: [
+          "Menyapa: Halo! / Selamat pagi! / Apa kabar?",
+          "Memperkenalkan diri: Nama saya… / Saya dari… / Saya bekerja sebagai…",
+          "Mengakhiri perkenalan dengan sopan: Senang berkenalan!",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Tom", text: "Halo! Nama saya Tom. Saya dari Australia.", translation: "Hi! My name is Tom. I'm from Australia." },
+          { speaker: "Sari", text: "Halo Tom! Saya Sari. Senang berkenalan! Kamu bisa berbicara Bahasa Indonesia?", translation: "Hi Tom! I'm Sari. Nice to meet you! Can you speak Indonesian?" },
+          { speaker: "Tom", text: "Sedikit — saya masih belajar! Sudah tiga bulan.", translation: "A little — I'm still learning! Three months already." },
+          { speaker: "Sari", text: "Wah, bagus sekali! Bahasa Indonesiamu sudah lancar.", translation: "Wow, that's great! Your Indonesian is already fluent." },
+          { speaker: "Tom", text: "Terima kasih! Terlalu baik. Kamu kerja di mana, Sari?", translation: "Thank you! Too kind. Where do you work, Sari?" },
+          { speaker: "Sari", text: "Saya guru Bahasa Indonesia di sekolah menengah. Kamu?", translation: "I'm an Indonesian language teacher at a high school. You?" },
+        ],
+        patternExamples: [
+          { pattern: "Nama saya [nama]. / Saya [nama].", examples: ["Nama saya Tom. (My name is Tom.)", "Saya Sari. (I'm Sari.)"] },
+          { pattern: "Saya dari [kota/negara].", examples: ["Saya dari Australia. (I'm from Australia.)", "Saya dari Jakarta. (I'm from Jakarta.)"] },
+          { pattern: "Senang berkenalan! / Senang bertemu (dengan) kamu!", examples: ["A: Nama saya Tom. B: Saya Sari. Senang berkenalan!"] },
+        ],
+        cultureNote: "Di Indonesia, sapaan bergantung pada waktu: Selamat pagi (pagi), Selamat siang (siang), Selamat sore (sore), Selamat malam (malam). Orang Indonesia sangat ramah pada orang asing yang mencoba berbicara Bahasa Indonesia — usahamu pasti diapresiasi!",
         vocab: [
-          { term: "selamat pagi", meaning: "good morning", example: "Selamat pagi, Bu Guru!" },
-          { term: "selamat malam", meaning: "good evening / good night", example: "Selamat malam semua." },
+          { term: "nama saya", meaning: "my name is", example: "Nama saya Tom." },
+          { term: "senang berkenalan", meaning: "nice to meet you", example: "Senang berkenalan, Sari!" },
+          { term: "sedikit", meaning: "a little", example: "Saya bisa berbicara sedikit Bahasa Indonesia." },
+          { term: "masih belajar", meaning: "still learning", example: "Saya masih belajar Bahasa Indonesia." },
+          { term: "sudah", meaning: "already / have (completed action)", example: "Sudah tiga bulan saya belajar." },
+        ],
+        quiz: [
+          q("'Nama saya Tom' artinya…", ["Where is Tom?","My name is Tom.","Tom is here.","This is Tom."], 1, "intro"),
+          q("Sapaan pada jam 8 pagi adalah…", ["Selamat siang","Selamat sore","Selamat malam","Selamat pagi"], 3, "greetings"),
+          qFill("Lengkapi: 'Senang ___ !' (nice to meet you)", ["berkenalan"], "vocab"),
+          qReorder("Susun: 'Nama saya Sari. Saya dari Jakarta.'", ["Saya dari Jakarta.","Nama saya Sari."], [1,0], "intro"),
+        ],
+      },
+      {
+        title: "Apa Kabar? — Berbasa-basi",
+        objectives: ["Menanyakan dan menjawab 'apa kabar'", "Menjaga percakapan dengan pertanyaan lanjutan"],
+        warmUp: "Di negara kamu, apa yang biasanya ditanyakan saat bertemu orang baru? Apakah sama dengan 'apa kabar' di Indonesia?",
+        canDo: [
+          "Menanyakan keadaan: Apa kabar? / Bagaimana kabarnya?",
+          "Menjawab dengan alami: Baik-baik saja / Lumayan / Luar biasa!",
+          "Mengembalikan pertanyaan: Dan kamu? / Bagaimana denganmu?",
+        ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Wei", text: "Selamat pagi, Sari! Apa kabar?", translation: "Good morning, Sari! How are you?" },
+          { speaker: "Sari", text: "Baik sekali, terima kasih! Kamu sendiri, Wei?", translation: "Very well, thank you! And you, Wei?" },
+          { speaker: "Wei", text: "Lumayan, agak capek. Kemarin ada ujian.", translation: "Not bad, a bit tired. I had an exam yesterday." },
+          { speaker: "Sari", text: "Oh ya? Gimana hasilnya?", translation: "Oh really? How did it go?" },
+          { speaker: "Wei", text: "Mudah-mudahan bagus! Saya rasa saya bisa mengerjakan soalnya.", translation: "Hopefully good! I think I managed the questions." },
+        ],
+        patternExamples: [
+          { pattern: "Apa kabar? → Baik(-baik saja) / Lumayan / Luar biasa!", examples: ["Apa kabar? — Baik-baik saja, terima kasih! (Fine, thanks!)", "Apa kabar? — Lumayan. (Not bad.)", "Apa kabar? — Luar biasa! (Fantastic!)"] },
+          { pattern: "Dan kamu? / Kamu sendiri?", examples: ["Saya baik. Dan kamu? (I'm fine. And you?)", "Baik sekali! Kamu sendiri? (Very well! What about you?)"] },
+        ],
+        cultureNote: "Bahasa Indonesia memiliki dua register: formal dan informal (gaul). 'Kamu' adalah informal; 'Anda' formal. Di antara teman, 'lo/gue' (bahasa gaul Jakarta) sering digunakan. Sebagai pelajar baru, fokus pada register formal/netral dulu.",
+        vocab: [
           { term: "apa kabar?", meaning: "how are you?", example: "Halo! Apa kabar?" },
-          { term: "terima kasih", meaning: "thank you", example: "Terima kasih banyak." },
-          { term: "sama-sama", meaning: "you're welcome", example: "—Terima kasih! —Sama-sama." },
-          { term: "maaf", meaning: "sorry", example: "Maaf, saya terlambat." },
+          { term: "baik-baik saja", meaning: "fine / doing well", example: "Saya baik-baik saja, terima kasih." },
+          { term: "lumayan", meaning: "not bad / fairly good", example: "Lumayan, sedikit capek." },
+          { term: "capek", meaning: "tired", example: "Saya capek setelah belajar semalam." },
+          { term: "mudah-mudahan", meaning: "hopefully", example: "Mudah-mudahan lulus ujian!" },
         ],
         quiz: [
-          q("'Good morning' in Indonesian is…", ["Selamat malam","Selamat siang","Selamat pagi","Selamat sore"], 2, "greetings"),
-          qFill("Type the Indonesian for 'thank you':", ["terima kasih"], "vocab"),
-          qMatch("Match the expression to its meaning:", [["Selamat pagi","Good morning"],["Terima kasih","Thank you"],["Maaf","Sorry"]], "vocab"),
-          qReorder("Build the greeting:", ["Apa","Selamat","kabar?","pagi!"], [1,3,0,2], "greetings"),
+          q("Jawaban paling umum untuk 'apa kabar?' adalah…", ["Selamat pagi","Baik-baik saja, terima kasih","Nama saya Sari","Saya dari Jakarta"], 1, "responses"),
+          q("'Lumayan' artinya…", ["very good","terrible","not bad / fairly good","I don't know"], 2, "vocab"),
+          qFill("Lengkapi: 'Saya baik. Dan ___?' (And you?)", ["kamu"], "conversation"),
+          qMatch("Cocokkan jawaban dengan nuansanya:", [["Luar biasa!","very positive"],["Baik-baik saja.","neutral/fine"],["Lumayan.","mildly okay"]], "responses"),
         ],
       },
     ],
   },
+
   {
-    title: "Angka & Waktu",
+    title: "Kehidupan Sehari-hari",
     levelLabel: "Beginner",
-    description: "Numbers, telling time, and dates in Indonesian.",
-    prereqTitles: ["Salam & Sapaan"],
+    description: "Bercerita tentang rutinitas harian, waktu, dan aktivitas sehari-hari.",
+    prereqTitles: ["Salam & Perkenalan"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Angka 1–20",
-        objectives: ["Count to 20 in Indonesian", "Use angka in context"],
-        grammar: `satu(1)  dua(2)  tiga(3)  empat(4)  lima(5)
-enam(6)  tujuh(7)  delapan(8)  sembilan(9)  sepuluh(10)
-sebelas(11)  dua belas(12)  tiga belas(13)  empat belas(14)  lima belas(15)
-enam belas(16)  tujuh belas(17)  delapan belas(18)  sembilan belas(19)  dua puluh(20)
-
-Pola: belasan = 11–19 (add -belas)
-       puluhan = 20–90 (add puluh)`,
-        reading: `Contoh:
-dua puluh tiga = 23  |  lima puluh = 50  |  seratus = 100
-Harga: Berapa harganya? (How much does it cost?)
-Ini dua puluh ribu rupiah. (This is 20,000 rupiah.)`,
-        dialogue: [
-          { speaker: "A", text: "Berapa umurmu?", translation: "How old are you?" },
-          { speaker: "B", text: "Saya dua puluh satu tahun. Kamu?", translation: "I'm 21 years old. You?" },
-          { speaker: "A", text: "Delapan belas tahun.", translation: "18 years old." },
+        title: "Rutinitasku",
+        objectives: ["Mendeskripsikan rutinitas harian", "Menggunakan kata keterangan waktu: setiap pagi, biasanya, selalu"],
+        warmUp: "Ceritakan hari kamu dari bangun tidur sampai tidur lagi. Aktivitas apa yang paling kamu nikmati?",
+        canDo: [
+          "Menceritakan rutinitas: Saya bangun jam…, Saya sarapan…",
+          "Menggunakan kata frekuensi: selalu, biasanya, kadang-kadang, jarang, tidak pernah",
+          "Menanyakan rutinitas orang lain: Kamu biasanya ngapain di pagi hari?",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Tom", text: "Sari, kamu biasanya bangun jam berapa?", translation: "Sari, what time do you usually wake up?" },
+          { speaker: "Sari", text: "Saya selalu bangun jam setengah enam. Habis itu olahraga dulu.", translation: "I always wake up at 5:30. After that I exercise first." },
+          { speaker: "Tom", text: "Wah, pagi sekali! Saya biasanya bangun jam tujuh.", translation: "Wow, very early! I usually wake up at 7." },
+          { speaker: "Sari", text: "Terus ngapain habis bangun?", translation: "Then what do you do after waking up?" },
+          { speaker: "Tom", text: "Mandi, sarapan, lalu berangkat ke kampus. Saya kuliah di sini.", translation: "Shower, breakfast, then go to campus. I'm studying here." },
+          { speaker: "Sari", text: "Oh, jurusan apa?", translation: "Oh, what major?" },
+          { speaker: "Tom", text: "Bahasa dan Sastra Indonesia. Makanya saya belajar Bahasa Indonesia!", translation: "Indonesian Language and Literature. That's why I'm learning Indonesian!" },
+        ],
+        patternExamples: [
+          { pattern: "Saya [frekuensi] [aktivitas].", examples: ["Saya selalu sarapan. (I always have breakfast.)", "Saya biasanya mandi pagi. (I usually shower in the morning.)", "Saya jarang makan siang di luar. (I rarely eat lunch outside.)"] },
+          { pattern: "Habis itu / Lalu / Kemudian [aktivitas].", examples: ["Habis olahraga, saya mandi. (After exercising, I shower.)", "Saya sarapan, lalu berangkat kerja. (I eat breakfast, then go to work.)"] },
+        ],
+        cultureNote: "Orang Indonesia sering menggunakan 'habis itu' atau 'terus' sebagai penghubung cerita — lebih santai dari 'kemudian' yang formal. Di Indonesia, mandi pagi adalah ritual harian yang hampir universal, bahkan sebelum aktivitas apa pun!",
         vocab: [
-          { term: "satu", meaning: "one (1)", example: "Satu apel." },
-          { term: "lima", meaning: "five (5)", example: "Lima orang." },
-          { term: "sepuluh", meaning: "ten (10)", example: "Sepuluh menit." },
-          { term: "dua puluh", meaning: "twenty (20)", example: "Dua puluh ribu." },
-          { term: "berapa?", meaning: "how many / how much?", example: "Berapa harganya?" },
+          { term: "bangun", meaning: "to wake up / get up", example: "Saya bangun jam enam pagi." },
+          { term: "sarapan", meaning: "breakfast", example: "Jangan lupa sarapan!" },
+          { term: "biasanya", meaning: "usually", example: "Saya biasanya minum kopi pagi hari." },
+          { term: "berangkat", meaning: "to leave / depart (to go somewhere)", example: "Saya berangkat ke kantor jam delapan." },
+          { term: "habis itu", meaning: "after that (informal)", example: "Mandi dulu, habis itu sarapan." },
         ],
         quiz: [
-          q("'tujuh' is…", ["5","6","7","8"], 2, "numbers"),
-          q("'sepuluh' means…", ["7","8","9","10"], 3, "numbers"),
-          q("How do you say 13?", ["satu belas","tiga belas","tiga puluh","tiga satu"], 1, "numbers"),
-          q("'Berapa?' means…", ["who","what","how many/much","where"], 2, "question-words"),
+          q("'Biasanya' artinya…", ["always","never","usually","sometimes"], 2, "frequency"),
+          q("'Saya berangkat ke kampus' artinya…", ["I arrived at campus","I left for campus","I study at campus","I'm at campus"], 1, "vocab"),
+          qFill("Lengkapi: 'Habis mandi, saya ___.' (sarapan)", ["sarapan"], "daily-routine"),
+          qReorder("Susun: 'Saya selalu bangun jam enam pagi.'", ["jam enam pagi.","Saya","selalu bangun"], [1,2,0], "daily-routine"),
         ],
       },
     ],
   },
-  // ── Keluarga ───────────────────────────────────────────────────────────────
+
   {
-    title: "Keluarga",
+    title: "Makanan & Memesan",
     levelLabel: "Beginner",
-    description: "Anggota keluarga dan cara memperkenalkan keluarga.",
-    prereqTitles: ["Angka & Waktu"],
+    description: "Memesan makanan dan minuman, memahami menu, dan berbicara di warung/restoran.",
+    prereqTitles: ["Kehidupan Sehari-hari"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Anggota Keluarga",
-        objectives: ["Menyebutkan anggota keluarga inti", "Memperkenalkan keluarga kepada orang lain"],
-        grammar: `Menyebut anggota keluarga:
-ayah (father)   ibu (mother)   kakak laki-laki (older brother)   kakak perempuan (older sister)
-adik laki-laki (younger brother)   adik perempuan (younger sister)
-kakek (grandfather)   nenek (grandmother)   paman (uncle)   bibi (aunt)
-
-Memperkenalkan keluarga:
-"Ini [nama], [ayah/ibu] saya." = This is [name], my [father/mother].
-"Nama ayah saya [nama]." = My father's name is [name].
-"Kami ada [angka] bersaudara." = There are [number] of us siblings.`,
-        reading: `Keluarga saya kecil tapi bahagia.
-Ayah saya bekerja sebagai insinyur. Ibu saya seorang guru.
-Saya punya satu kakak perempuan dan satu adik laki-laki.
-Kakek dan nenek tinggal bersama kami.
-Kami suka makan malam bersama setiap hari.`,
-        dialogue: [
-          { speaker: "A", text: "Keluargamu tinggal di mana?", translation: "Where does your family live?" },
-          { speaker: "B", text: "Kami tinggal di Bandung. Ada ayah, ibu, dan dua adik saya.", translation: "We live in Bandung. There's my father, mother, and two younger siblings." },
-          { speaker: "A", text: "Pekerjaan ayahmu apa?", translation: "What is your father's job?" },
-          { speaker: "B", text: "Ayah saya dokter. Ibu saya ibu rumah tangga.", translation: "My father is a doctor. My mother is a homemaker." },
+        title: "Di Warung Makan",
+        objectives: ["Memesan makanan dan minuman", "Menanyakan rekomendasi dan informasi menu"],
+        warmUp: "Apa makanan Indonesia favoritmu? Pernahkah kamu memesan makanan di warung atau restoran Indonesia?",
+        canDo: [
+          "Memesan: Saya mau pesan… / Bisa minta…?",
+          "Menanyakan rekomendasi: Apa yang enak di sini? / Apa menu andalannya?",
+          "Menanyakan harga dan membayar: Berapa totalnya? / Minta bon-nya.",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Tom", text: "Mbak, permisi! Boleh saya lihat menunya?", translation: "Excuse me, miss! May I see the menu?" },
+          { speaker: "Sari", text: "Ini menunya. Mau pesan apa dulu, minuman atau makanannya?", translation: "Here's the menu. Do you want to order drinks or food first?" },
+          { speaker: "Tom", text: "Minumannya dulu — es teh manis, satu ya. Terus, apa yang paling enak di sini?", translation: "Drinks first — one sweet iced tea please. Then, what's the most delicious thing here?" },
+          { speaker: "Sari", text: "Kalau mau saya saranin, ayam goreng kunyitnya juara. Orang-orang suka banget.", translation: "If I may suggest, the turmeric fried chicken is the best. People love it a lot." },
+          { speaker: "Tom", text: "Oke, ayam goreng kunyit satu, nasi putih juga ya. Pedas atau nggak?", translation: "Okay, one turmeric fried chicken, white rice too please. Is it spicy or not?" },
+          { speaker: "Sari", text: "Bisa request nggak pedas kok. Sebentar ya, saya panggilkan yang masak.", translation: "You can request non-spicy. One moment, I'll call the cook." },
+        ],
+        patternExamples: [
+          { pattern: "Saya mau pesan [makanan/minuman].", examples: ["Saya mau pesan nasi goreng satu. (I'd like to order one fried rice.)", "Bisa minta es jeruk? (Can I have iced orange juice?)", "Satu ayam goreng, nasi putih juga ya. (One fried chicken, white rice too please.)"] },
+          { pattern: "Apa yang paling enak / Apa andalannya?", examples: ["Apa yang paling enak di sini? (What's the most delicious here?)", "Apa menu andalan restoran ini? (What's this restaurant's specialty?)"] },
+        ],
+        cultureNote: "Warung adalah restoran kecil yang sangat khas Indonesia — biasanya murah, enak, dan penuh kehangatan. Kata sapaan untuk pelayan bisa 'Mbak' (perempuan) atau 'Mas' (laki-laki) — jauh lebih hangat dari 'Excuse me'! Di warung, kamu bayar belakangan setelah makan.",
         vocab: [
-          { term: "ayah", meaning: "father", example: "Ayah saya bekerja di kantor." },
+          { term: "mau pesan", meaning: "want to order", example: "Saya mau pesan nasi goreng." },
+          { term: "es teh manis", meaning: "sweet iced tea", example: "Satu es teh manis, ya." },
+          { term: "juara", meaning: "the best / champion (informal)", example: "Ayam gorengnya juara!" },
+          { term: "pedas", meaning: "spicy", example: "Apakah ini pedas?" },
+          { term: "Mbak / Mas", meaning: "Miss / Mr (used to address strangers politely)", example: "Mbak, boleh minta bonnya?" },
+        ],
+        quiz: [
+          q("'Mau pesan apa?' artinya…", ["Are you hungry?","What would you like to order?","Is the food ready?","Where is the menu?"], 1, "ordering"),
+          q("'Juara' dalam konteks makanan artinya…", ["spicy","cheap","the best / amazing","too salty"], 2, "slang"),
+          qFill("Lengkapi: 'Saya mau ___ nasi goreng satu.' (order)", ["pesan"], "ordering"),
+          qMatch("Cocokkan sapaan dengan orangnya:", [["Mbak","young woman"],["Mas","young man"],["Pak","older man"]], "address"),
+        ],
+      },
+    ],
+  },
+
+  {
+    title: "Belanja",
+    levelLabel: "Beginner",
+    description: "Berbelanja di pasar atau toko, tawar-menawar, dan menanyakan harga.",
+    prereqTitles: ["Makanan & Memesan"],
+    autoCompleteLevel: "",
+    modules: [
+      {
+        title: "Di Pasar & Toko",
+        objectives: ["Menanyakan harga dan ketersediaan barang", "Tawar-menawar dengan sopan"],
+        warmUp: "Pernahkah kamu menawar harga di pasar? Di negara kamu, apakah harga barang bisa ditawar?",
+        canDo: [
+          "Menanyakan harga: Berapa harganya? / Ini berapa?",
+          "Menawar: Boleh kurang? / Mahal banget, bisa lebih murah?",
+          "Membeli: Saya ambil ini. / Bisa bungkus?",
+        ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Wei", text: "Permisi, Pak. Ini batiknya berapa?", translation: "Excuse me, sir. How much is this batik?" },
+          { speaker: "Penjual", text: "Yang itu tiga ratus ribu, Mas.", translation: "That one is three hundred thousand, sir." },
+          { speaker: "Wei", text: "Wah, mahal juga ya. Boleh kurang nggak? Saya mau beli dua.", translation: "Wow, that's quite expensive. Can I get a discount? I want to buy two." },
+          { speaker: "Penjual", text: "Kalau dua, saya kasih dua ratus lima puluh ribu per lembar. Gimana?", translation: "If two, I'll give you two hundred fifty thousand each. How's that?" },
+          { speaker: "Wei", text: "Hmm, dua ratus aja bisa nggak, Pak?", translation: "Hmm, can you do two hundred only, sir?" },
+          { speaker: "Penjual", text: "Dua ratus dua puluh, final ya. Rugi saya kalau kurang dari itu.", translation: "Two hundred twenty, final price. I'll lose money if it's less than that." },
+          { speaker: "Wei", text: "Oke deh, deal! Bisa dibungkus yang bagus?", translation: "Okay then, deal! Can it be nicely wrapped?" },
+        ],
+        patternExamples: [
+          { pattern: "Berapa harganya? / Ini berapa?", examples: ["Berapa harganya? (How much is it?)", "Ini berapa, Pak? (How much is this, sir?)", "Yang itu berapa? (How much is that one?)"] },
+          { pattern: "Boleh kurang? / Bisa lebih murah?", examples: ["Boleh kurang, Pak? (Can it be less?)", "Mahal banget, bisa lebih murah? (Too expensive, can it be cheaper?)", "Kalau beli dua, bisa diskon? (If I buy two, can I get a discount?)"] },
+        ],
+        cultureNote: "Tawar-menawar (bargaining) adalah bagian dari budaya pasar tradisional Indonesia. Di mal atau toko modern, harga sudah tetap. Di pasar, pedagang biasanya menaikkan harga awal karena mengharapkan negosiasi. Tawar dengan sopan dan senyum — ini adalah interaksi sosial yang menyenangkan, bukan konfrontasi!",
+        vocab: [
+          { term: "berapa harganya?", meaning: "how much does it cost?", example: "Berapa harganya, Mbak?" },
+          { term: "mahal", meaning: "expensive", example: "Ini mahal banget!" },
+          { term: "murah", meaning: "cheap / inexpensive", example: "Harganya murah sekali." },
+          { term: "boleh kurang?", meaning: "can it be less? (bargaining)", example: "Boleh kurang, Pak? Saya mahasiswa." },
+          { term: "deal", meaning: "agreed! (used in bargaining)", example: "Deal! Saya ambil dua." },
+        ],
+        quiz: [
+          q("'Boleh kurang?' digunakan saat…", ["memesan makanan","menawar harga","meminta arah","menyapa orang"], 1, "shopping"),
+          q("'Mahal' artinya…", ["cheap","free","expensive","medium-priced"], 2, "vocab"),
+          qFill("Lengkapi: 'Berapa ___ ?' (how much is it?)", ["harganya"], "shopping"),
+          qMatch("Cocokkan dengan artinya:", [["mahal","expensive"],["murah","cheap"],["gratis","free"]], "vocab"),
+        ],
+      },
+    ],
+  },
+
+  {
+    title: "Keluarga & Hubungan",
+    levelLabel: "Beginner",
+    description: "Memperkenalkan keluarga, mendeskripsikan hubungan, dan berbicara tentang orang-orang terdekat.",
+    prereqTitles: ["Belanja"],
+    autoCompleteLevel: "",
+    modules: [
+      {
+        title: "Keluargaku",
+        objectives: ["Menyebutkan anggota keluarga", "Memperkenalkan keluarga kepada orang lain"],
+        warmUp: "Di Indonesia, keluarga besar sangat penting. Berapa orang dalam keluargamu? Siapa yang paling dekat denganmu?",
+        canDo: [
+          "Menyebut anggota keluarga: ayah, ibu, kakak, adik",
+          "Memperkenalkan keluarga: Ini kakak saya, namanya…",
+          "Mendeskripsikan anggota keluarga: Ayah saya bekerja sebagai…",
+        ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Tom", text: "Sari, ini foto keluargamu?", translation: "Sari, is this a photo of your family?" },
+          { speaker: "Sari", text: "Iya! Ini ayah dan ibu saya. Yang di sebelah ibu, itu kakak perempuan saya, Dewi.", translation: "Yes! This is my father and mother. The one next to my mother, that's my older sister, Dewi." },
+          { speaker: "Tom", text: "Dewi tinggal di mana?", translation: "Where does Dewi live?" },
+          { speaker: "Sari", text: "Di Surabaya. Sudah menikah, punya dua anak. Ini adik laki-laki saya, Budi — masih SMA.", translation: "In Surabaya. Already married, has two children. This is my younger brother, Budi — still in high school." },
+          { speaker: "Tom", text: "Keluargamu besar ya! Di Australia, rata-rata keluarga kecil — dua sampai tiga anak.", translation: "Your family is big! In Australia, families are usually small — two to three children." },
+          { speaker: "Sari", text: "Di Indonesia juga sekarang makin kecil. Tapi keluarga besar itu hangat!", translation: "In Indonesia it's also getting smaller now. But a big family is warm!" },
+        ],
+        patternExamples: [
+          { pattern: "Ini [hubungan] saya, namanya [nama].", examples: ["Ini kakak saya, namanya Dewi. (This is my older sister, her name is Dewi.)", "Ini ayah saya, namanya Bapak Hendra. (This is my father, his name is Mr. Hendra.)"] },
+          { pattern: "[Anggota keluarga] saya [deskripsi].", examples: ["Kakak saya sudah menikah. (My older sister is already married.)", "Adik saya masih sekolah. (My younger sibling is still in school.)"] },
+        ],
+        cultureNote: "Budaya Indonesia sangat mementingkan keluarga besar (extended family). Kakek-nenek sering tinggal serumah dengan cucu. Memanggil orang yang lebih tua dengan 'Bapak/Pak' atau 'Ibu/Bu' adalah bentuk penghormatan — bahkan untuk orang yang tidak dikenal!",
+        vocab: [
+          { term: "ayah / bapak", meaning: "father", example: "Ayah saya seorang dokter." },
           { term: "ibu", meaning: "mother", example: "Ibu saya pandai memasak." },
-          { term: "kakak", meaning: "older sibling", example: "Kakak saya sudah menikah." },
-          { term: "adik", meaning: "younger sibling", example: "Adik saya masih sekolah." },
-          { term: "kakek", meaning: "grandfather", example: "Kakek saya suka berkebun." },
-          { term: "nenek", meaning: "grandmother", example: "Nenek sering bercerita." },
-          { term: "bersaudara", meaning: "siblings (number of)", example: "Kami tiga bersaudara." },
+          { term: "kakak", meaning: "older sibling", example: "Kakak perempuan saya tinggal di Surabaya." },
+          { term: "adik", meaning: "younger sibling", example: "Adik laki-laki saya masih SMA." },
+          { term: "sudah menikah", meaning: "already married", example: "Kakak saya sudah menikah." },
         ],
         quiz: [
-          q("'Kakak' berarti…", ["adik","kakek","kakak (lebih tua)","nenek"], 2, "family-id"),
-          q("'Nenek' is…", ["grandfather","uncle","grandmother","aunt"], 2, "family-id"),
-          q("'Ayah' means…", ["mother","father","older brother","grandfather"], 1, "family-id"),
-          q("'Kami tiga bersaudara' means…", ["We have 3 children","There are 3 of us siblings","We are 3 friends","We have 3 cousins"], 1, "family-id"),
+          q("'Kakak' artinya…", ["younger sibling","older sibling","cousin","uncle"], 1, "family"),
+          q("'Adik laki-laki' artinya…", ["older brother","younger sister","younger brother","older sister"], 2, "family"),
+          qFill("Lengkapi: 'Ini ___ saya, namanya Dewi.' (kakak/adik, untuk saudara perempuan yang lebih tua)", ["kakak"], "family"),
+          qMatch("Cocokkan dengan artinya:", [["ayah","father"],["ibu","mother"],["adik","younger sibling"],["kakak","older sibling"]], "family"),
         ],
       },
     ],
   },
-  // ── Makanan & Minuman ──────────────────────────────────────────────────────
+
   {
-    title: "Makanan & Minuman",
+    title: "Tempat & Arah",
     levelLabel: "Beginner",
-    description: "Nama-nama makanan dan minuman populer Indonesia.",
-    prereqTitles: ["Keluarga"],
+    description: "Menanyakan dan memberikan petunjuk arah, menyebutkan tempat-tempat penting.",
+    prereqTitles: ["Keluarga & Hubungan"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Makanan Sehari-hari",
-        objectives: ["Menyebutkan makanan dan minuman umum", "Memesan makanan di warung/restoran"],
-        grammar: `Memesan makanan:
-Saya mau pesan... = I'd like to order...
-Ada...? = Do you have...?
-Satu porsi... = One serving of...
-Mau minum apa? = What would you like to drink?
-Berapa harganya? = How much is it?
-Pedas atau tidak? = Spicy or not?`,
-        reading: `Indonesia terkenal dengan makanannya yang lezat.
-Nasi goreng adalah makanan favorit banyak orang.
-Di warung, kamu bisa pesan: nasi goreng, mie goreng, soto, atau gado-gado.
-Minuman populer: es teh, es jeruk, kopi, dan jus buah.
-Jangan lupa bilang "pedas" atau "tidak pedas" saat memesan!`,
-        dialogue: [
-          { speaker: "Pelayan", text: "Selamat datang! Mau pesan apa?", translation: "Welcome! What would you like to order?" },
-          { speaker: "Tamu", text: "Satu nasi goreng spesial dan satu es teh, terima kasih.", translation: "One special fried rice and one iced tea, thank you." },
-          { speaker: "Pelayan", text: "Mau pedas?", translation: "Do you want it spicy?" },
-          { speaker: "Tamu", text: "Sedang saja. Tidak terlalu pedas.", translation: "Medium please. Not too spicy." },
+        title: "Di Mana…?",
+        objectives: ["Menanyakan letak suatu tempat", "Memberikan petunjuk arah sederhana"],
+        warmUp: "Bayangkan kamu sedang berada di kota asing. Seseorang bertanya arah ke kamu — dalam Bahasa Indonesia! Apa yang akan kamu katakan?",
+        canDo: [
+          "Menanyakan lokasi: Di mana…? / Ke mana…?",
+          "Memberikan arah: Belok kiri/kanan, lurus terus, di sebelah…",
+          "Menjelaskan jarak: Dekat / Jauh / Sekitar 10 menit jalan kaki",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Wei", text: "Permisi, stasiun kereta ada di mana ya?", translation: "Excuse me, where is the train station?" },
+          { speaker: "Tom", text: "Oh, lumayan dekat kok. Lurus terus dari sini, terus belok kanan di perempatan.", translation: "Oh, it's quite close actually. Go straight from here, then turn right at the intersection." },
+          { speaker: "Wei", text: "Belok kanan di perempatan — oke. Terus?", translation: "Turn right at the intersection — okay. Then?" },
+          { speaker: "Tom", text: "Habis belok kanan, jalan kira-kira 200 meter. Stasiunnya ada di sebelah kiri, di depan mal besar.", translation: "After turning right, walk about 200 meters. The station is on the left, in front of the big mall." },
+          { speaker: "Wei", text: "Kira-kira berapa menit jalan kaki?", translation: "About how many minutes on foot?" },
+          { speaker: "Tom", text: "Sekitar sepuluh menit. Nggak terlalu jauh.", translation: "About ten minutes. Not too far." },
+        ],
+        patternExamples: [
+          { pattern: "[Tempat] ada di mana? / Di mana [tempat]?", examples: ["Stasiun ada di mana? (Where is the station?)", "Di mana toilet? (Where is the toilet?)", "Rumah sakit ada di mana, Pak? (Where is the hospital, sir?)"] },
+          { pattern: "Lurus terus, lalu belok [kiri/kanan] di [landmark].", examples: ["Lurus terus, lalu belok kanan di perempatan. (Go straight, then turn right at the intersection.)", "Belok kiri di lampu merah. (Turn left at the traffic light.)"] },
+          { pattern: "Sekitar [angka] menit [jalan kaki/naik motor].", examples: ["Sekitar 10 menit jalan kaki. (About 10 minutes on foot.)", "Sekitar 5 menit naik ojek. (About 5 minutes by ojek.)"] },
+        ],
+        cultureNote: "Di Indonesia, ojek (ojol) — ojek online seperti Gojek dan Grab — adalah transportasi paling umum untuk jarak pendek di kota. Lebih cepat dari taksi di kemacetan. Banyak orang Indonesia lebih suka bilang 'naik Gojek' daripada menjelaskan arah panjang-lebar!",
         vocab: [
-          { term: "nasi goreng", meaning: "fried rice (iconic Indonesian dish)", example: "Nasi goreng paling enak di sini." },
-          { term: "mie goreng", meaning: "fried noodles", example: "Mie goreng atau nasi goreng?" },
-          { term: "soto", meaning: "Indonesian spiced broth soup", example: "Soto ayam sangat enak." },
-          { term: "es teh", meaning: "iced tea", example: "Minta satu es teh manis." },
-          { term: "pedas", meaning: "spicy", example: "Makanan ini pedas sekali!" },
-          { term: "enak", meaning: "delicious / tasty", example: "Masakannya enak banget!" },
-          { term: "makan siang", meaning: "lunch", example: "Kita makan siang di mana?" },
+          { term: "di mana", meaning: "where (asking for location)", example: "Stasiun ada di mana?" },
+          { term: "lurus terus", meaning: "go straight", example: "Lurus terus sampai perempatan." },
+          { term: "belok kiri/kanan", meaning: "turn left/right", example: "Belok kanan di lampu merah." },
+          { term: "di sebelah", meaning: "next to / beside", example: "Di sebelah apotek." },
+          { term: "kira-kira", meaning: "approximately / about", example: "Kira-kira 10 menit jalannya." },
         ],
         quiz: [
-          qFill("Tulis Bahasa Indonesia untuk 'delicious':", ["enak", "lezat"], "food-id"),
-          qMatch("Cocokkan makanan dengan artinya:", [["nasi goreng","fried rice"],["mie goreng","fried noodles"],["soto","spiced soup"]], "food-id"),
-          q("'Pedas' means…", ["sweet","spicy","sour","salty"], 1, "food-id"),
-          qReorder("Susun kalimat pemesanan:", ["satu","nasi goreng","Saya","mau pesan","dan es teh"], [2,3,1,0,4], "ordering-id"),
+          q("'Di mana stasiun?' menanyakan tentang…", ["distance","time","location","price"], 2, "directions"),
+          q("'Belok kiri' artinya…", ["go straight","turn right","turn left","go back"], 2, "directions"),
+          qFill("Lengkapi: 'Lurus ___ dari sini.' (go straight from here)", ["terus"], "directions"),
+          qReorder("Tanya arah: 'Permisi, stasiun ada di mana?'", ["ada di mana?","Permisi,","stasiun"], [1,2,0], "directions"),
         ],
       },
     ],
   },
-  // ── Warna & Bentuk ─────────────────────────────────────────────────────────
+
   {
-    title: "Warna & Bentuk",
+    title: "Angka, Waktu & Tanggal",
     levelLabel: "Beginner",
-    description: "Warna-warna dasar dan cara mendeskripsikan benda.",
-    prereqTitles: ["Makanan & Minuman"],
+    description: "Angka 1–1000, jam, hari, dan tanggal dalam Bahasa Indonesia.",
+    prereqTitles: ["Tempat & Arah"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Warna Dasar",
-        objectives: ["Menyebutkan 8 warna dasar dalam bahasa Indonesia", "Mendeskripsikan warna benda"],
-        grammar: `Warna digunakan setelah kata benda:
-baju merah (red shirt)   tas biru (blue bag)   mobil putih (white car)
-
-Atau dengan kata 'berwarna':
-Bajunya berwarna merah. (His shirt is red / of red color.)
-
-Warna dasar:
-merah (red)   biru (blue)   kuning (yellow)   hijau (green)
-putih (white)   hitam (black)   jingga/oranye (orange)   ungu (purple)
-coklat (brown)   abu-abu (grey)   merah muda/pink (pink)`,
-        reading: `Warna di sekitar kita:
-Langit berwarna biru. (The sky is blue.)
-Rumput berwarna hijau. (Grass is green.)
-Bendera Indonesia berwarna merah dan putih.
-Warna favoritku adalah biru karena seperti warna laut.`,
-        dialogue: [
-          { speaker: "A", text: "Kamu suka warna apa?", translation: "What color do you like?" },
-          { speaker: "B", text: "Saya suka warna hijau. Warna alam yang menenangkan.", translation: "I like green. It's a calming natural color." },
-          { speaker: "A", text: "Baju yang kamu pakai hari ini warnanya cantik!", translation: "The color of the shirt you're wearing today is pretty!" },
-          { speaker: "B", text: "Terima kasih! Ini warna biru muda.", translation: "Thank you! This is light blue." },
+        title: "Jam Berapa? Hari Apa?",
+        objectives: ["Menyebutkan jam dan hari dalam Bahasa Indonesia", "Menanyakan dan menjawab pertanyaan tentang waktu"],
+        warmUp: "Sekarang jam berapa di kotamu? Hari apa sekarang? Bisakah kamu mengatakannya dalam Bahasa Indonesia?",
+        canDo: [
+          "Menanyakan waktu: Jam berapa sekarang?",
+          "Menjawab: Jam [angka] / Jam [angka] lebih [menit] menit",
+          "Menyebutkan hari: Senin, Selasa… Minggu",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Sari", text: "Tom, sekarang jam berapa?", translation: "Tom, what time is it now?" },
+          { speaker: "Tom", text: "Hmm, sekarang jam setengah dua belas.", translation: "Hmm, it's now half past eleven (11:30)." },
+          { speaker: "Sari", text: "Wah, bentar lagi zuhur dong. Kamu sudah makan siang?", translation: "Wow, almost noon then. Have you had lunch?" },
+          { speaker: "Tom", text: "Belum. Mau makan di mana? Hari ini hari apa?", translation: "Not yet. Where shall we eat? What day is today?" },
+          { speaker: "Sari", text: "Hari Kamis. Kalau Kamis biasanya ada pasar sore di alun-alun.", translation: "Thursday. On Thursdays there's usually an evening market at the town square." },
+          { speaker: "Tom", text: "Wah, seru! Jam berapa mulainya?", translation: "Oh, fun! What time does it start?" },
+          { speaker: "Sari", text: "Jam tiga sore. Kita bisa ke sana setelah makan.", translation: "3 PM. We can go there after eating." },
+        ],
+        patternExamples: [
+          { pattern: "Jam [angka] / Jam setengah [angka+1] / Jam [angka] lebih [menit] menit", examples: ["Jam delapan. (8 o'clock)", "Jam setengah sembilan. (8:30 — literally 'half nine')", "Jam delapan lebih lima belas menit. (8:15)"] },
+          { pattern: "Hari [nama hari], tanggal [angka]", examples: ["Hari ini hari Senin. (Today is Monday.)", "Besok hari Selasa, tanggal 10. (Tomorrow is Tuesday, the 10th.)"] },
+        ],
+        cultureNote: "Cara menyebut waktu di Indonesia unik: 'jam setengah sembilan' artinya 8:30, bukan 9:30! 'Setengah' berarti setengah perjalanan menuju angka berikutnya — konsep yang sama dengan bahasa Belanda (Belanda pernah menjajah Indonesia selama 350 tahun).",
         vocab: [
-          { term: "merah", meaning: "red", example: "Apel ini berwarna merah." },
-          { term: "biru", meaning: "blue", example: "Langit biru cerah hari ini." },
-          { term: "kuning", meaning: "yellow", example: "Pisang berwarna kuning." },
-          { term: "hijau", meaning: "green", example: "Daun-daun berwarna hijau." },
-          { term: "putih", meaning: "white", example: "Bendera Indonesia merah dan putih." },
-          { term: "hitam", meaning: "black", example: "Kucing hitam lewat." },
-          { term: "warna", meaning: "color", example: "Warna favoritmu apa?" },
+          { term: "jam berapa?", meaning: "what time is it?", example: "Sekarang jam berapa?" },
+          { term: "jam setengah", meaning: "half past (the previous hour)", example: "Jam setengah delapan = 7:30" },
+          { term: "hari ini", meaning: "today", example: "Hari ini hari Senin." },
+          { term: "besok", meaning: "tomorrow", example: "Besok ada ujian." },
+          { term: "sore", meaning: "late afternoon (around 3–6 PM)", example: "Saya pulang jam lima sore." },
         ],
         quiz: [
-          qFill("Tulis warna 'red' dalam Bahasa Indonesia:", ["merah"], "colors-id"),
-          qMatch("Cocokkan warna dengan artinya:", [["merah","red"],["biru","blue"],["hijau","green"],["kuning","yellow"]], "colors-id"),
-          q("Bendera Indonesia berwarna…", ["merah dan biru","kuning dan hitam","merah dan putih","biru dan putih"], 2, "colors-id"),
-          qReorder("Susun kalimat: 'I like green because it is calming':", ["karena","Saya suka","menenangkan","warna hijau"], [1,3,0,2], "colors-id"),
-        ],
-      },
-    ],
-  },
-  // ── Transportasi ──────────────────────────────────────────────────────────
-  {
-    title: "Transportasi",
-    levelLabel: "Beginner",
-    description: "Kendaraan umum dan cara bertanya arah di Indonesia.",
-    prereqTitles: ["Warna & Bentuk"],
-    autoCompleteLevel: "",
-    modules: [
-      {
-        title: "Kendaraan & Arah",
-        objectives: ["Menyebutkan jenis kendaraan", "Bertanya dan memberikan arah"],
-        grammar: `Jenis kendaraan:
-bus, kereta api, taksi, ojek (motorcycle taxi), sepeda motor, pesawat, kapal
-
-Bertanya arah:
-Di mana...? = Where is...?
-Bagaimana cara ke...? = How do I get to...?
-Berapa jauh? = How far?
-
-Petunjuk arah:
-belok kanan (turn right)   belok kiri (turn left)   lurus (go straight)
-di sebelah kanan (on the right)   di sebelah kiri (on the left)
-dekat (near)   jauh (far)   lampu merah (traffic light)`,
-        reading: `Jakarta punya banyak transportasi umum.
-Ada Transjakarta (bus cepat), MRT, KRL, dan ojek online.
-Untuk pergi ke mana-mana, kamu bisa pakai aplikasi di ponsel.
-Kalau tersesat: "Permisi, stasiun MRT di mana ya?"
-"Lurus terus, lalu belok kanan di lampu merah."`,
-        dialogue: [
-          { speaker: "A", text: "Permisi, bagaimana cara ke Stasiun Gambir?", translation: "Excuse me, how do I get to Gambir Station?" },
-          { speaker: "B", text: "Naik bus nomor 12, turun di halte Gambir.", translation: "Take bus number 12, get off at the Gambir stop." },
-          { speaker: "A", text: "Berapa lama perjalanannya?", translation: "How long is the journey?" },
-          { speaker: "B", text: "Kira-kira 20 menit, tergantung macet.", translation: "About 20 minutes, depending on traffic." },
-        ],
-        vocab: [
-          { term: "kereta api", meaning: "train", example: "Naik kereta api lebih cepat." },
-          { term: "ojek", meaning: "motorcycle taxi", example: "Ojek online sangat populer di Indonesia." },
-          { term: "belok kanan", meaning: "turn right", example: "Belok kanan di perempatan." },
-          { term: "lurus", meaning: "straight ahead", example: "Jalan lurus saja sampai lampu merah." },
-          { term: "dekat", meaning: "near / close", example: "Stasiunnya dekat dari sini." },
-          { term: "macet", meaning: "traffic jam", example: "Jakarta sering macet." },
-          { term: "halte", meaning: "bus stop", example: "Tunggu di halte bus." },
-        ],
-        quiz: [
-          q("'Ojek' adalah…", ["car","bus","motorcycle taxi","bicycle"], 2, "transport-id"),
-          q("'Belok kiri' means…", ["go straight","turn right","turn left","stop"], 2, "directions-id"),
-          q("'Macet' artinya…", ["fast","traffic jam","bus stop","far"], 1, "vocab-id"),
-          q("'Berapa jauh?' asks…", ["How long?","How much?","How far?","How many?"], 2, "directions-id"),
-        ],
-      },
-    ],
-  },
-  // ── Pekerjaan ─────────────────────────────────────────────────────────────
-  {
-    title: "Pekerjaan",
-    levelLabel: "Beginner",
-    description: "Nama-nama pekerjaan dan cara bertanya tentang profesi.",
-    prereqTitles: ["Transportasi"],
-    autoCompleteLevel: "",
-    modules: [
-      {
-        title: "Profesi & Tempat Kerja",
-        objectives: ["Menyebutkan profesi umum", "Menanyakan dan menjelaskan pekerjaan seseorang"],
-        grammar: `Menyebut pekerjaan:
-Saya seorang [pekerjaan]. = I am a [job].
-Saya bekerja sebagai [pekerjaan]. = I work as a [job].
-Saya bekerja di [tempat]. = I work at [place].
-
-Menanyakan pekerjaan:
-Apa pekerjaanmu? / Kerja di mana? / Profesimu apa?
-Sudah berapa lama bekerja di sini? = How long have you worked here?`,
-        reading: `Indonesia punya banyak profesi penting:
-Dokter dan perawat menjaga kesehatan kita.
-Guru mendidik generasi masa depan.
-Petani menghasilkan makanan untuk semua orang.
-Polisi menjaga keamanan masyarakat.
-Pengusaha menciptakan lapangan kerja.
-Semua pekerjaan punya peran penting dalam masyarakat.`,
-        dialogue: [
-          { speaker: "A", text: "Apa pekerjaanmu sekarang?", translation: "What is your job now?" },
-          { speaker: "B", text: "Saya seorang guru SD. Sudah 5 tahun mengajar.", translation: "I'm an elementary school teacher. I've been teaching for 5 years." },
-          { speaker: "A", text: "Wah, keren! Kamu suka pekerjaanmu?", translation: "Wow, cool! Do you like your job?" },
-          { speaker: "B", text: "Sangat suka! Melihat murid berkembang itu menyenangkan.", translation: "I love it! Watching students grow is fulfilling." },
-        ],
-        vocab: [
-          { term: "dokter", meaning: "doctor", example: "Dokter itu sangat baik hati." },
-          { term: "guru", meaning: "teacher", example: "Guru saya mengajar matematika." },
-          { term: "polisi", meaning: "police officer", example: "Polisi membantu warga." },
-          { term: "petani", meaning: "farmer", example: "Petani bekerja keras setiap hari." },
-          { term: "pedagang", meaning: "merchant / trader", example: "Pedagang itu jual sayur." },
-          { term: "seorang", meaning: "a (person); one person", example: "Dia seorang dokter." },
-          { term: "bekerja", meaning: "to work", example: "Saya bekerja dari jam 8 pagi." },
-        ],
-        quiz: [
-          q("'Guru' berarti…", ["doctor","teacher","police","farmer"], 1, "jobs-id"),
-          q("'Saya seorang dokter' means…", ["I work with doctors","I am a doctor","I need a doctor","I like doctors"], 1, "jobs-id"),
-          q("'Petani' adalah…", ["merchant","teacher","farmer","engineer"], 2, "jobs-id"),
-          q("'Apa pekerjaanmu?' artinya…", ["Where do you work?","How long have you worked?","What is your job?","Do you like work?"], 2, "jobs-id"),
-        ],
-      },
-    ],
-  },
-  // ── Kata Kerja Dasar ──────────────────────────────────────────────────────
-  {
-    title: "Kata Kerja Dasar",
-    levelLabel: "Beginner",
-    description: "Kata kerja paling sering digunakan dalam percakapan sehari-hari.",
-    prereqTitles: ["Pekerjaan"],
-    autoCompleteLevel: "",
-    modules: [
-      {
-        title: "Verba Aktif & Me- Prefix",
-        objectives: ["Menggunakan kata kerja dasar dengan benar", "Memahami awalan me- pada kata kerja"],
-        grammar: `Kata kerja dasar Indonesia sering menggunakan awalan me-:
-makan (eat)   minum (drink)   pergi (go)   datang (come)
-beli / membeli (buy)   jual / menjual (sell)   baca / membaca (read)
-tulis / menulis (write)   lihat / melihat (see)   dengar / mendengar (hear)
-bicara / berbicara (speak)   tidur (sleep)   bangun (wake up)
-
-Bentuk kalimat: Subjek + kata kerja + objek
-"Saya makan nasi." (I eat rice.)
-"Dia membaca buku." (She reads a book.)`,
-        reading: `Aktivitas sehari-hari:
-Saya bangun pukul 6 pagi. Kemudian mandi dan sarapan.
-Saya pergi ke sekolah naik bus.
-Di sekolah, saya belajar dan menulis di buku.
-Pulang sekolah, saya makan siang dan tidur siang sebentar.
-Malam hari, saya menonton TV bersama keluarga.`,
-        dialogue: [
-          { speaker: "A", text: "Kamu suka membaca buku?", translation: "Do you like reading books?" },
-          { speaker: "B", text: "Suka sekali! Saya membaca setiap malam sebelum tidur.", translation: "I love it! I read every night before sleeping." },
-          { speaker: "A", text: "Buku apa yang sedang kamu baca sekarang?", translation: "What book are you reading now?" },
-          { speaker: "B", text: "Novel sejarah Indonesia. Sangat menarik!", translation: "An Indonesian historical novel. Very interesting!" },
-        ],
-        vocab: [
-          { term: "makan", meaning: "to eat", example: "Mari makan bersama!" },
-          { term: "minum", meaning: "to drink", example: "Jangan lupa minum air putih." },
-          { term: "pergi", meaning: "to go", example: "Saya mau pergi ke pasar." },
-          { term: "membeli", meaning: "to buy", example: "Ibu membeli sayur di pasar." },
-          { term: "membaca", meaning: "to read", example: "Anak itu suka membaca." },
-          { term: "menulis", meaning: "to write", example: "Guru menulis di papan tulis." },
-          { term: "tidur", meaning: "to sleep", example: "Saya tidur pukul 10 malam." },
-          { term: "bangun", meaning: "to wake up", example: "Bangun pagi itu menyehatkan." },
-        ],
-        quiz: [
-          q("'Minum' artinya…", ["to eat","to sleep","to drink","to go"], 2, "verbs-id"),
-          q("'Membaca' means…", ["to write","to speak","to read","to listen"], 2, "verbs-id"),
-          q("'Saya pergi ke sekolah' means…", ["I study at school","I go to school","I like school","I leave school"], 1, "verbs-id"),
-          q("Awalan 'me-' pada kata kerja berfungsi untuk…", ["negation","question","active verb form","past tense"], 2, "grammar-id"),
+          q("'Jam setengah sembilan' artinya…", ["9:30","8:30","9:00","8:00"], 1, "time"),
+          q("Hari setelah Rabu adalah…", ["Selasa","Jumat","Kamis","Minggu"], 2, "days"),
+          qFill("Lengkapi: '___ berapa sekarang?' (what time is it?)", ["Jam"], "time"),
+          qMatch("Cocokkan hari dengan urutan:", [["Senin","Monday"],["Rabu","Wednesday"],["Jumat","Friday"]], "days"),
         ],
       },
     ],
   },
 ];
+
 
 // ─── MANDARIN ─────────────────────────────────────────────────────────────────
 
 const mandarinSkills: SkillSeed[] = [
   {
-    title: "Pinyin & Tones",
-    levelLabel: "HSK1",
-    description: "Learn pinyin romanization, 4 tones, and basic greetings.",
+    title: "拼音 Pīnyīn",
+    levelLabel: "Beginner",
+    description: "Master the Pinyin phonetic system — your key to reading and pronouncing all Mandarin.",
     prereqTitles: [],
-    autoCompleteLevel: "",
+    autoCompleteLevel: "intermediate,advanced",
     modules: [
       {
-        title: "The 4 Tones",
-        objectives: ["Understand Mandarin's 4 tones", "Read tone marks over pinyin"],
-        grammar: `Mandarin is tonal — the same syllable means different things depending on the tone:
-
-1st tone (māo ─): high, flat — like singing one long note → mā = mother
-2nd tone (máo ╱): rising — like asking "huh?" → má = hemp
-3rd tone (mǎo ╲╱): falling then rising — like a hesitant "hmm" → mǎ = horse
-4th tone (mào ╲): falling — like saying "no!" firmly → mà = to scold
-
-Neutral tone: light, quick, no mark — de (的) in 我的 (my/mine)`,
-        reading: `The famous example:
-mā (妈) = mother  máo (麻) = hemp  mǎo (马) = horse  mà (骂) = to scold
-
-Tones apply to all syllables. Getting them wrong changes the meaning!
-Practice: say mā→má→mǎ→mà going up, up-down, down.`,
-        dialogue: [
-          { speaker: "A", text: "你好！(Nǐ hǎo!)", translation: "Hello!" },
-          { speaker: "B", text: "你好！你叫什么名字？(Nǐ hǎo! Nǐ jiào shénme míngzi?)", translation: "Hello! What's your name?" },
-          { speaker: "A", text: "我叫小明。(Wǒ jiào Xiǎomíng.)", translation: "My name is Xiaoming." },
+        title: "Initials & Finals — The Building Blocks",
+        objectives: ["Understand how Pinyin syllables are built", "Read basic initials and finals"],
+        warmUp: "Think about how you learned the alphabet. Pinyin is like a phonetic alphabet for Mandarin — but every syllable has a tone. Ready to explore?",
+        canDo: [
+          "Understand how Pinyin syllables = initial + final",
+          "Read common finals: a, o, e, i, u, ü",
+          "Read common initials: b, p, m, f, d, t, n, l",
         ],
+        grammar: `Pinyin syllable = Initial (consonant) + Final (vowel/vowel cluster)
+b + a = ba (爸 bà = father)
+m + a = ma (妈 mā = mother)
+n + i = ni (你 nǐ = you)
+h + ǎo = hǎo (好 = good)
+
+Pinyin is NOT English pronunciation — common traps:
+x = like 'sh' in 'she'
+q = like 'ch' in 'cheese'
+zh = like 'j' in 'jump' (retroflexed)
+c = like 'ts' in 'cats'`,
+        reading: `Pinyin is used in dictionaries, learning materials, and phone keyboards.
+Once you learn the tones, you can pronounce any Chinese word from Pinyin alone.
+Goal: use Pinyin as a tool to reach Chinese characters — not a permanent crutch!`,
+        dialogue: [
+          { speaker: "Li Wei", text: "nǐ hǎo!", translation: "Hello!" },
+          { speaker: "Emma", text: "nǐ hǎo! wǒ shì Emma.", translation: "Hello! I'm Emma." },
+        ],
+        patternExamples: [
+          { pattern: "Initial + Final = Syllable", examples: ["b + ā = bā (八 eight)", "m + ā = mā (妈 mother)", "n + ǐ = nǐ (你 you)", "h + ǎo = hǎo (好 good)"] },
+        ],
+        cultureNote: "Pinyin was developed in the 1950s by linguists in China to standardize pronunciation across China's many dialects. Today it's essential for phone input — Chinese people type in Pinyin and select the character they want. Learning Pinyin is not just for foreigners — it's built into every Chinese phone!",
         vocab: [
-          { term: "你好", reading: "nǐ hǎo", meaning: "hello (lit. you good)", example: "你好！老师。(Hello, teacher!)" },
-          { term: "谢谢", reading: "xièxie", meaning: "thank you", example: "谢谢你！(Thank you!)" },
-          { term: "再见", reading: "zàijiàn", meaning: "goodbye (lit. see again)", example: "再见！(Goodbye!)" },
-          { term: "对不起", reading: "duìbuqǐ", meaning: "sorry / I'm sorry", example: "对不起！(I'm sorry!)" },
-          { term: "没关系", reading: "méiguānxi", meaning: "it doesn't matter / no problem", example: "没关系！(No problem!)" },
+          { term: "nǐ (你)", reading: "nǐ", meaning: "you", example: "nǐ hǎo! (你好! Hello!)" },
+          { term: "wǒ (我)", reading: "wǒ", meaning: "I / me", example: "wǒ shì Emma. (我是Emma. I am Emma.)" },
+          { term: "hǎo (好)", reading: "hǎo", meaning: "good", example: "hěn hǎo! (很好! Very good!)" },
+          { term: "shì (是)", reading: "shì", meaning: "to be (am/is/are)", example: "wǒ shì xuésheng. (I am a student.)" },
+          { term: "bù (不)", reading: "bù", meaning: "not / no", example: "wǒ bù zhīdào. (I don't know.)" },
         ],
         quiz: [
-          q("The 1st tone is…", ["falling","rising","flat/high","falling-rising"], 2, "tones"),
-          qFill("Type the pinyin for 'hello' (你好):", ["ni hao", "nǐ hǎo"], "vocab"),
-          qMatch("Match the tone to its description:", [["1st tone","high flat ─"],["2nd tone","rising ╱"],["3rd tone","falling-rising ╲╱"],["4th tone","falling ╲"]], "tones"),
-          qReorder("Put in correct tone order (1st→2nd→3rd→4th):", ["mà","māo","mǎo","máo"], [1,3,2,0], "tones"),
+          q("In Pinyin, 'x' is pronounced like…", ["ks (like 'fox')","sh in 'she'","z in 'zoo'","s in 'sun'"], 1, "pinyin-sounds"),
+          q("A Pinyin syllable is made of…", ["only a vowel","an initial + a final","only a consonant","two initials"], 1, "pinyin-structure"),
+          q("'妈 mā' means…", ["father","horse","scold","mother"], 3, "vocab"),
+          qFill("The Pinyin for 'you' (你) is:", ["nǐ","ni"], "pinyin-vocab"),
         ],
       },
       {
-        title: "Numbers 1–10 in Mandarin",
-        objectives: ["Count 1–10 in Mandarin", "Use numbers in simple phrases"],
-        grammar: `一(yī) 二(èr) 三(sān) 四(sì) 五(wǔ)
-六(liù) 七(qī) 八(bā) 九(jiǔ) 十(shí)
-
-Key notes:
-• 一 (yī) changes tone depending on what follows:
-  before 4th tone: yí (一个 yí gè = one (thing))
-  before 1st/2nd/3rd tone: yì (一天 yì tiān = one day)
-• 两 (liǎng) is used instead of 二 when counting objects: 两个苹果 = two apples`,
-        reading: `Useful number phrases:
-多少钱？(duōshao qián?) = How much money?
-一百 (yī bǎi) = 100  |  一千 (yī qiān) = 1000
-这个多少钱？(Zhège duōshao qián?) = How much is this?`,
-        dialogue: [
-          { speaker: "A", text: "这个多少钱？(Zhège duōshao qián?)", translation: "How much is this?" },
-          { speaker: "B", text: "十块。(Shí kuài.)", translation: "Ten yuan." },
-          { speaker: "A", text: "太贵了！(Tài guì le!)", translation: "Too expensive!" },
+        title: "The Four Tones — 声调",
+        objectives: ["Identify all four tones + neutral tone", "Pronounce the same syllable in different tones"],
+        warmUp: "The word 'ma' in Mandarin has four completely different meanings depending on how you say it. Can you believe one syllable can mean 'mother', 'hemp', 'horse', AND 'to scold'?",
+        canDo: [
+          "Produce the 4 tones: high flat (1st), rising (2nd), dip-and-rise (3rd), falling (4th)",
+          "Distinguish between tones by ear and in writing",
+          "Avoid common tone mistakes that change meaning",
         ],
+        grammar: `1st tone (ā): high and flat — like a sustained musical note → 妈 mā (mother)
+2nd tone (á): rising — like asking "Really?" → 麻 má (hemp/trouble)
+3rd tone (ǎ): dip then rise — like a doubtful "hmm?" → 马 mǎ (horse)
+4th tone (à): short and falling — like a firm "No!" → 骂 mà (to scold)
+Neutral tone: short and unstressed — used in particles like 吗 ma (question)`,
+        reading: `Tones MUST be memorized with vocabulary — not added later.
+mā má mǎ mà = 妈 麻 马 骂 — four different words, one pronunciation!
+Tip: exaggerate tones when practicing. Natives will still understand you.`,
+        dialogue: [
+          { speaker: "Li Wei", text: "nǐ māma shì lǎoshī ma?", translation: "Is your mother a teacher?" },
+          { speaker: "Hana", text: "shì de! tā hěn máng.", translation: "Yes she is! She's very busy." },
+        ],
+        patternExamples: [
+          { pattern: "Same syllable, 4 tones = 4 different words (ma example)", examples: ["mā (妈) = mother — HIGH FLAT", "má (麻) = hemp / trouble — RISING", "mǎ (马) = horse — DIP-RISE", "mà (骂) = to scold — FALLING"] },
+        ],
+        cultureNote: "Getting tones wrong can cause misunderstandings — and funny ones! Saying 'wǒ xiǎng wèn nǐ' (我想问你 I want to ask you) with wrong tones might sound like something very different. Don't be embarrassed — tonal errors are universal for beginners. Laugh and keep practicing!",
         vocab: [
-          { term: "一", reading: "yī", meaning: "one (1)", example: "一个苹果。(One apple.)" },
-          { term: "五", reading: "wǔ", meaning: "five (5)", example: "五点。(Five o'clock.)" },
-          { term: "十", reading: "shí", meaning: "ten (10)", example: "十分钟。(Ten minutes.)" },
-          { term: "多少", reading: "duōshao", meaning: "how many / how much", example: "多少钱？(How much?)" },
-          { term: "贵", reading: "guì", meaning: "expensive", example: "太贵了！(Too expensive!)" },
+          { term: "māma (妈妈)", reading: "māma", meaning: "mother / mom", example: "wǒ māma shì lǎoshī. (My mother is a teacher.)" },
+          { term: "lǎoshī (老师)", reading: "lǎoshī", meaning: "teacher", example: "tā shì wǒ de lǎoshī. (She is my teacher.)" },
+          { term: "máng (忙)", reading: "máng", meaning: "busy", example: "nǐ máng ma? (Are you busy?)" },
+          { term: "hěn (很)", reading: "hěn", meaning: "very", example: "tā hěn máng. (She is very busy.)" },
+          { term: "ma (吗)", reading: "ma", meaning: "question particle (neutral tone)", example: "nǐ hǎo ma? (Are you well?)" },
         ],
         quiz: [
-          q("'五' is pronounced…", ["sì","wǔ","liù","qī"], 1, "numbers"),
-          q("'十' means…", ["five","seven","nine","ten"], 3, "numbers"),
-          q("'多少钱？' means…", ["What is this?","How much?","Where is it?","Do you have it?"], 1, "shopping"),
-          q("When counting 2 objects, use…", ["二","两","双","对"], 1, "numbers"),
-        ],
-      },
-    ],
-  },
-  // ── Greetings & Self Introduction (问候) ──────────────────────────────────
-  {
-    title: "Greetings & Introductions (问候)",
-    levelLabel: "HSK1",
-    description: "Introduce yourself and greet people in Mandarin.",
-    prereqTitles: ["Pinyin & Tones"],
-    autoCompleteLevel: "",
-    modules: [
-      {
-        title: "Self Introduction — 自我介绍",
-        objectives: ["Introduce yourself in Mandarin", "Ask and answer basic personal questions"],
-        grammar: `Key introduction phrases:
-我叫... (Wǒ jiào...) = My name is... (lit. I'm called...)
-我是... (Wǒ shì...) = I am...
-我来自... (Wǒ láizì...) = I'm from...
-我...岁 (Wǒ...suì) = I am...years old
-我是学生/老师/工程师 = I am a student/teacher/engineer
-
-Questions:
-你叫什么名字？(Nǐ jiào shénme míngzi?) = What's your name?
-你从哪里来？(Nǐ cóng nǎlǐ lái?) = Where are you from?
-你多大了？(Nǐ duō dà le?) = How old are you?`,
-        reading: `自我介绍示例:
-你好！我叫李明。我是中国人，来自上海。
-我今年二十岁，是大学生。
-我在学英语和日语。很高兴认识你！
-
-(Hello! My name is Li Ming. I am Chinese, from Shanghai.
-I am 20 years old and a university student.
-I am studying English and Japanese. Nice to meet you!)`,
-        dialogue: [
-          { speaker: "A", text: "你好！你叫什么名字？", translation: "Hello! What's your name?" },
-          { speaker: "B", text: "你好！我叫王芳。你呢？", translation: "Hello! My name is Wang Fang. And you?" },
-          { speaker: "A", text: "我叫大卫。我来自印度尼西亚。你来自哪里？", translation: "My name is David. I'm from Indonesia. Where are you from?" },
-          { speaker: "B", text: "我来自北京。很高兴认识你！", translation: "I'm from Beijing. Nice to meet you!" },
-        ],
-        vocab: [
-          { term: "我叫", reading: "wǒ jiào", meaning: "my name is (lit. I am called)", example: "我叫小明。(My name is Xiaoming.)" },
-          { term: "我是", reading: "wǒ shì", meaning: "I am", example: "我是学生。(I am a student.)" },
-          { term: "来自", reading: "láizì", meaning: "come from / from", example: "我来自印度尼西亚。(I'm from Indonesia.)" },
-          { term: "高兴认识你", reading: "gāoxìng rènshi nǐ", meaning: "nice to meet you", example: "很高兴认识你！" },
-          { term: "学生", reading: "xuésheng", meaning: "student", example: "我是大学生。(I'm a university student.)" },
-          { term: "老师", reading: "lǎoshī", meaning: "teacher", example: "她是我的老师。(She is my teacher.)" },
-          { term: "你呢？", reading: "nǐ ne?", meaning: "And you? / What about you?", example: "我很好，你呢？(I'm good, and you?)" },
-        ],
-        quiz: [
-          qFill("Write the pinyin for 你好:", ["ni hao", "nǐ hǎo"], "vocab-zh"),
-          qMatch("Match Chinese to English:", [["你好","hello"],["谢谢","thank you"],["再见","goodbye"],["学生","student"]], "vocab-zh"),
-          qReorder("Build '我叫小明' (My name is Xiaoming):", ["小明","我","叫"], [1,2,0], "intro-zh"),
-          q("'很高兴认识你' means…", ["How are you?","See you later","Nice to meet you","Good morning"], 2, "vocab-zh"),
+          q("The 2nd tone (á) sounds like…", ["a sustained flat note","a falling note","a rising note","a dipping then rising note"], 2, "tones"),
+          q("'mǎ' (马) means…", ["mother","hemp","horse","to scold"], 2, "tones"),
+          q("The neutral tone is…", ["always stressed","short and unstressed","always 1st tone","the same as 4th tone"], 1, "tones"),
+          qMatch("Match the tone mark to its description:", [["ā","1st — high flat"],["á","2nd — rising"],["ǎ","3rd — dip-rise"],["à","4th — falling"]], "tones"),
         ],
       },
     ],
   },
-  // ── Family (家人) ──────────────────────────────────────────────────────────
+
   {
-    title: "Family (家人)",
-    levelLabel: "HSK1",
-    description: "Family members and talking about your family in Mandarin.",
-    prereqTitles: ["Greetings & Introductions (问候)"],
+    title: "你好 Nǐ Hǎo",
+    levelLabel: "Beginner",
+    description: "Greet people, introduce yourself, and exchange basic personal information in Mandarin.",
+    prereqTitles: ["拼音 Pīnyīn"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Family Members — 家庭成员",
-        objectives: ["Name family members in Mandarin", "Talk about your family"],
-        grammar: `Family vocabulary:
-爸爸(bàba) = dad   妈妈(māma) = mom   哥哥(gēge) = older brother   姐姐(jiějie) = older sister
-弟弟(dìdi) = younger brother   妹妹(mèimei) = younger sister
-爷爷(yéye) = paternal grandfather   奶奶(nǎinai) = paternal grandmother
-儿子(érzi) = son   女儿(nǚ'ér) = daughter
-
-Structure:
-我有一个哥哥。(Wǒ yǒu yī gè gēge.) = I have an older brother.
-我没有姐姐。(Wǒ méiyǒu jiějie.) = I don't have an older sister.
-我的爸爸是医生。(Wǒ de bàba shì yīshēng.) = My father is a doctor.`,
-        reading: `我的家:
-我家有四口人：爸爸、妈妈、弟弟和我。
-爸爸是工程师，妈妈是护士。
-弟弟今年十五岁，在上中学。
-我们一家人很幸福。
-
-(My family: There are four people in my family: dad, mom, younger brother, and me.
-Dad is an engineer, mom is a nurse. My brother is 15 and in middle school. Our family is very happy.)`,
-        dialogue: [
-          { speaker: "A", text: "你家有几口人？", translation: "How many people are in your family?" },
-          { speaker: "B", text: "我家有三口人：爸爸、妈妈和我。你呢？", translation: "There are three in my family: dad, mom and me. And you?" },
-          { speaker: "A", text: "我家有五口人。我有一个哥哥和一个妹妹。", translation: "There are five in mine. I have an older brother and a younger sister." },
-          { speaker: "B", text: "哥哥做什么工作？", translation: "What does your older brother do for work?" },
+        title: "你好！— Hello!",
+        objectives: ["Greet people in Mandarin", "Introduce yourself: name, country, occupation"],
+        warmUp: "你好 (nǐ hǎo) literally means 'you good'. What do you think the literal meaning of your language's greeting is?",
+        canDo: [
+          "Greet: nǐ hǎo / nǐ hǎo ma?",
+          "Introduce yourself: wǒ shì… / wǒ jiào… / wǒ cóng…lái",
+          "Respond to introductions: rènshi nǐ hěn gāoxìng!",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Hana", text: "你好！我叫Hana。你叫什么名字？", translation: "nǐ hǎo! wǒ jiào Hana. nǐ jiào shénme míngzì? / Hello! My name is Hana. What's your name?" },
+          { speaker: "Li Wei", text: "你好，Hana！我叫李伟。认识你很高兴！", translation: "nǐ hǎo, Hana! wǒ jiào Lǐ Wěi. rènshi nǐ hěn gāoxìng! / Hello Hana! I'm Li Wei. Nice to meet you!" },
+          { speaker: "Emma", text: "我也是！我叫Emma，我是美国人。", translation: "wǒ yě shì! wǒ jiào Emma, wǒ shì Měiguórén. / Me too! I'm Emma, I'm American." },
+          { speaker: "Li Wei", text: "Hana，你是哪国人？", translation: "Hana, nǐ shì nǎ guó rén? / Hana, what nationality are you?" },
+          { speaker: "Hana", text: "我是日本人，我从大阪来。", translation: "wǒ shì Rìběnrén, wǒ cóng Dàbǎn lái. / I'm Japanese, I come from Osaka." },
+        ],
+        patternExamples: [
+          { pattern: "我叫[name] / 我是[name]", examples: ["我叫Hana。(wǒ jiào Hana — My name is Hana)", "我是李伟。(wǒ shì Lǐ Wěi — I am Li Wei)"] },
+          { pattern: "我是[nationality]人 / 我从[place]来", examples: ["我是日本人。(wǒ shì Rìběnrén — I'm Japanese)", "我从上海来。(wǒ cóng Shànghǎi lái — I come from Shanghai)"] },
+          { pattern: "认识你很高兴！", examples: ["A: 你好，我叫Hana。B: 认识你很高兴！(rènshi nǐ hěn gāoxìng — Nice to meet you!)"] },
+        ],
+        cultureNote: "In China, asking '你吃了吗？(nǐ chī le ma — Have you eaten?)' is a common greeting equivalent to 'How are you?' — food is central to Chinese culture and social bonding. Business cards (名片 míngpiàn) are exchanged with two hands as a sign of respect, similar to Japan.",
         vocab: [
-          { term: "爸爸", reading: "bàba", meaning: "dad / father", example: "爸爸很高大。(Dad is tall.)" },
-          { term: "妈妈", reading: "māma", meaning: "mom / mother", example: "妈妈做饭很好吃。(Mom cooks deliciously.)" },
-          { term: "哥哥", reading: "gēge", meaning: "older brother", example: "哥哥在上大学。(Older brother is in university.)" },
-          { term: "姐姐", reading: "jiějie", meaning: "older sister", example: "姐姐已经结婚了。(Older sister is already married.)" },
-          { term: "我有", reading: "wǒ yǒu", meaning: "I have", example: "我有两个妹妹。(I have two younger sisters.)" },
-          { term: "口", reading: "kǒu", meaning: "measure word for family members", example: "我家有四口人。(There are 4 people in my family.)" },
+          { term: "你好 (nǐ hǎo)", reading: "nǐ hǎo", meaning: "hello (literally: you good)", example: "你好！你叫什么名字？" },
+          { term: "我叫 (wǒ jiào)", reading: "wǒ jiào", meaning: "my name is (literally: I am called)", example: "我叫李伟。" },
+          { term: "认识你很高兴 (rènshi nǐ hěn gāoxìng)", reading: "rènshi nǐ hěn gāoxìng", meaning: "nice to meet you", example: "认识你很高兴！" },
+          { term: "哪国人 (nǎ guó rén)", reading: "nǎ guó rén", meaning: "what nationality", example: "你是哪国人？" },
+          { term: "从…来 (cóng…lái)", reading: "cóng…lái", meaning: "come from (a place)", example: "我从北京来。" },
         ],
         quiz: [
-          q("'弟弟' means…", ["older brother","younger sister","younger brother","older sister"], 2, "family-zh"),
-          q("'我家有三口人' means…", ["I have 3 siblings","There are 3 people in my family","I am 3 years old","My family has 3 rooms"], 1, "family-zh"),
-          q("'妈妈' is…", ["dad","grandmother","mom","aunt"], 2, "family-zh"),
-          q("'我有一个哥哥' means…", ["I want an older brother","I have an older brother","My older brother is one","I know one older brother"], 1, "family-zh"),
+          q("'我叫李伟' means…", ["I am from Beijing","I am a student","My name is Li Wei","Nice to meet you"], 2, "introduction"),
+          q("'认识你很高兴' is said when…", ["saying goodbye","meeting someone new","asking for directions","ordering food"], 1, "greetings"),
+          qFill("Complete: '我是___ 人' (I am Japanese) — use 日本:", ["日本"], "nationality"),
+          qReorder("Build: 'Hello! My name is Emma, I'm American.'", ["我叫Emma，","你好！","我是美国人。"], [1,0,2], "intro"),
+        ],
+      },
+      {
+        title: "你是学生吗？— Are You a Student?",
+        objectives: ["Ask and answer yes/no questions with 吗", "Say your occupation in Mandarin"],
+        warmUp: "In Mandarin, you make a yes/no question simply by adding 吗 (ma) at the end. How different is that from your language?",
+        canDo: [
+          "Form yes/no questions: [statement] + 吗？",
+          "Say your occupation: 我是学生 / 我是老师 / 我在…工作",
+          "Answer positively: 是的 / 对！ and negatively: 不是",
+        ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Li Wei", text: "Emma，你是学生吗？", translation: "Emma, nǐ shì xuésheng ma? / Emma, are you a student?" },
+          { speaker: "Emma", text: "是的，我是大学生。我在北京大学学习中文。", translation: "shì de, wǒ shì dàxuéshēng. wǒ zài Běijīng Dàxué xuéxí Zhōngwén. / Yes, I'm a university student. I study Chinese at Peking University." },
+          { speaker: "Li Wei", text: "哇，好厉害！你学习多久了？", translation: "wā, hǎo lìhai! nǐ xuéxí duō jiǔ le? / Wow, impressive! How long have you been studying?" },
+          { speaker: "Emma", text: "一年了。中文很难，但是很有意思！你是老师吗？", translation: "yī nián le. Zhōngwén hěn nán, dànshì hěn yǒu yìsi! nǐ shì lǎoshī ma? / One year. Chinese is very difficult, but very interesting! Are you a teacher?" },
+          { speaker: "Li Wei", text: "不是，我是程序员。在一家科技公司工作。", translation: "bù shì, wǒ shì chéngyuányuán. zài yī jiā kējì gōngsī gōngzuò. / No, I'm a programmer. I work at a tech company." },
+        ],
+        patternExamples: [
+          { pattern: "[Statement] + 吗？= Yes/No question", examples: ["你是学生吗？(Are you a student?)", "他很忙吗？(Is he very busy?)", "这个好吃吗？(Is this delicious?)"] },
+          { pattern: "我是[job] / 我在[place]工作", examples: ["我是学生。(I am a student.)", "我是老师。(I am a teacher.)", "我在医院工作。(I work at a hospital.)"] },
+          { pattern: "是的 (yes) / 不是 (no, I'm not)", examples: ["你是学生吗？— 是的！(Yes!)", "你是老师吗？— 不是，我是学生。(No, I'm a student.)"] },
+        ],
+        cultureNote: "Mandarin doesn't have a simple 'yes/no' like English. Instead, you repeat the verb: 你是学生吗？→ 是 (yes, am) or 不是 (no, am not). 是的 is also commonly used. This concept takes a little getting used to but becomes very natural!",
+        vocab: [
+          { term: "学生 (xuésheng)", reading: "xuésheng", meaning: "student", example: "我是大学生。(I am a university student.)" },
+          { term: "老师 (lǎoshī)", reading: "lǎoshī", meaning: "teacher", example: "他是中文老师。(He is a Chinese teacher.)" },
+          { term: "难 (nán)", reading: "nán", meaning: "difficult", example: "中文很难！(Chinese is very difficult!)" },
+          { term: "有意思 (yǒu yìsi)", reading: "yǒu yìsi", meaning: "interesting", example: "这本书很有意思。(This book is very interesting.)" },
+          { term: "工作 (gōngzuò)", reading: "gōngzuò", meaning: "work / job", example: "你在哪里工作？(Where do you work?)" },
+        ],
+        quiz: [
+          q("To make a yes/no question in Mandarin, you add…", ["吗 at the end","吗 at the beginning","是 before the verb","不 before the verb"], 0, "grammar"),
+          q("'不是' is used to say…", ["yes","not really","no / I am not","I don't know"], 2, "negation"),
+          qFill("Complete: '你是学生___？' (Are you a student?)", ["吗"], "questions"),
+          qMatch("Match occupation to Pinyin:", [["学生","xuésheng"],["老师","lǎoshī"],["医生","yīshēng"]], "vocab"),
         ],
       },
     ],
   },
-  // ── Food & Drink (食物饮料) ────────────────────────────────────────────────
+
   {
-    title: "Food & Drink (食物)",
-    levelLabel: "HSK1",
-    description: "Order food, express preferences, and talk about Chinese cuisine.",
-    prereqTitles: ["Family (家人)"],
+    title: "日常生活 Rìcháng Shēnghuó",
+    levelLabel: "Beginner",
+    description: "Talk about daily routines, time, and common activities in Mandarin.",
+    prereqTitles: ["你好 Nǐ Hǎo"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Food Vocabulary — 食物",
-        objectives: ["Name common foods and drinks in Mandarin", "Order food and say what you like"],
-        grammar: `Food expressions:
-我想吃... (Wǒ xiǎng chī...) = I want to eat...
-我喜欢吃... (Wǒ xǐhuān chī...) = I like to eat...
-这个好吃吗？(Zhège hǎochī ma?) = Is this delicious?
-好吃！(Hǎochī!) = Delicious!   不好吃 (bù hǎochī) = Not good / tastes bad
-
-Measure words:
-一碗饭 (yī wǎn fàn) = one bowl of rice
-一杯茶 (yī bēi chá) = one cup of tea
-一瓶水 (yī píng shuǐ) = one bottle of water`,
-        reading: `中国美食:
-中国有很多好吃的食物。
-我最喜欢吃饺子和面条。
-在餐厅，我通常点米饭和炒菜。
-喝茶是中国的传统文化。
-(Chinese cuisine: China has a lot of delicious food.
-I love dumplings and noodles the most. At restaurants I usually order rice and stir-fried dishes.
-Drinking tea is Chinese traditional culture.)`,
-        dialogue: [
-          { speaker: "A", text: "你喜欢吃什么中国菜？", translation: "What Chinese food do you like?" },
-          { speaker: "B", text: "我最喜欢吃饺子！你呢？", translation: "I love dumplings the most! And you?" },
-          { speaker: "A", text: "我喜欢吃米饭和炒菜。你喝什么？", translation: "I like rice and stir-fry. What are you drinking?" },
-          { speaker: "B", text: "绿茶。好喝！你要来一杯吗？", translation: "Green tea. It's great! Would you like a cup?" },
+        title: "几点了？— What Time Is It?",
+        objectives: ["Tell the time in Mandarin", "Talk about when you do things"],
+        warmUp: "Mandarin time-telling uses very logical patterns. 八点 = 8 o'clock (8 points). Can you guess what 三点半 might mean?",
+        canDo: [
+          "Ask the time: 现在几点？",
+          "Tell the time: ～点 / ～点半 / ～点～分",
+          "Say when you do things: 我八点…/ 早上/晚上",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Emma", text: "现在几点了？", translation: "xiànzài jǐ diǎn le? / What time is it now?" },
+          { speaker: "Li Wei", text: "八点半。你几点上课？", translation: "bā diǎn bàn. nǐ jǐ diǎn shàng kè? / 8:30. What time is your class?" },
+          { speaker: "Emma", text: "九点，还有三十分钟。来得及！", translation: "jiǔ diǎn, hái yǒu sānshí fēnzhōng. lái de jí! / At 9, there are still 30 minutes. I'll make it in time!" },
+          { speaker: "Hana", text: "我昨天八点才睡觉，早上六点就起床了！", translation: "wǒ zuótiān bā diǎn cái shuìjiào, zǎoshang liù diǎn jiù qǐchuáng le! / I didn't sleep until 8 PM yesterday, but got up at 6 AM!" },
+          { speaker: "Li Wei", text: "哇，你不累吗？", translation: "wā, nǐ bù lèi ma? / Wow, aren't you tired?" },
+        ],
+        patternExamples: [
+          { pattern: "[数字]点 / [数字]点半 / [数字]点[分钟]分", examples: ["八点 (bā diǎn = 8 o'clock)", "三点半 (sān diǎn bàn = 3:30)", "九点十五分 (jiǔ diǎn shíwǔ fēn = 9:15)"] },
+          { pattern: "早上/下午/晚上 + [时间]", examples: ["早上八点 (zǎoshang bā diǎn = 8 AM)", "下午两点 (xiàwǔ liǎng diǎn = 2 PM)", "晚上十点 (wǎnshang shí diǎn = 10 PM)"] },
+        ],
+        cultureNote: "China uses a 24-hour clock in official contexts, but colloquially people say 早上 (morning), 下午 (afternoon), or 晚上 (evening) before the time to clarify. Note: 两点 (liǎng diǎn) is used for '2 o'clock', not 二点 — 两 is used when counting things, including hours.",
         vocab: [
-          { term: "米饭", reading: "mǐfàn", meaning: "cooked rice", example: "我要一碗米饭。(I want a bowl of rice.)" },
-          { term: "面条", reading: "miàntiáo", meaning: "noodles", example: "面条好吃极了！(The noodles are so delicious!)" },
-          { term: "饺子", reading: "jiǎozi", meaning: "dumplings", example: "我妈妈包的饺子最好吃。(My mom's dumplings are the best.)" },
-          { term: "茶", reading: "chá", meaning: "tea", example: "一杯绿茶，谢谢。(One green tea, please.)" },
-          { term: "好吃", reading: "hǎochī", meaning: "delicious (food)", example: "这个好吃！(This is delicious!)" },
-          { term: "我想", reading: "wǒ xiǎng", meaning: "I want to / I'd like to", example: "我想吃火锅。(I want to eat hot pot.)" },
+          { term: "几点 (jǐ diǎn)", reading: "jǐ diǎn", meaning: "what time (literally: how many points)", example: "现在几点？(What time is it now?)" },
+          { term: "点 (diǎn)", reading: "diǎn", meaning: "o'clock (lit: dot/point)", example: "九点 = 9 o'clock" },
+          { term: "半 (bàn)", reading: "bàn", meaning: "half (30 minutes past)", example: "八点半 = 8:30" },
+          { term: "起床 (qǐchuáng)", reading: "qǐchuáng", meaning: "to get up / get out of bed", example: "我六点起床。(I get up at 6.)" },
+          { term: "睡觉 (shuìjiào)", reading: "shuìjiào", meaning: "to sleep / go to sleep", example: "我十点睡觉。(I sleep at 10.)" },
         ],
         quiz: [
-          q("'好吃' means…", ["expensive","spicy","delicious","hot"], 2, "food-zh"),
-          q("'米饭' is…", ["noodles","dumplings","cooked rice","bread"], 2, "food-zh"),
-          q("'我想吃饺子' means…", ["I made dumplings","I want to eat dumplings","I like dumplings","I don't like dumplings"], 1, "food-zh"),
-          q("'一杯茶' means…", ["a bottle of tea","a bowl of tea","a cup of tea","a plate of tea"], 2, "food-zh"),
+          q("'三点半' means…", ["3:00","3:05","3:30","3:15"], 2, "time"),
+          q("'早上八点' means…", ["8 PM","8 AM","8:00 (no context)","8:30 in the morning"], 1, "time"),
+          qFill("Complete: '现在几___ ？' (what time is it?)", ["点"], "time"),
+          qMatch("Match to English:", [["起床","get up"],["睡觉","go to sleep"],["上课","attend class"]], "daily-vocab"),
+        ],
+      },
+      {
+        title: "你喜欢做什么？— What Do You Like To Do?",
+        objectives: ["Express likes and dislikes", "Talk about hobbies and free time activities"],
+        warmUp: "你喜欢做什么？You'll learn to answer this question today. Think about three activities you love — how would you say them in Mandarin?",
+        canDo: [
+          "Say what you like: 我喜欢… / 我很喜欢…",
+          "Say what you dislike: 我不喜欢… / 我不太喜欢…",
+          "Talk about hobbies: 我的爱好是…",
+        ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Emma", text: "李伟，你喜欢做什么？有什么爱好？", translation: "Lǐ Wěi, nǐ xǐhuān zuò shénme? yǒu shénme àihào? / Li Wei, what do you like to do? What are your hobbies?" },
+          { speaker: "Li Wei", text: "我喜欢打篮球和听音乐。你呢？", translation: "wǒ xǐhuān dǎ lánqiú hé tīng yīnyuè. nǐ ne? / I like playing basketball and listening to music. What about you?" },
+          { speaker: "Emma", text: "我很喜欢学习中文！也喜欢看电影，特别是中国电影。", translation: "wǒ hěn xǐhuān xuéxí Zhōngwén! yě xǐhuān kàn diànyǐng, tèbié shì Zhōngguó diànyǐng. / I really like studying Chinese! I also like watching movies, especially Chinese films." },
+          { speaker: "Hana", text: "我不太喜欢运动，但是喜欢做饭。", translation: "wǒ bù tài xǐhuān yùndòng, dànshì xǐhuān zuò fàn. / I don't like sports very much, but I like cooking." },
+          { speaker: "Li Wei", text: "哇，你会做中国菜吗？", translation: "wā, nǐ huì zuò Zhōngguó cài ma? / Wow, can you make Chinese food?" },
+        ],
+        patternExamples: [
+          { pattern: "我喜欢 / 我很喜欢 / 我不喜欢 / 我不太喜欢 [verb/noun]", examples: ["我喜欢听音乐。(I like listening to music.)", "我很喜欢中国电影。(I really like Chinese movies.)", "我不喜欢运动。(I don't like sports.)", "我不太喜欢辣的食物。(I don't like spicy food very much.)"] },
+          { pattern: "我的爱好是[activity]。", examples: ["我的爱好是打篮球。(My hobby is playing basketball.)", "我的爱好是画画。(My hobby is drawing.)"] },
+        ],
+        cultureNote: "Chinese people commonly bond over food — '你吃了吗？' (Have you eaten?) is a greeting. Asking about hobbies is a popular topic among young people. 打篮球 (basketball), 看剧 (watching TV dramas), 打游戏 (gaming), and 旅游 (travel) are very popular hobbies in modern China.",
+        vocab: [
+          { term: "喜欢 (xǐhuān)", reading: "xǐhuān", meaning: "to like", example: "我喜欢听音乐。(I like listening to music.)" },
+          { term: "爱好 (àihào)", reading: "àihào", meaning: "hobby", example: "你有什么爱好？(What hobbies do you have?)" },
+          { term: "听音乐 (tīng yīnyuè)", reading: "tīng yīnyuè", meaning: "to listen to music", example: "我喜欢听音乐放松。" },
+          { term: "看电影 (kàn diànyǐng)", reading: "kàn diànyǐng", meaning: "to watch movies", example: "周末我喜欢看电影。" },
+          { term: "做饭 (zuò fàn)", reading: "zuò fàn", meaning: "to cook (literally: make rice/food)", example: "她很喜欢做饭。" },
+        ],
+        quiz: [
+          q("'我不太喜欢' means…", ["I hate","I don't like very much","I really like","I don't know"], 1, "likes"),
+          q("'爱好' means…", ["love","hobbies","sports","free time"], 1, "vocab"),
+          qFill("Complete: '我喜欢___音乐。' (listening to music)", ["听"], "hobbies"),
+          qReorder("Build: 'I like watching Chinese movies.'", ["我喜欢","特别是中国电影。","看电影，"], [0,2,1], "hobbies"),
         ],
       },
     ],
   },
-  // ── Colors (颜色) ──────────────────────────────────────────────────────────
+
   {
-    title: "Colors (颜色)",
-    levelLabel: "HSK1",
-    description: "Color vocabulary and describing objects in Mandarin.",
-    prereqTitles: ["Food & Drink (食物)"],
+    title: "吃饭 Chī Fàn",
+    levelLabel: "Beginner",
+    description: "Order food, talk about Chinese cuisine, and navigate a Chinese restaurant.",
+    prereqTitles: ["日常生活 Rìcháng Shēnghuó"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Basic Colors — 颜色",
-        objectives: ["Name 8 colors in Mandarin", "Describe objects using colors"],
-        grammar: `Colors in Mandarin use 色(sè) = color:
-红色(hóngsè) = red   蓝色(lánsè) = blue   黄色(huángsè) = yellow   绿色(lǜsè) = green
-白色(báisè) = white   黑色(hēisè) = black   橙色(chéngsè) = orange   紫色(zǐsè) = purple
-
-In conversation, 色 is often dropped: 红的(hóng de) = the red one
-Using colors to describe:
-红色的苹果 = red apple   蓝色的天空 = blue sky
-什么颜色？(shénme yánsè?) = What color?`,
-        reading: `颜色在生活中:
-天空是蓝色的。(The sky is blue.)
-草是绿色的。(Grass is green.)
-太阳是黄色的。(The sun is yellow.)
-中国国旗是红色和黄色的。(China's flag is red and yellow.)
-我最喜欢的颜色是蓝色。(My favorite color is blue.)`,
-        dialogue: [
-          { speaker: "A", text: "你最喜欢什么颜色？", translation: "What is your favorite color?" },
-          { speaker: "B", text: "我喜欢绿色，像森林一样。你呢？", translation: "I like green, like a forest. And you?" },
-          { speaker: "A", text: "我喜欢红色。红色很漂亮！", translation: "I like red. Red is very beautiful!" },
-          { speaker: "B", text: "你的包是什么颜色的？", translation: "What color is your bag?" },
+        title: "在餐厅 — At the Restaurant",
+        objectives: ["Order food and drinks in a Chinese restaurant", "Use measure words with food"],
+        warmUp: "Chinese menus can be overwhelming — hundreds of dishes! Have you tried any Chinese food? What's your favorite?",
+        canDo: [
+          "Get the waiter's attention: 服务员！",
+          "Order: 我要… / 来一份…",
+          "Ask what's good: 有什么好吃的？",
+          "Use basic measure words: 一碗、一盘、一杯",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Hana", text: "服务员！", translation: "fúwùyuán! / Waiter / Excuse me!" },
+          { speaker: "Li Wei", text: "来了！请问，要点什么？", translation: "lái le! qǐngwèn, yào diǎn shénme? / Coming! May I ask, what would you like to order?" },
+          { speaker: "Hana", text: "有什么好吃的推荐？我们是第一次来。", translation: "yǒu shénme hǎo chī de tuījiàn? wǒmen shì dìyī cì lái. / What do you recommend? This is our first time." },
+          { speaker: "Li Wei", text: "我们的招牌菜是宫保鸡丁，还有酸辣汤很受欢迎。", translation: "wǒmen de zhāopái cài shì gōngbǎo jīdīng, hái yǒu suānlà tāng hěn shòu huānyíng. / Our signature dish is Kung Pao chicken, and the hot and sour soup is also very popular." },
+          { speaker: "Emma", text: "好，来一份宫保鸡丁，一碗米饭，还有两碗酸辣汤。", translation: "hǎo, lái yī fèn gōngbǎo jīdīng, yī wǎn mǐfàn, hái yǒu liǎng wǎn suānlà tāng. / Okay, one portion Kung Pao chicken, one bowl of rice, and two bowls of hot and sour soup." },
+          { speaker: "Li Wei", text: "好的！请稍等。", translation: "hǎo de! qǐng shāo děng. / Alright! Please wait a moment." },
+        ],
+        patternExamples: [
+          { pattern: "来[measure word + 量词][dish]！ / 我要[dish]", examples: ["来一份宫保鸡丁！(One serving of Kung Pao chicken!)", "来两碗米饭。(Two bowls of rice.)", "我要一杯茶。(I want a cup of tea.)"] },
+          { pattern: "Measure words: 份 fèn (portions), 碗 wǎn (bowls), 杯 bēi (cups), 盘 pán (plates)", examples: ["一份饺子 (one portion of dumplings)", "一碗汤 (one bowl of soup)", "两杯水 (two glasses of water)"] },
+        ],
+        cultureNote: "In Chinese restaurants, you call the waiter by shouting '服务员！' — perfectly normal and not rude! Chinese dining is communal: dishes are placed in the center and everyone shares. The host is expected to order for the table and often pays for everyone — refusing to let someone pay can cause awkward social dynamics!",
         vocab: [
-          { term: "红色", reading: "hóngsè", meaning: "red", example: "红色的玫瑰。(Red roses.)" },
-          { term: "蓝色", reading: "lánsè", meaning: "blue", example: "蓝色的天空。(Blue sky.)" },
-          { term: "黄色", reading: "huángsè", meaning: "yellow", example: "黄色的香蕉。(Yellow banana.)" },
-          { term: "绿色", reading: "lǜsè", meaning: "green", example: "绿色的树。(Green trees.)" },
-          { term: "白色", reading: "báisè", meaning: "white", example: "白色的雪。(White snow.)" },
-          { term: "黑色", reading: "hēisè", meaning: "black", example: "黑色的猫。(Black cat.)" },
-          { term: "颜色", reading: "yánsè", meaning: "color", example: "你喜欢什么颜色？(What color do you like?)" },
+          { term: "服务员 (fúwùyuán)", reading: "fúwùyuán", meaning: "waiter / service staff", example: "服务员，买单！(Waiter, the check please!)" },
+          { term: "点 (diǎn)", reading: "diǎn", meaning: "to order (food)", example: "你要点什么？(What would you like to order?)" },
+          { term: "推荐 (tuījiàn)", reading: "tuījiàn", meaning: "to recommend", example: "你有什么推荐？(What do you recommend?)" },
+          { term: "一碗 (yī wǎn)", reading: "yī wǎn", meaning: "one bowl (measure word + bowl)", example: "一碗米饭。(One bowl of rice.)" },
+          { term: "好吃 (hǎo chī)", reading: "hǎo chī", meaning: "delicious (literally: good to eat)", example: "这个很好吃！(This is very delicious!)" },
         ],
         quiz: [
-          q("'红色' is…", ["blue","green","yellow","red"], 3, "colors-zh"),
-          q("'绿色' means…", ["blue","green","yellow","white"], 1, "colors-zh"),
-          q("'什么颜色？' asks…", ["What time?","What color?","How much?","How many?"], 1, "colors-zh"),
-          q("China's flag colors are…", ["红色和蓝色","红色和黄色","黄色和白色","红色和白色"], 1, "colors-zh"),
+          q("To get a waiter's attention in a Chinese restaurant, you say…", ["请！","谢谢！","服务员！","你好！"], 2, "restaurant"),
+          q("'一碗米饭' uses 碗 as a…", ["verb","adjective","measure word","question word"], 2, "measure-words"),
+          q("'好吃' literally means…", ["good food","tasty restaurant","good to eat","I'm hungry"], 2, "vocab"),
+          qFill("Complete: '来一___宫保鸡丁。' (one serving — use 份)", ["份"], "measure-words"),
         ],
       },
     ],
   },
-  // ── Time & Date (时间) ──────────────────────────────────────────────────────
+
   {
-    title: "Time & Date (时间)",
-    levelLabel: "HSK1",
-    description: "Tell the time, days of the week, and dates in Mandarin.",
-    prereqTitles: ["Colors (颜色)"],
+    title: "去哪里？Qù Nǎlǐ?",
+    levelLabel: "Beginner",
+    description: "Ask for directions, use transport, and navigate in a Mandarin-speaking city.",
+    prereqTitles: ["吃饭 Chī Fàn"],
     autoCompleteLevel: "",
     modules: [
       {
-        title: "Telling Time & Days — 时间和星期",
-        objectives: ["Tell the time in Mandarin", "Name days of the week and use date expressions"],
-        grammar: `Telling time:
-现在几点？(Xiànzài jǐ diǎn?) = What time is it now?
-现在三点。(Xiànzài sān diǎn.) = It's 3 o'clock.
-三点半 (sān diǎn bàn) = 3:30   三点一刻 (sān diǎn yī kè) = 3:15
-
-Days of the week: 星期 (xīngqī) + number
-星期一(Mon) 星期二(Tue) 星期三(Wed) 星期四(Thu) 星期五(Fri) 星期六(Sat) 星期天/日(Sun)
-
-Time expressions:
-今天(jīntiān) = today   明天(míngtiān) = tomorrow   昨天(zuótiān) = yesterday
-上午(shàngwǔ) = morning   下午(xiàwǔ) = afternoon   晚上(wǎnshang) = evening`,
-        reading: `我的一天:
-我每天早上七点起床。(I wake up at 7 every morning.)
-上午九点去上课。(I go to class at 9am.)
-下午三点放学。(School ends at 3pm.)
-晚上八点做作业。(I do homework at 8pm.)
-星期六和星期天不用上学。(No school on Saturday and Sunday.)`,
-        dialogue: [
-          { speaker: "A", text: "现在几点？", translation: "What time is it now?" },
-          { speaker: "B", text: "现在两点半。你有课吗？", translation: "It's 2:30. Do you have class?" },
-          { speaker: "A", text: "有，三点开始。今天是星期几？", translation: "Yes, it starts at 3. What day is today?" },
-          { speaker: "B", text: "今天是星期四。明天星期五，快到周末了！", translation: "Today is Thursday. Tomorrow is Friday, almost the weekend!" },
+        title: "怎么去？— How Do I Get There?",
+        objectives: ["Ask for and understand directions in Mandarin", "Name common transport and use 坐/骑/走"],
+        warmUp: "Imagine you're lost in Shanghai without Google Maps. You see a local. What Mandarin phrases would you need?",
+        canDo: [
+          "Ask directions: 请问，…怎么走？",
+          "Understand: 往左/右转、一直走、在…旁边",
+          "Say transport method: 坐地铁、骑自行车、走路",
         ],
+        grammar: "",
+        reading: "",
+        dialogue: [
+          { speaker: "Emma", text: "请问，天安门广场怎么走？", translation: "qǐngwèn, Tiān'ānmén Guǎngchǎng zěnme zǒu? / Excuse me, how do I get to Tiananmen Square?" },
+          { speaker: "Li Wei", text: "你可以坐地铁，坐一号线，在天安门东站下车。", translation: "nǐ kěyǐ zuò dìtiě, zuò yī hào xiàn, zài Tiān'ānmén Dōng Zhàn xià chē. / You can take the subway — take Line 1, get off at Tiananmen East Station." },
+          { speaker: "Emma", text: "地铁站在哪里？", translation: "dìtiě zhàn zài nǎlǐ? / Where is the subway station?" },
+          { speaker: "Li Wei", text: "一直往前走，在红绿灯那里往左转，就在银行旁边。", translation: "yīzhí wǎng qián zǒu, zài hónglǜdēng nàlǐ wǎng zuǒ zhuǎn, jiù zài yínháng pángbiān. / Go straight ahead, turn left at the traffic light, it's right next to the bank." },
+          { speaker: "Emma", text: "谢谢！大概多远？", translation: "xièxiè! dàgài duō yuǎn? / Thank you! About how far?" },
+          { speaker: "Li Wei", text: "走路大概五分钟。", translation: "zǒulù dàgài wǔ fēnzhōng. / About a 5-minute walk." },
+        ],
+        patternExamples: [
+          { pattern: "请问，[place]怎么走？", examples: ["请问，地铁站怎么走？(Excuse me, how do I get to the subway station?)", "请问，厕所在哪里？(Excuse me, where is the toilet?)"] },
+          { pattern: "往[左/右]转 / 一直走 / 在[landmark]旁边", examples: ["往左转 (turn left)", "一直走 (go straight)", "在银行旁边 (next to the bank)", "在红绿灯那里 (at the traffic light)"] },
+          { pattern: "坐地铁/公共汽车 / 骑自行车 / 走路", examples: ["坐地铁去 (go by subway)", "骑自行车去 (go by bicycle)", "走路大概十分钟 (about 10 minutes on foot)"] },
+        ],
+        cultureNote: "China has the world's largest subway network — Shanghai alone has over 500 stations! The subway (地铁 dìtiě) is the most efficient way to navigate Chinese cities. Most stations have signs in both Chinese and English, and ticket machines often have an English option. Didi (滴滴) is China's equivalent of Uber.",
         vocab: [
-          { term: "现在", reading: "xiànzài", meaning: "now / currently", example: "现在几点？(What time is it now?)" },
-          { term: "几点", reading: "jǐ diǎn", meaning: "what time / how many o'clock", example: "你几点睡觉？(What time do you sleep?)" },
-          { term: "今天", reading: "jīntiān", meaning: "today", example: "今天天气很好。(The weather is great today.)" },
-          { term: "明天", reading: "míngtiān", meaning: "tomorrow", example: "明天见！(See you tomorrow!)" },
-          { term: "昨天", reading: "zuótiān", meaning: "yesterday", example: "昨天我去了图书馆。(Yesterday I went to the library.)" },
-          { term: "星期", reading: "xīngqī", meaning: "week / day of week", example: "这个星期你有空吗？(Are you free this week?)" },
-          { term: "周末", reading: "zhōumò", meaning: "weekend", example: "周末你做什么？(What do you do on weekends?)" },
+          { term: "请问 (qǐngwèn)", reading: "qǐngwèn", meaning: "excuse me / may I ask", example: "请问，厕所在哪里？" },
+          { term: "怎么走 (zěnme zǒu)", reading: "zěnme zǒu", meaning: "how to get there (literally: how to walk)", example: "地铁站怎么走？" },
+          { term: "一直走 (yīzhí zǒu)", reading: "yīzhí zǒu", meaning: "go straight", example: "一直走，然后左转。" },
+          { term: "坐地铁 (zuò dìtiě)", reading: "zuò dìtiě", meaning: "take the subway", example: "我每天坐地铁上班。" },
+          { term: "旁边 (pángbiān)", reading: "pángbiān", meaning: "next to / beside", example: "在超市旁边。(Next to the supermarket.)" },
         ],
         quiz: [
-          q("'现在几点？' means…", ["What day is it?","What time is it?","What is today?","When are you free?"], 1, "time-zh"),
-          q("'三点半' is…", ["3:00","3:15","3:30","3:45"], 2, "time-zh"),
-          q("'明天' means…", ["yesterday","today","tomorrow","next week"], 2, "time-zh"),
-          q("Saturday in Chinese is…", ["星期五","星期六","星期天","星期四"], 1, "days-zh"),
+          q("'怎么走' means…", ["how far is it","how do I get there","where is it","how long does it take"], 1, "directions"),
+          q("'往左转' means…", ["go straight","turn right","turn left","go back"], 2, "directions"),
+          q("'坐地铁' means…", ["ride a bicycle","take the subway","walk","take a bus"], 1, "transport"),
+          qFill("Complete: '___问，超市怎么走？' (excuse me)", ["请"], "polite"),
         ],
       },
     ],
   },
 ];
 
-// ─── Achievements ──────────────────────────────────────────────────────────────
+// ─── Achievements ─────────────────────────────────────────────────────────────
 
 const achievements = [
-  { code: "first_lesson", title: "First Lesson Completed", description: "Complete your first module.", icon: "sprout", criteria: { type: "modules_completed", value: 1 } },
-  { code: "streak_7", title: "7-Day Streak", description: "Keep a 7-day learning streak.", icon: "flame", criteria: { type: "streak", value: 7 } },
-  { code: "streak_30", title: "30-Day Streak", description: "Keep a 30-day learning streak.", icon: "flame", criteria: { type: "streak", value: 30 } },
-  { code: "flashcards_50", title: "50 Flashcards Reviewed", description: "Review 50 flashcards.", icon: "cards", criteria: { type: "flashcards_reviewed", value: 50 } },
-  { code: "flashcards_100", title: "100 Flashcards Reviewed", description: "Review 100 flashcards.", icon: "cards", criteria: { type: "flashcards_reviewed", value: 100 } },
-  { code: "xp_500", title: "500 XP Earned", description: "Earn a total of 500 XP.", icon: "star", criteria: { type: "total_xp", value: 500 } },
-  { code: "xp_1000", title: "1000 XP Earned", description: "Earn a total of 1000 XP.", icon: "star", criteria: { type: "total_xp", value: 1000 } },
-  { code: "modules_10", title: "Dedicated Learner", description: "Complete 10 modules.", icon: "trophy", criteria: { type: "modules_completed", value: 10 } },
-  { code: "conversation_master", title: "Conversation Master", description: "Complete 5 AI conversations.", icon: "chat", criteria: { type: "conversations_completed", value: 5 } },
-  { code: "hiragana_complete", title: "Hiragana Master", description: "Complete all Hiragana modules.", icon: "star", criteria: { type: "modules_completed", value: 11 } },
+  { code: "first_module",        title: "First Steps",         description: "Complete your first module.",                     icon: "star",    criteria: { type: "modules_completed",       value: 1  } },
+  { code: "five_modules",        title: "On a Roll",           description: "Complete 5 modules.",                             icon: "fire",    criteria: { type: "modules_completed",       value: 5  } },
+  { code: "twenty_modules",      title: "Dedicated Learner",   description: "Complete 20 modules.",                            icon: "medal",   criteria: { type: "modules_completed",       value: 20 } },
+  { code: "first_streak",        title: "Habit Builder",       description: "Maintain a 3-day learning streak.",               icon: "flame",   criteria: { type: "streak_days",             value: 3  } },
+  { code: "week_streak",         title: "Week Warrior",        description: "Maintain a 7-day learning streak.",               icon: "trophy",  criteria: { type: "streak_days",             value: 7  } },
+  { code: "xp_100",              title: "XP Starter",          description: "Earn 100 XP.",                                    icon: "zap",     criteria: { type: "total_xp",               value: 100} },
+  { code: "xp_500",              title: "XP Collector",        description: "Earn 500 XP.",                                    icon: "zap",     criteria: { type: "total_xp",               value: 500} },
+  { code: "perfect_quiz",        title: "Perfect Score",       description: "Get 100% on a quiz.",                             icon: "check",   criteria: { type: "perfect_quiz",            value: 1  } },
+  { code: "conversation_first",  title: "Conversation Starter","description": "Complete your first AI conversation.",           icon: "chat",    criteria: { type: "conversations_completed", value: 1  } },
+  { code: "conversation_master", title: "Conversation Master", description: "Complete 5 AI conversations.",                    icon: "chat",    criteria: { type: "conversations_completed", value: 5  } },
+  { code: "hiragana_complete",   title: "Hiragana Master",     description: "Complete all Hiragana modules.",                  icon: "star",    criteria: { type: "modules_completed",       value: 11 } },
 ];
 
 // ─── Seeder ────────────────────────────────────────────────────────────────────
@@ -2610,9 +2304,13 @@ async function main() {
             title: m.title,
             orderIndex: modOrder++,
             objectives: JSON.stringify(m.objectives),
+            warmUp: m.warmUp ?? "",
+            canDo: JSON.stringify(m.canDo ?? []),
             grammar: m.grammar,
             reading: m.reading,
             dialogue: JSON.stringify(m.dialogue),
+            patternExamples: JSON.stringify(m.patternExamples ?? []),
+            cultureNote: m.cultureNote ?? "",
             xpReward: 50,
           },
         });
